@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "com.bci4kids.bciessentials": "https://github.com/kirtonBCIlab/bci-essentials-unity.git?path=/Packages/com.bci4kids.bciessentials",
     "com.labstreaminglayer.lsl4unity": "https://github.com/labstreaminglayer/LSL4Unity.git",
     "com.unity.collab-proxy": "2.2.0",
     "com.unity.feature.2d": "2.0.0",
