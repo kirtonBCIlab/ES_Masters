@@ -192,19 +192,19 @@ namespace BCIEssentials.ControllerBehaviors
             _rotateBack.y = -90f;
             
             mainCam.transform.Rotate(_rotateAway);
-             StartCoroutine(DisplayTextOnScreen("+"));
-            _restingState = true;
-            _open = true;
+            StartCoroutine(DisplayTextOnScreen("+"));
+           // _restingState = true;
+            //_open = true;
             //1 minute eyes open Resting State 
-            yield return new WaitForSecondsRealtime(60f); //60
-            _open = false;
-            _closed = true;
+            //yield return new WaitForSecondsRealtime(60f); //60
+            //_open = false;
+            //_closed = true;
         
-            StartCoroutine(DisplayTextOnScreen("Close"));
+            //StartCoroutine(DisplayTextOnScreen("Close"));
             //1 minute eyes closed Resting State 
-            yield return new WaitForSecondsRealtime(60f); //60
-            _restingState = false;
-            _closed = false;
+            //yield return new WaitForSecondsRealtime(60f); //60
+            //_restingState = false;
+            //_closed = false;
             mainCam.transform.Rotate(_rotateBack);
 
             //set initial color and contrast
