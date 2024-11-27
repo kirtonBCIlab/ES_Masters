@@ -15,7 +15,7 @@ namespace BCIEssentials.StimulusEffects
         public Renderer _renderer;
 
         [SerializeField]
-        public Material[] materialList;
+        public Material materialList;
 
         [Header("Flash Settings")]
         private Color _flashOnColor = Color.red;
@@ -31,13 +31,23 @@ namespace BCIEssentials.StimulusEffects
 
         public enum ContrastLevel
         {
-            Max,
-            OneStepDown,
-            TwoStepsDown,
-            Min
+            Contrast1,
+            Contrast2,
+            Contrast3,
+            Contrast4
         }
+
+        public enum Size
+        {
+            Size1,
+            Size2,
+            Size3,
+            Size4
+        }
+
         public ContrastLevel _contrastLevel;
-        public Material[] setMaterials;
+        public Size _size;
+        public Material setMaterial;
 
         private void Start()
         {
@@ -52,7 +62,7 @@ namespace BCIEssentials.StimulusEffects
                 Debug.LogWarning($"No material assigned to renderer component on {gameObject.name}.");
             }
 
-            _renderer.material = materialList[6];
+            _renderer.material = materialList;
             AssignMaterialColor(_flashOffColor);
         }
 
@@ -122,36 +132,60 @@ namespace BCIEssentials.StimulusEffects
             _flashOnColor = colorContrast.Grey();
         }
 
+        private void SizeController()
+        {
+            Vector3 newSize = Vector3.one; // Default size is (1, 1, 1)
+
+            switch (_size)
+            {
+                case Size.Size1:
+                    newSize = new Vector3(0.5f, 0.5f, 0.5f); // Smaller size
+                    break;
+                case Size.Size2:
+                    newSize = new Vector3(1f, 1f, 1f); // Default size
+                    break;
+                case Size.Size3:
+                    newSize = new Vector3(1.5f, 1.5f, 1.5f); // Larger size
+                    break;
+                case Size.Size4:
+                    newSize = new Vector3(2f, 2f, 2f); // Even larger size
+                    break;
+            }
+
+            // Apply the size change
+            transform.localScale = newSize;
+        }   
+
+
+
         public int ConvertContrastLevel(ContrastLevel _contrastLevel)
         {
-            if(_contrastLevel == ContrastLevel.Max)
+            if(_contrastLevel == ContrastLevel.Contrast1)
                 return 100;
-            else if (_contrastLevel == ContrastLevel.OneStepDown)
+            else if (_contrastLevel == ContrastLevel.Contrast2)
                 return 50;
-            else if (_contrastLevel == ContrastLevel.TwoStepsDown)
+            else if (_contrastLevel == ContrastLevel.Contrast3)
                 return 25;
-            else if (_contrastLevel == ContrastLevel.Min)
+            else if (_contrastLevel == ContrastLevel.Contrast4)
                 return 10;
             else return 0;
         }
 
-
-        private void AssignMaterialColor(Color color)
+        public void AssignMaterialColor(Color color)
         {
-            _renderer.material.color = color;
+            _renderer.material.SetColor("_color", color);
         }
 
         public void SetContrast(ContrastLevel x)
         {
             _contrastLevel = x;
             ContrastController();
-            if(setMaterials[0] != null)
-            {
-                setMaterials[0] = materialList[6]; 
-                setMaterials[1] = null;
-                _renderer.materials = setMaterials;
-                _flashOffColor = Color.black;
-            }
+        }
+
+        public void SetSize(Size x)
+        {
+            _size = x;
+            SizeController();
         }
     }
  }

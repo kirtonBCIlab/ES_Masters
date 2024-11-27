@@ -407,9 +407,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1702854012}
-  - component: {fileID: 1702854011}
   - component: {fileID: 1702854010}
   - component: {fileID: 1702854015}
+  - component: {fileID: 1702854017}
   - component: {fileID: 1702854013}
   - component: {fileID: 1702854016}
   m_Layer: 0
@@ -435,40 +435,6 @@ MonoBehaviour:
   _numRows: 1
   _numColumns: 1
   _spacing: {x: 1, y: 1}
---- !u!114 &1702854011
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1702854009}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0f1658f388bda412abc92a8c7c45d2f3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _selfRegister: 1
-  _selfRegisterAsActive: 0
-  setup: {fileID: 1702854010}
-  setupRequired: 1
-  targetFrameRate: 144
-  _hotkeysEnabled: 1
-  _selectableSPOs: []
-  windowLength: 1
-  interWindowInterval: 0
-  numTrainingSelections: 0
-  numTrainWindows: 3
-  pauseBeforeTraining: 2
-  trainTargetPresentationTime: 3
-  trainBreak: 1
-  shamFeedback: 0
-  trainTargetPersistent: 0
-  trainTarget: 99
-  myTag: BCI
-  setFreqFlash: 0
-  realFreqFlash: 0
-  mainCam: {fileID: 519420031}
-  _displayText: {fileID: 540361293}
 --- !u!4 &1702854012
 Transform:
   m_ObjectHideFlags: 0
@@ -511,7 +477,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ffa8dfff27ddf714abcbba57f76469d1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _lslMarkerStream: {fileID: 0}
+  _lslMarkerStream: {fileID: 1702854013}
   _lslResponseStream: {fileID: 1702854016}
   _dontDestroyActiveInstance: 1
 --- !u!114 &1702854016
@@ -529,6 +495,40 @@ MonoBehaviour:
   _targetStreamName: PythonResponse
   _resolveTimeout: 1
   _pollFrequency: 0
+--- !u!114 &1702854017
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1702854009}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6050c11687d3c184091b19a81764ea9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _selfRegister: 1
+  _selfRegisterAsActive: 0
+  setup: {fileID: 1702854010}
+  setupRequired: 1
+  targetFrameRate: 100
+  _hotkeysEnabled: 1
+  _selectableSPOs: []
+  windowLength: 1
+  interWindowInterval: 0
+  numTrainingSelections: 0
+  numTrainWindows: 3
+  pauseBeforeTraining: 2
+  trainTargetPresentationTime: 3
+  trainBreak: 1
+  shamFeedback: 0
+  trainTargetPersistent: 0
+  trainTarget: 99
+  myTag: BCI
+  setFreqFlash: 0
+  realFreqFlash: 0
+  mainCam: {fileID: 519420031}
+  _displayText: {fileID: 540361293}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

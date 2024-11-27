@@ -46,8 +46,9 @@ namespace BCIEssentials.ControllerBehaviors
 
             //set first frequency
             setFreqFlash = 10;
-            OnStimulusRunComplete();
+           // OnStimulusRunComplete();
             PopulateObjectList();
+            RunStimulus();
         }
 
         public override void PopulateObjectList(SpoPopulationMethod populationMethod = SpoPopulationMethod.Tag)
@@ -140,32 +141,6 @@ namespace BCIEssentials.ControllerBehaviors
             }
             yield return null;
         }
-
-        public void StopStimulusRun(int j, int l)
-        {
-      
-            ColorFlashEffect3 spoEffect = _selectableSPOs[0].GetComponent<ColorFlashEffect3>();
-
-                if (spoEffect != null)
-                {
-                    if (l == 0)
-                       SetMaterial(1);
-                    else if (l == 1)
-                        SetMaterial(2);
-                    else if (l == 2)
-                        SetMaterial(3);
-                    else if (l == 3)
-                        SetMaterial(4);
-                    else if (l == 4)
-                        SetMaterial(5);
-                    else if (l == 5)
-                        SetMaterial(6);
-
-                    OnStimulusRunComplete();
-                    PopulateObjectList();
-                }
-            }
-        
             
         protected override IEnumerator RunStimulus()
         {
@@ -178,18 +153,6 @@ namespace BCIEssentials.ControllerBehaviors
             
             mainCam.transform.Rotate(_rotateAway);
             StartCoroutine(DisplayTextOnScreen("+"));
-           // _restingState = true;
-            //_open = true;
-            //1 minute eyes open Resting State 
-            //yield return new WaitForSecondsRealtime(60f); //60
-            //_open = false;
-            //_closed = true;
-        
-            //StartCoroutine(DisplayTextOnScreen("Close"));
-            //1 minute eyes closed Resting State 
-            //yield return new WaitForSecondsRealtime(60f); //60
-            //_restingState = false;
-            //_closed = false;
             mainCam.transform.Rotate(_rotateBack);
 
             //set initial color and contrast
@@ -205,79 +168,33 @@ namespace BCIEssentials.ControllerBehaviors
             mainCam.transform.Rotate(_rotateAway);
             _offMessages = false;
 
-            for(var l = 0 ; l < 7; l++)
-            //this loops through all 7 stimuli  
+            for(var l = 0 ; l < 12; l++)
             {
-                for(var k = 0; k < 3; k++)
+                for(var i = 0; i <100*10; i++) //(StimulusRunning)
+                //the number that i is less than is the amount of seconds to flash for 
+                //144 = 1 second (frame rate is 144 Hz) so 12 seconds = i < 144*12
                 {
-                //do this 3 times so each stimulus is played at all 3 frequencies 
-                    for(var j = 0; j < 3; j++)
-                    //do this for loop 3 times (12 seconds on 8 seconds off * 3)
-                    {
-                        for(var i = 0; i <144*12; i++) //(StimulusRunning)
-                        //the number that i is less than is the amount of seconds to flash for 
-                        //144 = 1 second (frame rate is 144 Hz) so 12 seconds = i < 144*12
-                        {
-                            yield return OnStimulusRunBehavior();
-                        }
-
-                        //rotate the camera away from the stimuli objects when they are off
-                        mainCam.transform.Rotate(_rotateAway);
-                        _offMessages = true;
-
-                        //control the 3 second countdown during every 8 seconds off
-                        if (k <= 2)
-                        {
-                            if(k < 2 || (k ==2 && j < 2))
-                            {   
-                                yield return new WaitForSecondsRealtime(5f); //5
-                                StartCoroutine(DisplayTextOnScreen("3"));
-                                yield return new WaitForSecondsRealtime(3f); 
-                            }
-                        }
-
-                        //rotate the camera back to facing the stimulus objects 
-                        mainCam.transform.Rotate(_rotateBack);
-                        _offMessages = false;
-
-                        //change the frequency of the stimulus object
-                        if (j == 2)
-                        {
-                            if (k == 0)
-                            {
-                                StopStimulusRun(j, 0);
-                            }
-                            if (k == 1)
-                            {
-                                StopStimulusRun(j+1, 0);
-                            }
-                        }
-
-                    }
+                    yield return OnStimulusRunBehavior();
                 }
 
+                //rotate the camera away from the stimuli objects when they are off
                 mainCam.transform.Rotate(_rotateAway);
-
-                //wait 20 seconds between sets and display the countdown 
-                //the first call to StartCountDown displays a message to respond to the survey
-                //(immediately after the flashing stops). And then wait 15 seconds before starting the 5 second countdown. 
                 _offMessages = true;
-                StartCoroutine(DisplayTextOnScreen("Survey"));
-                yield return new WaitForSecondsRealtime(15f);  //15
 
-                if(l != 6)
+                if(l != 11)
                 {
-                    StartCoroutine(DisplayTextOnScreen("5"));
-                    yield return new WaitForSecondsRealtime(4f);
+                    yield return new WaitForSecondsRealtime(2f); //5
+                    StartCoroutine(DisplayTextOnScreen("3"));
+                    yield return new WaitForSecondsRealtime(3f); 
                 }
 
-                //when StopStimulusRun is called with 6, the frequency is set to 9.6 and the stimulus contrast/texture is changed
-                StopStimulusRun(6, l); 
-                yield return new WaitForSecondsRealtime(1f);
-                mainCam.transform.Rotate(_rotateBack); 
+                SetMaterial(l+1);
+                
+                //rotate the camera back to facing the stimulus objects 
+                mainCam.transform.Rotate(_rotateBack);
                 _offMessages = false;
                         
-                if(l == 6)
+                if(l == 11)
                 {
                     mainCam.transform.Rotate(_rotateAway);
                     _offMessages = true;
@@ -367,38 +284,101 @@ namespace BCIEssentials.ControllerBehaviors
                 _displayText.text = "";
             }
         } 
+
         private void SetMaterial(int key)
         {
             ColorFlashEffect3 spoEffect = _selectableSPOs[0].GetComponent<ColorFlashEffect3>();
             if (orderDict.TryGetValue(key, out string material))
             {       
-                if (material == "MinContrast")
+                if (material == "Contrast1Size1")
                 {
-                    spoEffect.SetContrast(ColorFlashEffect3.ContrastLevel.Min);
-                    stimulusString = ", MinContrast";
+                    spoEffect.SetContrast(ColorFlashEffect3.ContrastLevel.Contrast1);
+                    spoEffect.SetSize(ColorFlashEffect3.Size.Size1);
+                    stimulusString = ", Contrast1 Size1";
                 }
-                else if (material == "MaxContrast")
+                else if (material == "Contrast1Size2")
                 {
-                    spoEffect.SetContrast(ColorFlashEffect3.ContrastLevel.Max);
-                    stimulusString = ", MaxContrast";
+                    spoEffect.SetContrast(ColorFlashEffect3.ContrastLevel.Contrast1);
+                    spoEffect.SetSize(ColorFlashEffect3.Size.Size2);
+                    stimulusString = ", Contrast1 Size2";
+                }
+                else if (material == "Contrast1Size3")
+                {
+                    spoEffect.SetContrast(ColorFlashEffect3.ContrastLevel.Contrast1);
+                    spoEffect.SetSize(ColorFlashEffect3.Size.Size3);
+                    stimulusString = ", Contrast1 Size3";
+                }
+                else if (material == "Contrast2Size1")
+                {
+                    spoEffect.SetContrast(ColorFlashEffect3.ContrastLevel.Contrast2);
+                    spoEffect.SetSize(ColorFlashEffect3.Size.Size1);
+                    stimulusString = ", Contrast2 Size1";
+                }
+                else if (material == "Contrast2Size2")
+                {
+                    spoEffect.SetContrast(ColorFlashEffect3.ContrastLevel.Contrast2);
+                    spoEffect.SetSize(ColorFlashEffect3.Size.Size2);
+                    stimulusString = ", Contrast2 Size2";
+                }
+                else if (material == "Contrast2Size3")
+                {
+                    spoEffect.SetContrast(ColorFlashEffect3.ContrastLevel.Contrast2);
+                    spoEffect.SetSize(ColorFlashEffect3.Size.Size3);
+                    stimulusString = ", Contrast2 Size3";
+                }
+                else if (material == "Contrast3Size1")
+                {
+                    spoEffect.SetContrast(ColorFlashEffect3.ContrastLevel.Contrast3);
+                    spoEffect.SetSize(ColorFlashEffect3.Size.Size1);
+                    stimulusString = ", Contrast3 Size1";
+                }
+                else if (material == "Contrast3Size2")
+                {
+                    spoEffect.SetContrast(ColorFlashEffect3.ContrastLevel.Contrast3);
+                    spoEffect.SetSize(ColorFlashEffect3.Size.Size2);
+                    stimulusString = ", Contrast3 Size2";
+                }
+                else if (material == "Contrast3Size3")
+                {
+                    spoEffect.SetContrast(ColorFlashEffect3.ContrastLevel.Contrast3);
+                    spoEffect.SetSize(ColorFlashEffect3.Size.Size3);
+                    stimulusString = ", Contrast3 Size3";
+                }
+                else if (material == "Contrast4Size1")
+                {
+                    spoEffect.SetContrast(ColorFlashEffect3.ContrastLevel.Contrast4);
+                    spoEffect.SetSize(ColorFlashEffect3.Size.Size1);
+                    stimulusString = ", Contrast4 Size1";
+                }
+                else if (material == "Contrast4Size2")
+                {
+                    spoEffect.SetContrast(ColorFlashEffect3.ContrastLevel.Contrast4);
+                    spoEffect.SetSize(ColorFlashEffect3.Size.Size2);
+                    stimulusString = ", Contrast4 Size2";
+                }
+                else if (material == "Contrast4Size3")
+                {
+                    spoEffect.SetContrast(ColorFlashEffect3.ContrastLevel.Contrast4);
+                    spoEffect.SetSize(ColorFlashEffect3.Size.Size3);
+                    stimulusString = ", Contrast4 Size3";
                 }
             }
         }
 
         private void Randomize()
         {
-                orderDict.Add(0, "Contrast1_Size1");
-                orderDict.Add(1, "Contrast1_Size2");
-                orderDict.Add(2, "Contrast1_Size3");
-                orderDict.Add(3, "Contrast2_Size1");
-                orderDict.Add(4, "Contrast2_Size2");
-                orderDict.Add(5, "Contrast2_Size3");
-                orderDict.Add(6, "Contrast3_Size1");
-                orderDict.Add(7, "Contrast3_Size2");
-                orderDict.Add(8, "Contrast3_Size3");
-                orderDict.Add(9, "Contrast4_Size1");
-                orderDict.Add(10, "Contrast4_Size2");
-                orderDict.Add(11, "Contrast4_Size3");
+                orderDict.Add(0, "Contrast1Size1");
+                orderDict.Add(1, "Contrast1Size2");
+                orderDict.Add(2, "Contrast1Size3");
+                orderDict.Add(3, "Contrast2Size1");
+                orderDict.Add(4, "Contrast2Size2");
+                orderDict.Add(5, "Contrast2Size3");
+                orderDict.Add(6, "Contrast3Size1");
+                orderDict.Add(7, "Contrast3Size2");
+                orderDict.Add(8, "Contrast3Size3");
+                orderDict.Add(9, "Contrast4Size1");
+                orderDict.Add(10, "Contrast4Size2");
+                orderDict.Add(11, "Contrast4Size3");  
 
 
                 System.Random random = new System.Random();
