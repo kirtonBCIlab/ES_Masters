@@ -5,9 +5,6 @@ using System.Collections.Generic;
 
 namespace BCIEssentials.StimulusEffects
 {
-      /// <summary>
-    /// Assign or Flash a renderers material color.
-    /// </summary>
     public class ColorFlashEffect3 : StimulusEffect
     {
         [SerializeField]
@@ -42,13 +39,11 @@ namespace BCIEssentials.StimulusEffects
             Size1,
             Size2,
             Size3,
-            Size4
         }
 
         public ContrastLevel _contrastLevel;
         public Size _size;
-        public Material setMaterial;
-
+    
         private void Start()
         {
             if (_renderer == null && !gameObject.TryGetComponent(out _renderer))
@@ -125,7 +120,6 @@ namespace BCIEssentials.StimulusEffects
 /// </summary>
         private void ContrastController()
         {
-            //_flashOffColor = Color.black;
             ColorContrast colorContrast = GetComponent<ColorContrast>();
             int contrastIntValue = ConvertContrastLevel(_contrastLevel);
             colorContrast.SetContrast(contrastIntValue);
@@ -147,16 +141,11 @@ namespace BCIEssentials.StimulusEffects
                 case Size.Size3:
                     newSize = new Vector3(1.5f, 1.5f, 1.5f); // Larger size
                     break;
-                case Size.Size4:
-                    newSize = new Vector3(2f, 2f, 2f); // Even larger size
-                    break;
             }
 
             // Apply the size change
             transform.localScale = newSize;
         }   
-
-
 
         public int ConvertContrastLevel(ContrastLevel _contrastLevel)
         {
