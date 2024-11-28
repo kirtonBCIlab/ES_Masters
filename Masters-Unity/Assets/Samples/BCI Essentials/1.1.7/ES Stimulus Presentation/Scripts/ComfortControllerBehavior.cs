@@ -21,7 +21,6 @@ namespace BCIEssentials.ControllerBehaviors
         private int[] frame_off_count = new int[99];
         private int[] frame_on_count = new int[99];
 
-        //start of emily stuff
         public Camera mainCam;
         public Text _displayText;
         private bool _offMessages;
@@ -46,7 +45,6 @@ namespace BCIEssentials.ControllerBehaviors
 
             //set first frequency
             setFreqFlash = 10;
-           // OnStimulusRunComplete();
             PopulateObjectList();
             RunStimulus();
         }
@@ -144,87 +142,75 @@ namespace BCIEssentials.ControllerBehaviors
             
         protected override IEnumerator RunStimulus()
         {
-            //setup variables for camera rotation 
-            var _rotateAway = Vector3.zero;
-            _rotateAway.y = 90f;
-
-            var _rotateBack = Vector3.zero;
-            _rotateBack.y = -90f;
-            
-            mainCam.transform.Rotate(_rotateAway);
-            StartCoroutine(DisplayTextOnScreen("+"));
-            mainCam.transform.Rotate(_rotateBack);
-
-            //set initial color and contrast
-            ColorFlashEffect3 spoEffect = _selectableSPOs[0].GetComponent<ColorFlashEffect3>();
-            SetMaterial(0);
-            stimulusString = ", "  + orderDict[0];
-
-            //5 seconds count down before starting
-            _offMessages = true;                    
-            mainCam.transform.Rotate(_rotateBack);
-            StartCoroutine(DisplayTextOnScreen("5"));
-            yield return new WaitForSecondsRealtime(5f);
-            mainCam.transform.Rotate(_rotateAway);
-            _offMessages = false;
-
-            for(var l = 0 ; l < 12; l++)
+            for (var timesShown = 0; timesShown < 2; timesShown++)
             {
-                for(var i = 0; i <100*10; i++) //(StimulusRunning)
-                //the number that i is less than is the amount of seconds to flash for 
-                //144 = 1 second (frame rate is 144 Hz) so 12 seconds = i < 144*12
-                {
-                    yield return OnStimulusRunBehavior();
-                }
+                //setup variables for camera rotation 
+                var _rotateAway = Vector3.zero;
+                _rotateAway.y = 90f;
 
-                //rotate the camera away from the stimuli objects when they are off
-                mainCam.transform.Rotate(_rotateAway);
-                _offMessages = true;
-
-                if(l != 11)
-                {
-                    yield return new WaitForSecondsRealtime(2f); //5
-                    StartCoroutine(DisplayTextOnScreen("3"));
-                    yield return new WaitForSecondsRealtime(3f); 
-                }
-
-                SetMaterial(l+1);
+                var _rotateBack = Vector3.zero;
+                _rotateBack.y = -90f;
                 
-                //rotate the camera back to facing the stimulus objects 
+                mainCam.transform.Rotate(_rotateAway);
+                StartCoroutine(DisplayTextOnScreen("+"));
                 mainCam.transform.Rotate(_rotateBack);
+
+                //set initial color and contrast
+                ColorFlashEffect3 spoEffect = _selectableSPOs[0].GetComponent<ColorFlashEffect3>();
+                SetMaterial(0);
+                stimulusString = ", "  + orderDict[0];
+
+                //5 seconds count down before starting
+                _offMessages = true;                    
+                mainCam.transform.Rotate(_rotateBack);
+                StartCoroutine(DisplayTextOnScreen("5"));
+                yield return new WaitForSecondsRealtime(5f);
+                mainCam.transform.Rotate(_rotateAway);
                 _offMessages = false;
-                        
-                if(l == 11)
+
+                for(var l = 0 ; l < 12; l++)
                 {
+                    for(var i = 0; i <100*10; i++) //(StimulusRunning)
+                    //the number that i is less than is the amount of seconds to flash for 
+                    //100 = 1 second (frame rate is 144 Hz) so 12 seconds = i < 144*12
+                    {
+                        yield return OnStimulusRunBehavior();
+                    }
+
+                    //rotate the camera away from the stimuli objects when they are off
                     mainCam.transform.Rotate(_rotateAway);
                     _offMessages = true;
-                    yield return new WaitForSecondsRealtime(8f);
-                    StartCoroutine(DisplayTextOnScreen("End"));
+
+                    //if(l != 11)
+                    //{
                     yield return new WaitForSecondsRealtime(2f);
+                    StartCoroutine(DisplayTextOnScreen("3"));
+                    yield return new WaitForSecondsRealtime(3f); 
+                    //}
+
+                    SetMaterial(l+1);
+                    
+                    //rotate the camera back to facing the stimulus objects 
+                    mainCam.transform.Rotate(_rotateBack);
                     _offMessages = false;
-
-                    _restingState = true;
-                    _open = true;
-                    StartCoroutine(DisplayTextOnScreen("+"));
-
-                    //1 minute eyes open Resting State 
-                    yield return new WaitForSecondsRealtime(60f); //60
-                    _open = false;
-                    _closed = true;
-
-                    StartCoroutine(DisplayTextOnScreen("Close"));
-
-                    //1 minutes eye closed Resting State 
-                    yield return new WaitForSecondsRealtime(60f); //60
-                    _restingState = false;
-                    _closed = false;
-
-                    StartCoroutine(DisplayTextOnScreen("EndOfSession"));
-                    StopCoroutineReference(ref _runStimulus);
                 }
+                //Re-randomize stmulus order to show them again
+                Randomize();
             }
-                StopCoroutineReference(ref _runStimulus);
-                StopCoroutineReference(ref _sendMarkers);
+
+            //end of presentation messages
+            mainCam.transform.Rotate(_rotateAway);
+            _offMessages = true;
+            yield return new WaitForSecondsRealtime(8f);
+            StartCoroutine(DisplayTextOnScreen("End"));
+            yield return new WaitForSecondsRealtime(2f);
+            _offMessages = false;
+
+            StartCoroutine(DisplayTextOnScreen("EndOfSession"));
+            StopCoroutineReference(ref _runStimulus);
+            
+            StopCoroutineReference(ref _runStimulus);
+            StopCoroutineReference(ref _sendMarkers);
         }
 
 
@@ -271,15 +257,9 @@ namespace BCIEssentials.ControllerBehaviors
                 yield return new WaitForSecondsRealtime(5.0f);
                 _displayText.text = "";
             }
-              else if(textOption == "+")
+            else if(textOption == "+")
             {
                 _displayText.text = "+";
-                yield return new WaitForSecondsRealtime(60.0f);
-                _displayText.text = "";
-            }
-            else if(textOption == "Close")
-            {
-                _displayText.text = "Close your eyes";
                 yield return new WaitForSecondsRealtime(60.0f);
                 _displayText.text = "";
             }
