@@ -184,7 +184,7 @@ namespace BCIEssentials.ControllerBehaviors
                         yield return new WaitForSecondsRealtime(3f); 
                     }
 
-                    SetMaterial(l+1);
+                    SetMaterial(stimNumber+1);
                     
                     //rotate the camera back to facing the stimulus objects 
                     mainCam.transform.Rotate(_rotateBack);
@@ -198,14 +198,12 @@ namespace BCIEssentials.ControllerBehaviors
             mainCam.transform.Rotate(_rotateAway);
             StartCoroutine(DisplayTextOnScreen("EndOfSession"));
             StopCoroutineReference(ref _runStimulus);
-            
-            //StopCoroutineReference(ref _runStimulus);
             StopCoroutineReference(ref _sendMarkers);
         }
 
 
 
-//////Helper Methods
+        //Helper Methods
         public IEnumerator DisplayTextOnScreen(string textOption)
         {
             if(textOption == "3")
@@ -230,29 +228,11 @@ namespace BCIEssentials.ControllerBehaviors
                 yield return new WaitForSecondsRealtime(1.0f);
                _displayText.text = "";
             }
-            //else if(textOption == "End")
-            //{
-            //    _displayText. text = "Look at the plus sign";
-            //    yield return new WaitForSecondsRealtime(2.0f);
-            //    _displayText.text = "";
-            //}
             else if(textOption == "EndOfSession")
             {
                 _displayText. text = "End";
                 yield return new WaitForSecondsRealtime(2.0f);
             }
-            else if(textOption == "Survey")
-            {
-                _displayText.text = "Survey";
-                yield return new WaitForSecondsRealtime(5.0f);
-                _displayText.text = "";
-            }
-            //else if(textOption == "+")
-            //{
-            //    _displayText.text = "+";
-            //    yield return new WaitForSecondsRealtime(60.0f);
-            //    _displayText.text = "";
-            //}
         } 
 
         private void SetMaterial(int key)
