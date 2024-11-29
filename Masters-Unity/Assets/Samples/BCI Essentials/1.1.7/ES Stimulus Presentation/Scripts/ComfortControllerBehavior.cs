@@ -164,11 +164,11 @@ namespace BCIEssentials.ControllerBehaviors
                 SetMaterial(0);
                 stimulusString = ", "  + orderDict[0];
 
-                for(var l = 0 ; l < 12; l++)
+                for(var stimNumber = 0 ; stimNumber < 12; stimNumber++)
                 {
-                    for(var i = 0; i <100*10; i++) //(StimulusRunning)
-                    //the number that i is less than is the amount of seconds to flash for 
-                    //100 = 1 second (frame rate is 144 Hz) so 12 seconds = i < 144*12
+                    for(var flash = 0; flash <100*10; flash++) //(StimulusRunning)
+                    //the number that flash is less than is the amount of seconds to flash for 
+                    //100 = 1 second (frame rate is 100 Hz) so 10 seconds = flash < 100*10s
                     {
                         yield return OnStimulusRunBehavior();
                     }
@@ -177,7 +177,7 @@ namespace BCIEssentials.ControllerBehaviors
                     mainCam.transform.Rotate(_rotateAway);
                     _offMessages = true;
 
-                    if(!(l == 11 && timesShown == 1))
+                    if(!(stimNumber == 11 && timesShown == 1))
                     {
                         yield return new WaitForSecondsRealtime(2f);
                         StartCoroutine(DisplayTextOnScreen("3"));
@@ -199,7 +199,7 @@ namespace BCIEssentials.ControllerBehaviors
             StartCoroutine(DisplayTextOnScreen("EndOfSession"));
             StopCoroutineReference(ref _runStimulus);
             
-            StopCoroutineReference(ref _runStimulus);
+            //StopCoroutineReference(ref _runStimulus);
             StopCoroutineReference(ref _sendMarkers);
         }
 
@@ -230,12 +230,12 @@ namespace BCIEssentials.ControllerBehaviors
                 yield return new WaitForSecondsRealtime(1.0f);
                _displayText.text = "";
             }
-            else if(textOption == "End")
-            {
-                _displayText. text = "Look at the plus sign";
-                yield return new WaitForSecondsRealtime(2.0f);
-                _displayText.text = "";
-            }
+            //else if(textOption == "End")
+            //{
+            //    _displayText. text = "Look at the plus sign";
+            //    yield return new WaitForSecondsRealtime(2.0f);
+            //    _displayText.text = "";
+            //}
             else if(textOption == "EndOfSession")
             {
                 _displayText. text = "End";
@@ -247,12 +247,12 @@ namespace BCIEssentials.ControllerBehaviors
                 yield return new WaitForSecondsRealtime(5.0f);
                 _displayText.text = "";
             }
-            else if(textOption == "+")
-            {
-                _displayText.text = "+";
-                yield return new WaitForSecondsRealtime(60.0f);
-                _displayText.text = "";
-            }
+            //else if(textOption == "+")
+            //{
+            //    _displayText.text = "+";
+            //    yield return new WaitForSecondsRealtime(60.0f);
+            //    _displayText.text = "";
+            //}
         } 
 
         private void SetMaterial(int key)
