@@ -170,6 +170,7 @@ namespace BCIEssentials.ControllerBehaviors
                     //the number that flash is less than is the amount of seconds to flash for 
                     //100 = 1 second (frame rate is 100 Hz) so 10 seconds = flash < 100*10s
                     {
+                        StartCoroutine(DisplayTextOnScreen("+"));
                         yield return OnStimulusRunBehavior();
                     }
 
@@ -230,8 +231,14 @@ namespace BCIEssentials.ControllerBehaviors
             }
             else if(textOption == "EndOfSession")
             {
-                _displayText. text = "End";
+                _displayText.text = "End";
                 yield return new WaitForSecondsRealtime(2.0f);
+            }
+            else if(textOption == "+")
+            {
+                _displayText.text = "+";
+                yield return new WaitForSecondsRealtime(1.0f);
+                _displayText.text = "";
             }
         } 
 
