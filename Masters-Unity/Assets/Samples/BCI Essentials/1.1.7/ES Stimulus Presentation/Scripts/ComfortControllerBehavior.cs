@@ -142,31 +142,27 @@ namespace BCIEssentials.ControllerBehaviors
             
         protected override IEnumerator RunStimulus()
         {
+            //setup variables for camera rotation 
+            var _rotateAway = Vector3.zero;
+            _rotateAway.y = 90f;
+
+            var _rotateBack = Vector3.zero;
+            _rotateBack.y = -90f;
+            
+            //5 seconds count down before starting
+            _offMessages = true;                    
+            mainCam.transform.Rotate(_rotateBack);
+            StartCoroutine(DisplayTextOnScreen("5"));
+            yield return new WaitForSecondsRealtime(5f);
+            mainCam.transform.Rotate(_rotateAway);
+            _offMessages = false;
+
             for (var timesShown = 0; timesShown < 2; timesShown++)
-            {
-                //setup variables for camera rotation 
-                var _rotateAway = Vector3.zero;
-                _rotateAway.y = 90f;
-
-                var _rotateBack = Vector3.zero;
-                _rotateBack.y = -90f;
-                
-                mainCam.transform.Rotate(_rotateAway);
-                StartCoroutine(DisplayTextOnScreen("+"));
-                mainCam.transform.Rotate(_rotateBack);
-
+            {                
                 //set initial color and contrast
                 ColorFlashEffect3 spoEffect = _selectableSPOs[0].GetComponent<ColorFlashEffect3>();
                 SetMaterial(0);
                 stimulusString = ", "  + orderDict[0];
-
-                //5 seconds count down before starting
-                _offMessages = true;                    
-                mainCam.transform.Rotate(_rotateBack);
-                StartCoroutine(DisplayTextOnScreen("5"));
-                yield return new WaitForSecondsRealtime(5f);
-                mainCam.transform.Rotate(_rotateAway);
-                _offMessages = false;
 
                 for(var l = 0 ; l < 12; l++)
                 {
@@ -181,12 +177,12 @@ namespace BCIEssentials.ControllerBehaviors
                     mainCam.transform.Rotate(_rotateAway);
                     _offMessages = true;
 
-                    //if(l != 11)
-                    //{
-                    yield return new WaitForSecondsRealtime(2f);
-                    StartCoroutine(DisplayTextOnScreen("3"));
-                    yield return new WaitForSecondsRealtime(3f); 
-                    //}
+                    if(!(l == 11 && timesShown == 1))
+                    {
+                        yield return new WaitForSecondsRealtime(2f);
+                        StartCoroutine(DisplayTextOnScreen("3"));
+                        yield return new WaitForSecondsRealtime(3f); 
+                    }
 
                     SetMaterial(l+1);
                     
@@ -194,18 +190,12 @@ namespace BCIEssentials.ControllerBehaviors
                     mainCam.transform.Rotate(_rotateBack);
                     _offMessages = false;
                 }
-                //Re-randomize stmulus order to show them again
+                //cLear out the dict and re-randomize stmulus order to show them again
+                orderDict.Clear();
                 Randomize();
             }
 
-            //end of presentation messages
             mainCam.transform.Rotate(_rotateAway);
-            _offMessages = true;
-            yield return new WaitForSecondsRealtime(8f);
-            StartCoroutine(DisplayTextOnScreen("End"));
-            yield return new WaitForSecondsRealtime(2f);
-            _offMessages = false;
-
             StartCoroutine(DisplayTextOnScreen("EndOfSession"));
             StopCoroutineReference(ref _runStimulus);
             
