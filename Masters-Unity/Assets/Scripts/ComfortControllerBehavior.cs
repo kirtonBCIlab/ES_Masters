@@ -28,6 +28,7 @@ namespace BCIEssentials.ControllerBehaviors
         private bool _open;
         private bool _closed;
         private string stimulusString = "";
+        private string markerString = "";
         private Dictionary<int, string> orderDict = new Dictionary<int, string>();
 
 
@@ -63,42 +64,42 @@ namespace BCIEssentials.ControllerBehaviors
             }
         }
 
-        protected override IEnumerator SendMarkers(int trainingIndex = 99)
-        {
-            while (StimulusRunning)
-            {
-                string freqString = "";
-                string markerString=  "";
-                string trainingString;
+        //protected override IEnumerator SendMarkers(int trainingIndex = 99)
+        //{
+           // while (StimulusRunning)
+           // {
+            //     string freqString = "";
+            //     string markerString=  "";
+            //     string trainingString;
                 
-                if(!_offMessages)
-                {
-                    freqString = freqString + "," + realFreqFlash.ToString();
-                    trainingString = (trainingIndex <= _selectableSPOs.Count) ? trainingIndex.ToString() : "-1";
+            //     if(!_offMessages)
+            //     {
+            //         freqString = freqString + "," + realFreqFlash.ToString();
+            //         trainingString = (trainingIndex <= _selectableSPOs.Count) ? trainingIndex.ToString() : "-1";
                     
-                    markerString = "tvep," + _selectableSPOs.Count.ToString() + "," + trainingString + "," +
-                                        windowLength.ToString() + freqString + stimulusString;
-                }
+            //         markerString = "tvep," + _selectableSPOs.Count.ToString() + "," + trainingString + "," +
+            //                             windowLength.ToString() + freqString + stimulusString;
+            //     }
 
-                if(_offMessages)
-                {
-                    markerString = "Stimulus Off";
-                }
+            //     if(_offMessages)
+            //     {
+            //         markerString = "Stimulus Off";
+            //     }
 
-                if(_restingState && _open)
-                {
-                    markerString = "Resting state, eyes open";
-                }
-                if(_restingState && _closed)
-                {
-                    markerString = "Resting state, eyes closed";
-                }
+            //     if(_restingState && _open)
+            //     {
+            //         markerString = "Resting state, eyes open";
+            //     }
+            //     if(_restingState && _closed)
+            //     {
+            //         markerString = "Resting state, eyes closed";
+            //     }
 
-                marker.Write(markerString);
+            //     marker.Write(markerString);
 
-                yield return new WaitForSecondsRealtime(windowLength + interWindowInterval);     
-            }
-        }
+            //     yield return new WaitForSecondsRealtime(windowLength + interWindowInterval);     
+            // }
+        //}
         
 
         protected override IEnumerator OnStimulusRunBehavior()
@@ -124,7 +125,7 @@ namespace BCIEssentials.ControllerBehaviors
                         frame_count[i] = 0;
                     }
                 }
-            }
+            } 
             yield return null;
         }
 
@@ -138,6 +139,7 @@ namespace BCIEssentials.ControllerBehaviors
                 }
             }
             yield return null;
+            // stop message
         }
             
         protected override IEnumerator RunStimulus()
@@ -166,6 +168,9 @@ namespace BCIEssentials.ControllerBehaviors
 
                 for(var stimNumber = 0 ; stimNumber < 12; stimNumber++)
                 {
+                    markerString = "ssvep," + _selectableSPOs.Count.ToString() + "," + windowLength.ToString() + "," + realFreqFlash.ToString() + stimulusString;
+                    marker.Write(markerString);
+
                     for(var flash = 0; flash <100*10; flash++) //(StimulusRunning)
                     //the number that flash is less than is the amount of seconds to flash for 
                     //100 = 1 second (frame rate is 100 Hz) so 10 seconds = flash < 100*10s
@@ -173,7 +178,7 @@ namespace BCIEssentials.ControllerBehaviors
                         StartCoroutine(DisplayTextOnScreen("+"));
                         yield return OnStimulusRunBehavior();
                     }
-
+                    marker.Write("off");
                     //rotate the camera away from the stimuli objects when they are off
                     mainCam.transform.Rotate(_rotateAway);
                     _offMessages = true;
