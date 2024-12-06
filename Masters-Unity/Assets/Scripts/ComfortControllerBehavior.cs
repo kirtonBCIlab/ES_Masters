@@ -23,10 +23,6 @@ namespace BCIEssentials.ControllerBehaviors
 
         public Camera mainCam;
         public Text _displayText;
-        private bool _offMessages;
-        private bool _restingState;
-        private bool _open;
-        private bool _closed;
         private string stimulusString = "";
         private string markerString = "";
         private Dictionary<int, string> orderDict = new Dictionary<int, string>();
@@ -63,44 +59,6 @@ namespace BCIEssentials.ControllerBehaviors
                 realFreqFlash = targetFrameRate / (float)(frame_off_count[i] + frame_on_count[i]);
             }
         }
-
-        //protected override IEnumerator SendMarkers(int trainingIndex = 99)
-        //{
-           // while (StimulusRunning)
-           // {
-            //     string freqString = "";
-            //     string markerString=  "";
-            //     string trainingString;
-                
-            //     if(!_offMessages)
-            //     {
-            //         freqString = freqString + "," + realFreqFlash.ToString();
-            //         trainingString = (trainingIndex <= _selectableSPOs.Count) ? trainingIndex.ToString() : "-1";
-                    
-            //         markerString = "tvep," + _selectableSPOs.Count.ToString() + "," + trainingString + "," +
-            //                             windowLength.ToString() + freqString + stimulusString;
-            //     }
-
-            //     if(_offMessages)
-            //     {
-            //         markerString = "Stimulus Off";
-            //     }
-
-            //     if(_restingState && _open)
-            //     {
-            //         markerString = "Resting state, eyes open";
-            //     }
-            //     if(_restingState && _closed)
-            //     {
-            //         markerString = "Resting state, eyes closed";
-            //     }
-
-            //     marker.Write(markerString);
-
-            //     yield return new WaitForSecondsRealtime(windowLength + interWindowInterval);     
-            // }
-        //}
-        
 
         protected override IEnumerator OnStimulusRunBehavior()
         {
@@ -139,7 +97,6 @@ namespace BCIEssentials.ControllerBehaviors
                 }
             }
             yield return null;
-            // stop message
         }
             
         protected override IEnumerator RunStimulus()
@@ -152,12 +109,10 @@ namespace BCIEssentials.ControllerBehaviors
             _rotateBack.y = -90f;
             
             //5 seconds count down before starting
-            _offMessages = true;                    
             mainCam.transform.Rotate(_rotateBack);
             StartCoroutine(DisplayTextOnScreen("5"));
             yield return new WaitForSecondsRealtime(5f);
             mainCam.transform.Rotate(_rotateAway);
-            _offMessages = false;
 
             for (var timesShown = 0; timesShown < 2; timesShown++)
             {                
@@ -168,6 +123,7 @@ namespace BCIEssentials.ControllerBehaviors
 
                 for(var stimNumber = 0 ; stimNumber < 12; stimNumber++)
                 {
+                    //send marker for stimulus starting
                     markerString = "ssvep," + _selectableSPOs.Count.ToString() + "," + windowLength.ToString() + "," + realFreqFlash.ToString() + stimulusString;
                     marker.Write(markerString);
 
@@ -178,10 +134,12 @@ namespace BCIEssentials.ControllerBehaviors
                         StartCoroutine(DisplayTextOnScreen("+"));
                         yield return OnStimulusRunBehavior();
                     }
+
+                    //send marker for stimulus off
                     marker.Write("off");
+
                     //rotate the camera away from the stimuli objects when they are off
                     mainCam.transform.Rotate(_rotateAway);
-                    _offMessages = true;
 
                     if(!(stimNumber == 11 && timesShown == 1))
                     {
@@ -194,7 +152,6 @@ namespace BCIEssentials.ControllerBehaviors
                     
                     //rotate the camera back to facing the stimulus objects 
                     mainCam.transform.Rotate(_rotateBack);
-                    _offMessages = false;
                 }
                 //cLear out the dict and re-randomize stmulus order to show them again
                 orderDict.Clear();
@@ -206,8 +163,6 @@ namespace BCIEssentials.ControllerBehaviors
             StopCoroutineReference(ref _runStimulus);
             StopCoroutineReference(ref _sendMarkers);
         }
-
-
 
         //Helper Methods
         public IEnumerator DisplayTextOnScreen(string textOption)
