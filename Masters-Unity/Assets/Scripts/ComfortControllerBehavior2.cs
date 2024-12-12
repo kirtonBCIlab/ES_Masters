@@ -27,13 +27,14 @@ namespace BCIEssentials.ControllerBehaviors
         private string markerString = "";
         private Dictionary<int, string> orderDict = new Dictionary<int, string>();
 
-        private DoubleEliminationBracket bracket;
 
+        // Variables for presenting 2 at a time
+        private DoubleEliminationBracket bracket;
         private SpriteRenderer stim1;
         private SpriteRenderer stim2;
-
         private GameObject stim1Object;
         private GameObject stim2Object;
+        private bool? preference;
 
         protected override void Start()
         {
@@ -44,33 +45,25 @@ namespace BCIEssentials.ControllerBehaviors
         
             _displayText = GameObject.Find("TextToDisplay").GetComponent<Text>();
 
-            //randomize order of stimulus presentation 
+            // randomize order of stimulus presentation 
             Randomize();
+            // populate bracket with randomized stimuli
             bracket = new DoubleEliminationBracket(orderDict);  
 
             //set first frequency
             setFreqFlash = 10;
+
             PopulateObjectList();
             RunStimulus();
         }
 
         private void GetSPOs()
         {
-            marker.Write("inside getSPOs");
             stim1 = _selectableSPOs[0].GetComponent<SpriteRenderer>();
             stim1Object = GameObject.Find("Object 1");
 
-            if (stim1Object != null)
-            {
-                marker.Write("object 1 found");
-            }
-
             stim2 = _selectableSPOs[1].GetComponent<SpriteRenderer>();
             stim2Object = GameObject.Find("Object 2");
-            if (stim2Object != null)
-            {
-                 marker.Write("object 2 found");
-            }
         }
 
         public override void PopulateObjectList(SpoPopulationMethod populationMethod = SpoPopulationMethod.Tag)
@@ -128,7 +121,7 @@ namespace BCIEssentials.ControllerBehaviors
             
         protected override IEnumerator RunStimulus()
         {
-            //Assign SPO sprite renderers to variables so we can turn them on and off
+            // Assign SPO sprite renderers and gameobjects to variables so we can turn them on/off and move them
             GetSPOs();
 
             // Camera setup for transitions
@@ -138,22 +131,16 @@ namespace BCIEssentials.ControllerBehaviors
             var rotateBack = Vector3.zero;
             rotateBack.y = -90f;
 
-            marker.Write("RunStimulus started");
-            mainCam.transform.Rotate(rotateBack);
-            StartCoroutine(DisplayTextOnScreen("5"));
-            yield return new WaitForSecondsRealtime(5f);
-            mainCam.transform.Rotate(rotateAway);
-
             // Loop through the double elimination bracket
             while (!bracket.IsComplete())
             {
-                var currentPair = bracket.GetCurrentMatch(); // Get the next stimulus pair
+                // get the next pair in the bracket
+                var currentPair = bracket.GetCurrentMatch(); 
                 if (currentPair == null) break;
 
                 // Extract stimuli indices
                 int stim1Index = currentPair.Stimulus1;
                 int stim2Index = currentPair.Stimulus2 ?? -1;
-
 
                 // Get names from orderDict
                 string stim1Name = orderDict[stim1Index];
@@ -163,14 +150,13 @@ namespace BCIEssentials.ControllerBehaviors
                 SetMaterialStim1(stim1Index);
                 SetMaterialStim2(stim2Index);
 
-                //Turn off stimulus 2 for now
+                // Turn off stimulus 2 for now & move stim 1 to center of screen
                 stim2.enabled = false;
-
-                // Move stim 1 to center of screen
                 stim1Object.transform.position = new Vector3(1, 0, 0);
         
                 // Present Stimulus 1
                 StartCoroutine(DisplayTextOnScreen("5")); // 5-second countdown
+                yield return new WaitForSecondsRealtime(5f);
 
                 stimulusString = ", "  + stim1Name;
                 markerString = "ssvep," + _selectableSPOs.Count.ToString() + "," + windowLength.ToString() + "," + realFreqFlash.ToString() + stimulusString;
@@ -187,18 +173,16 @@ namespace BCIEssentials.ControllerBehaviors
 
                 marker.Write("off");
 
-                // Turn off stimulus 1 and turn on stimulus 2
+                // Turn off stimulus 1 and turn on stimulus 2 and move stim2 to center of screen
                 stim1.enabled = false;
                 stim2.enabled = true;
+                stim2Object.transform.position = new Vector3(1, 0, 0);
+
 
                 mainCam.transform.Rotate(rotateAway);
                 yield return new WaitForSecondsRealtime(2f);
                 StartCoroutine(DisplayTextOnScreen("3"));
                 yield return new WaitForSecondsRealtime(3f); 
-
-                //Move stim2 to middle of screen
-                stim2Object.transform.position = new Vector3(1, 0, 0);
-
 
                 // Present Stimulus 2
                 mainCam.transform.Rotate(rotateBack);
@@ -221,10 +205,8 @@ namespace BCIEssentials.ControllerBehaviors
                 StartCoroutine(DisplayTextOnScreen("3"));
                 yield return new WaitForSecondsRealtime(3f); 
 
-                //Turn both stimuli on
+                //Turn both stimuli on and move stimuli to either side of the screen
                 stim1.enabled = true;
-
-                //Move stimuli to either side of the screen
                 stim1Object.transform.position = new Vector3(0, 0, 0);
                 stim2Object.transform.position = new Vector3(2, 0, 0);
 
@@ -243,21 +225,30 @@ namespace BCIEssentials.ControllerBehaviors
                 
                 marker.Write("off");
 
-                marker.Write("Pair 1 done, collect input");
-
-                // Capture preference with keypress input
-                StartCoroutine(DisplayTextOnScreen("Choose"));
-
                 StartCoroutine(GetUserPreferenceCoroutine());
                 yield return new WaitUntil(() => preference != null);
 
                 // Record the winner in the bracket
                 // Stim1 = 'true' recorded, Stim2 = 'false' recorded
-                bracket.RecordMatchResult(preference ? stim1Index : stim2Index);
+                if (preference.HasValue)
+                {
+                    bracket.RecordMatchResult(preference.Value ? stim1Index : stim2Index);
+                    StartCoroutine(DisplayTextOnScreen("Break"));
+                    yield return new WaitForSecondsRealtime(15.0f);
+                }
+                else
+                {
+                    Debug.Log("No preference chosen");
+                }
+
+
+                // Reset preference to null so the value doesn't carry over to the next pair
+                preference = null;
 
 
                 // Pause before next match
-                yield return new WaitForSecondsRealtime(15f);
+                //StartCoroutine(DisplayTextOnScreen("Break"));
+                //yield return new WaitForSecondsRealtime(15.0f);
             }
 
                 // Finalize
@@ -267,15 +258,15 @@ namespace BCIEssentials.ControllerBehaviors
                 StopCoroutineReference(ref _sendMarkers);
         }
     
-        private bool preference = false; // Store the user's preference
+        //private bool preference = false; // Store the user's preference
 
         private IEnumerator GetUserPreferenceCoroutine()
         {
             bool preferenceCaptured = false;
-
             // Wait for user input
             while (!preferenceCaptured)
             {
+                StartCoroutine(DisplayTextOnScreen("Choose"));
                 if (Input.GetKeyDown(KeyCode.Alpha1) || Input.GetKeyDown(KeyCode.Keypad1))
                 {
                     preference = true; // Stimulus 1 selected
@@ -335,7 +326,13 @@ namespace BCIEssentials.ControllerBehaviors
             else if (textOption == "Choose")
             {
                 _displayText.text = "Press 1 or 2";
-                yield return new WaitForSecondsRealtime(5.0f);
+                yield return new WaitForSecondsRealtime(1.0f);
+                //_displayText.text = "";
+            }
+            else if (textOption == "Break")
+            {
+                _displayText.text = "Break";
+                yield return new WaitForSecondsRealtime(15.0f);
                 _displayText.text = "";
             }
 
