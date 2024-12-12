@@ -160,8 +160,8 @@ namespace BCIEssentials.ControllerBehaviors
                 string stim2Name = orderDict[stim2Index];
 
                 // Set the materials for each stimulus
-                SetMaterial(stim1Index);
-                SetMaterial(stim2Index);
+                SetMaterialStim1(stim1Index);
+                SetMaterialStim2(stim2Index);
 
                 //Turn off stimulus 2 for now
                 stim2.enabled = false;
@@ -201,7 +201,6 @@ namespace BCIEssentials.ControllerBehaviors
 
 
                 // Present Stimulus 2
-                SetMaterial(stim2Index);
                 mainCam.transform.Rotate(rotateBack);
                 stimulusString = ", "  + stim2Name;
                 markerString = "ssvep," + _selectableSPOs.Count.ToString() + "," + windowLength.ToString() + "," + realFreqFlash.ToString() + stimulusString;
@@ -243,25 +242,19 @@ namespace BCIEssentials.ControllerBehaviors
                 }
                 
                 marker.Write("off");
-                marker.Write("Pair 1 done");
 
-
-
-
-                // Simultaneous presentation
-                //yield return new WaitForSecondsRealtime(3f);
-                //_selectableSPOs[0].StartStimulus();
-                //_selectableSPOs[1].StartStimulus();
-                //yield return new WaitForSecondsRealtime(5f);
+                marker.Write("Pair 1 done, collect input");
 
                 // Capture preference with keypress input
-                //_displayText.text = "Press 1 for Stimulus 1 or 2 for Stimulus 2";
-                //bool preference = GetUserPreference(); // Custom method for user input
-                //bracket.RecordMatchResult(currentPair, preference ? stim1Index : stim2Index);
+                StartCoroutine(DisplayTextOnScreen("Choose"));
 
-                // Stop both stimuli
-                //_selectableSPOs[0].StopStimulus();
-                //_selectableSPOs[1].StopStimulus();
+                StartCoroutine(GetUserPreferenceCoroutine());
+                yield return new WaitUntil(() => preference != null);
+
+                // Record the winner in the bracket
+                // Stim1 = 'true' recorded, Stim2 = 'false' recorded
+                bracket.RecordMatchResult(preference ? stim1Index : stim2Index);
+
 
                 // Pause before next match
                 yield return new WaitForSecondsRealtime(15f);
@@ -274,12 +267,11 @@ namespace BCIEssentials.ControllerBehaviors
                 StopCoroutineReference(ref _sendMarkers);
         }
     
+        private bool preference = false; // Store the user's preference
 
-        // User preference method with keypress logic
-        private bool GetUserPreference()
+        private IEnumerator GetUserPreferenceCoroutine()
         {
             bool preferenceCaptured = false;
-            bool preference = false;
 
             // Wait for user input
             while (!preferenceCaptured)
@@ -288,20 +280,20 @@ namespace BCIEssentials.ControllerBehaviors
                 {
                     preference = true; // Stimulus 1 selected
                     preferenceCaptured = true;
+                    Debug.Log("Stimulus 1 selected successfully in the controller");
                 }
                 else if (Input.GetKeyDown(KeyCode.Alpha2) || Input.GetKeyDown(KeyCode.Keypad2))
                 {
                     preference = false; // Stimulus 2 selected
                     preferenceCaptured = true;
+                    Debug.Log("Stimulus 2 selected successfully in the controller");
                 }
 
-                // Ensure Unity doesn't freeze during the wait
-                if (!preferenceCaptured)
-                    System.Threading.Thread.Sleep(10);
+                // Yield until the next frame to prevent freezing
+                yield return null;
             }
-
-            return preference;
         }
+
 
 
         //Helper Methods
@@ -340,11 +332,98 @@ namespace BCIEssentials.ControllerBehaviors
                 yield return new WaitForSecondsRealtime(1.0f);
                 _displayText.text = "";
             }
+            else if (textOption == "Choose")
+            {
+                _displayText.text = "Press 1 or 2";
+                yield return new WaitForSecondsRealtime(5.0f);
+                _displayText.text = "";
+            }
+
         } 
 
-        private void SetMaterial(int key)
+        private void SetMaterialStim1(int key)
         {
             ColorFlashEffect3 spoEffect = _selectableSPOs[0].GetComponent<ColorFlashEffect3>();
+            if (orderDict.TryGetValue(key, out string material))
+            {       
+                if (material == "Contrast1Size1")
+                {
+                    spoEffect.SetContrast(ColorFlashEffect3.ContrastLevel.Contrast1);
+                    spoEffect.SetSize(ColorFlashEffect3.Size.Size1);
+                    stimulusString = ", Contrast1 Size1";
+                }
+                else if (material == "Contrast1Size2")
+                {
+                    spoEffect.SetContrast(ColorFlashEffect3.ContrastLevel.Contrast1);
+                    spoEffect.SetSize(ColorFlashEffect3.Size.Size2);
+                    stimulusString = ", Contrast1 Size2";
+                }
+                else if (material == "Contrast1Size3")
+                {
+                    spoEffect.SetContrast(ColorFlashEffect3.ContrastLevel.Contrast1);
+                    spoEffect.SetSize(ColorFlashEffect3.Size.Size3);
+                    stimulusString = ", Contrast1 Size3";
+                }
+                else if (material == "Contrast2Size1")
+                {
+                    spoEffect.SetContrast(ColorFlashEffect3.ContrastLevel.Contrast2);
+                    spoEffect.SetSize(ColorFlashEffect3.Size.Size1);
+                    stimulusString = ", Contrast2 Size1";
+                }
+                else if (material == "Contrast2Size2")
+                {
+                    spoEffect.SetContrast(ColorFlashEffect3.ContrastLevel.Contrast2);
+                    spoEffect.SetSize(ColorFlashEffect3.Size.Size2);
+                    stimulusString = ", Contrast2 Size2";
+                }
+                else if (material == "Contrast2Size3")
+                {
+                    spoEffect.SetContrast(ColorFlashEffect3.ContrastLevel.Contrast2);
+                    spoEffect.SetSize(ColorFlashEffect3.Size.Size3);
+                    stimulusString = ", Contrast2 Size3";
+                }
+                else if (material == "Contrast3Size1")
+                {
+                    spoEffect.SetContrast(ColorFlashEffect3.ContrastLevel.Contrast3);
+                    spoEffect.SetSize(ColorFlashEffect3.Size.Size1);
+                    stimulusString = ", Contrast3 Size1";
+                }
+                else if (material == "Contrast3Size2")
+                {
+                    spoEffect.SetContrast(ColorFlashEffect3.ContrastLevel.Contrast3);
+                    spoEffect.SetSize(ColorFlashEffect3.Size.Size2);
+                    stimulusString = ", Contrast3 Size2";
+                }
+                else if (material == "Contrast3Size3")
+                {
+                    spoEffect.SetContrast(ColorFlashEffect3.ContrastLevel.Contrast3);
+                    spoEffect.SetSize(ColorFlashEffect3.Size.Size3);
+                    stimulusString = ", Contrast3 Size3";
+                }
+                else if (material == "Contrast4Size1")
+                {
+                    spoEffect.SetContrast(ColorFlashEffect3.ContrastLevel.Contrast4);
+                    spoEffect.SetSize(ColorFlashEffect3.Size.Size1);
+                    stimulusString = ", Contrast4 Size1";
+                }
+                else if (material == "Contrast4Size2")
+                {
+                    spoEffect.SetContrast(ColorFlashEffect3.ContrastLevel.Contrast4);
+                    spoEffect.SetSize(ColorFlashEffect3.Size.Size2);
+                    stimulusString = ", Contrast4 Size2";
+                }
+                else if (material == "Contrast4Size3")
+                {
+                    spoEffect.SetContrast(ColorFlashEffect3.ContrastLevel.Contrast4);
+                    spoEffect.SetSize(ColorFlashEffect3.Size.Size3);
+                    stimulusString = ", Contrast4 Size3";
+                }
+            }
+        }
+
+        private void SetMaterialStim2(int key)
+        {
+            ColorFlashEffect3 spoEffect = _selectableSPOs[1].GetComponent<ColorFlashEffect3>();
             if (orderDict.TryGetValue(key, out string material))
             {       
                 if (material == "Contrast1Size1")
