@@ -32,6 +32,9 @@ namespace BCIEssentials.ControllerBehaviors
         private SpriteRenderer stim1;
         private SpriteRenderer stim2;
 
+        private GameObject stim1Object;
+        private GameObject stim2Object;
+
         protected override void Start()
         {
             base.Start();
@@ -55,14 +58,16 @@ namespace BCIEssentials.ControllerBehaviors
         {
             marker.Write("inside getSPOs");
             stim1 = _selectableSPOs[0].GetComponent<SpriteRenderer>();
+            stim1Object = GameObject.Find("Object 1");
 
-            if (stim1 != null)
+            if (stim1Object != null)
             {
                 marker.Write("object 1 found");
             }
 
             stim2 = _selectableSPOs[1].GetComponent<SpriteRenderer>();
-            if (stim2 != null)
+            stim2Object = GameObject.Find("Object 2");
+            if (stim2Object != null)
             {
                  marker.Write("object 2 found");
             }
@@ -161,6 +166,9 @@ namespace BCIEssentials.ControllerBehaviors
                 //Turn off stimulus 2 for now
                 stim2.enabled = false;
 
+                // Move stim 1 to center of screen
+                stim1Object.transform.position = new Vector3(1, 0, 0);
+        
                 // Present Stimulus 1
                 StartCoroutine(DisplayTextOnScreen("5")); // 5-second countdown
 
@@ -188,6 +196,10 @@ namespace BCIEssentials.ControllerBehaviors
                 StartCoroutine(DisplayTextOnScreen("3"));
                 yield return new WaitForSecondsRealtime(3f); 
 
+                //Move stim2 to middle of screen
+                stim2Object.transform.position = new Vector3(1, 0, 0);
+
+
                 // Present Stimulus 2
                 SetMaterial(stim2Index);
                 mainCam.transform.Rotate(rotateBack);
@@ -212,6 +224,10 @@ namespace BCIEssentials.ControllerBehaviors
 
                 //Turn both stimuli on
                 stim1.enabled = true;
+
+                //Move stimuli to either side of the screen
+                stim1Object.transform.position = new Vector3(0, 0, 0);
+                stim2Object.transform.position = new Vector3(2, 0, 0);
 
                 mainCam.transform.Rotate(rotateBack);
                 stimulusString = ", Stim1: " + stim1Name + ", Stim2: " + stim2Name;
@@ -473,6 +489,8 @@ namespace BCIEssentials.ControllerBehaviors
 
                 orderDict = new Dictionary<int, string>(randomDict);     
             }    
+
+          
 
  }
 }
