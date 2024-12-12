@@ -1,0 +1,52 @@
+{
+  "name": "com.bci4kids.bciessentials",
+  "version": "1.1.7",
+  "displayName": "BCI Essentials",
+  "description": "A Unity base environment for streamlined development of BCI applications",
+  "unity": "2021.3",
+  "unityRelease": "15f1",
+  "documentationUrl": "https://github.com/kirtonBCIlab/bci-essentials-unity",
+  "changelogUrl": "https://github.com/kirtonBCIlab/bci-essentials-unity/releases",
+  "license": "MIT",
+  "author": {
+    "name": "BCI Games",
+    "email": "contact@bci.games",
+    "url": "https://bci.games/"
+  },
+  "dependencies": {
+    "com.unity.shadergraph": "12.1.8",
+    "com.labstreaminglayer.lsl4unity" : "1.16.0"
+  },
+  "samples": [
+    {
+      "displayName": "Controller Hotswapping Example",
+      "description": "Demonstrates how to set up a BCI controller with multiple behavior types which can be switched at runtime.",
+      "path": "Samples~/Controller Hotswapping Example"
+    },
+    {
+      "displayName": "Original MI Controller",
+      "description": "An example setup for the prepackage style MI Controller.",
+      "path": "Samples~/Original MI Controller"
+    },
+    {
+      "displayName": "Original P300 Controller",
+      "description": "An example setup for the prepackage style P300 Controller.",
+      "path": "Samples~/Original P300 Controller"
+    },
+    {
+      "displayName": "Original SSVEP Controller",
+      "description": "An example setup for the prepackage style SSVEP Controller.",
+      "path": "Samples~/Original SSVEP Controller"
+    },
+    {
+      "displayName": "Basic Marker Receviers Example",
+      "description": "An example on how different types of Marker Receivers can be used with the LSLServiceProvider.",
+      "path": "Samples~/BasicMarkerReceivers"
+    },
+    {
+      "displayName": "ES Stimulus Presentation",
+      "description": "Stimulus presentation for Emily Schrag's thesis project",
+      "path": "Samples~/ES Stimulus Presentation"
+    }
+  ]
+}

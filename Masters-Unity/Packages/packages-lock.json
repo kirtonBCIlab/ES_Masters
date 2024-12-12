@@ -1,14 +1,13 @@
 {
   "dependencies": {
     "com.bci4kids.bciessentials": {
-      "version": "https://github.com/kirtonBCIlab/bci-essentials-unity.git?path=/Packages/com.bci4kids.bciessentials",
+      "version": "file:com.bci4kids.bciessentials@890dd86da9",
       "depth": 0,
-      "source": "git",
+      "source": "embedded",
       "dependencies": {
         "com.unity.shadergraph": "12.1.8",
         "com.labstreaminglayer.lsl4unity": "1.16.0"
-      },
-      "hash": "890dd86da99234e83ae0666e471fd66bec02ae9f"
+      }
     },
     "com.labstreaminglayer.lsl4unity": {
       "version": "https://github.com/labstreaminglayer/LSL4Unity.git",
