@@ -36,6 +36,8 @@ namespace BCIEssentials.ControllerBehaviors
         private GameObject stim2Object;
         private bool? preference;
 
+        private int pairNum;
+
         protected override void Start()
         {
             base.Start();
@@ -131,9 +133,12 @@ namespace BCIEssentials.ControllerBehaviors
             var rotateBack = Vector3.zero;
             rotateBack.y = -90f;
 
+            pairNum = 1;
+
             // Loop through the double elimination bracket
             while (!bracket.IsComplete())
             {
+                marker.Write("Pair number" + pairNum);
                 // get the next pair in the bracket
                 var currentPair = bracket.GetCurrentMatch(); 
                 if (currentPair == null) break;
@@ -163,7 +168,7 @@ namespace BCIEssentials.ControllerBehaviors
                 marker.Write(markerString);
 
 
-                for(var flash = 0; flash <100*10; flash++) //(StimulusRunning)
+                for(var flash = 0; flash <100*2; flash++) //(StimulusRunning)
                 //the number that flash is less than is the amount of seconds to flash for 
                 //100 = 1 second (frame rate is 100 Hz) so 10 seconds = flash < 100*10s
                 {
@@ -190,7 +195,7 @@ namespace BCIEssentials.ControllerBehaviors
                 markerString = "ssvep," + _selectableSPOs.Count.ToString() + "," + windowLength.ToString() + "," + realFreqFlash.ToString() + stimulusString;
                 marker.Write(markerString);
 
-                for(var flash = 0; flash <100*10; flash++) //(StimulusRunning)
+                for(var flash = 0; flash <100*2; flash++) //(StimulusRunning)
                 //the number that flash is less than is the amount of seconds to flash for 
                 //100 = 1 second (frame rate is 100 Hz) so 10 seconds = flash < 100*10s
                 {
@@ -215,7 +220,7 @@ namespace BCIEssentials.ControllerBehaviors
                 markerString = "ssvep," + _selectableSPOs.Count.ToString() + "," + windowLength.ToString() + "," + realFreqFlash.ToString() + stimulusString;
                 marker.Write(markerString);
 
-                for(var flash = 0; flash <100*10; flash++) //(StimulusRunning)
+                for(var flash = 0; flash <100*2; flash++) //(StimulusRunning)
                 //the number that flash is less than is the amount of seconds to flash for 
                 //100 = 1 second (frame rate is 100 Hz) so 10 seconds = flash < 100*10s
                 {
@@ -234,7 +239,7 @@ namespace BCIEssentials.ControllerBehaviors
                 {
                     bracket.RecordMatchResult(preference.Value ? stim1Index : stim2Index);
                     StartCoroutine(DisplayTextOnScreen("Break"));
-                    yield return new WaitForSecondsRealtime(15.0f);
+                    yield return new WaitForSecondsRealtime(5.0f);
                 }
                 else
                 {
@@ -245,10 +250,7 @@ namespace BCIEssentials.ControllerBehaviors
                 // Reset preference to null so the value doesn't carry over to the next pair
                 preference = null;
 
-
-                // Pause before next match
-                //StartCoroutine(DisplayTextOnScreen("Break"));
-                //yield return new WaitForSecondsRealtime(15.0f);
+                pairNum = pairNum + 1;
             }
 
                 // Finalize
@@ -332,7 +334,7 @@ namespace BCIEssentials.ControllerBehaviors
             else if (textOption == "Break")
             {
                 _displayText.text = "Break";
-                yield return new WaitForSecondsRealtime(15.0f);
+                yield return new WaitForSecondsRealtime(5.0f);
                 _displayText.text = "";
             }
 
