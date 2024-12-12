@@ -123,122 +123,139 @@ namespace BCIEssentials.ControllerBehaviors
             
         protected override IEnumerator RunStimulus()
         {
+            //Assign SPO sprite renderers to variables so we can turn them on and off
+            GetSPOs();
 
-        GetSPOs();
-        // Camera setup for transitions
-        var rotateAway = Vector3.zero;
-        rotateAway.y = 90f;
+            // Camera setup for transitions
+            var rotateAway = Vector3.zero;
+            rotateAway.y = 90f;
 
-        var rotateBack = Vector3.zero;
-        rotateBack.y = -90f;
+            var rotateBack = Vector3.zero;
+            rotateBack.y = -90f;
 
-        marker.Write("RunStimulus started");
-        mainCam.transform.Rotate(rotateBack);
-        StartCoroutine(DisplayTextOnScreen("5"));
-        yield return new WaitForSecondsRealtime(5f);
-        mainCam.transform.Rotate(rotateAway);
-
-        // Loop through the double elimination bracket
-        while (!bracket.IsComplete())
-        {
-            marker.Write("inside presentation");
-
-            var currentPair = bracket.GetCurrentMatch(); // Get the next stimulus pair
-            if (currentPair == null) break;
-
-            // Extract stimuli indices
-            int stim1Index = currentPair.Stimulus1;
-            int stim2Index = currentPair.Stimulus2 ?? -1;
-
-
-            // Get names from orderDict
-            string stim1Name = orderDict[stim1Index];
-            string stim2Name = orderDict[stim2Index];
-
-            // Set the materials for each stimulus
-            SetMaterial(stim1Index);
-            SetMaterial(stim2Index);
-
-            // Present Stimulus 1
-            //mainCam.transform.Rotate(rotateBack);
-            StartCoroutine(DisplayTextOnScreen("5")); // 5-second countdown
-
-            stimulusString = ", "  + stim1Name;
-            markerString = "ssvep," + _selectableSPOs.Count.ToString() + "," + windowLength.ToString() + "," + realFreqFlash.ToString() + stimulusString;
-            marker.Write(markerString);
-
-            //TUrn off stim 2
-           // _selectableSPOs[1].SetActive(false);
-
-            for(var flash = 0; flash <100*10; flash++) //(StimulusRunning)
-            //the number that flash is less than is the amount of seconds to flash for 
-            //100 = 1 second (frame rate is 100 Hz) so 10 seconds = flash < 100*10s
-            {
-                StartCoroutine(DisplayTextOnScreen("+"));
-                yield return OnStimulusRunBehavior();
-            }
-
-            marker.Write("off");
-
-            mainCam.transform.Rotate(rotateAway);
-            yield return new WaitForSecondsRealtime(2f);
-            StartCoroutine(DisplayTextOnScreen("3"));
-            yield return new WaitForSecondsRealtime(3f); 
-
-
-
-            // Present Stimulus 2
-            SetMaterial(stim2Index);
+            marker.Write("RunStimulus started");
             mainCam.transform.Rotate(rotateBack);
-            stimulusString = ", "  + stim2Name;
-            markerString = "ssvep," + _selectableSPOs.Count.ToString() + "," + windowLength.ToString() + "," + realFreqFlash.ToString() + stimulusString;
-            marker.Write(markerString);
+            StartCoroutine(DisplayTextOnScreen("5"));
+            yield return new WaitForSecondsRealtime(5f);
+            mainCam.transform.Rotate(rotateAway);
 
-            for(var flash = 0; flash <100*10; flash++) //(StimulusRunning)
-            //the number that flash is less than is the amount of seconds to flash for 
-            //100 = 1 second (frame rate is 100 Hz) so 10 seconds = flash < 100*10s
+            // Loop through the double elimination bracket
+            while (!bracket.IsComplete())
             {
-                StartCoroutine(DisplayTextOnScreen("+"));
-                yield return OnStimulusRunBehavior();
+                var currentPair = bracket.GetCurrentMatch(); // Get the next stimulus pair
+                if (currentPair == null) break;
+
+                // Extract stimuli indices
+                int stim1Index = currentPair.Stimulus1;
+                int stim2Index = currentPair.Stimulus2 ?? -1;
+
+
+                // Get names from orderDict
+                string stim1Name = orderDict[stim1Index];
+                string stim2Name = orderDict[stim2Index];
+
+                // Set the materials for each stimulus
+                SetMaterial(stim1Index);
+                SetMaterial(stim2Index);
+
+                //Turn off stimulus 2 for now
+                stim2.enabled = false;
+
+                // Present Stimulus 1
+                StartCoroutine(DisplayTextOnScreen("5")); // 5-second countdown
+
+                stimulusString = ", "  + stim1Name;
+                markerString = "ssvep," + _selectableSPOs.Count.ToString() + "," + windowLength.ToString() + "," + realFreqFlash.ToString() + stimulusString;
+                marker.Write(markerString);
+
+
+                for(var flash = 0; flash <100*10; flash++) //(StimulusRunning)
+                //the number that flash is less than is the amount of seconds to flash for 
+                //100 = 1 second (frame rate is 100 Hz) so 10 seconds = flash < 100*10s
+                {
+                    StartCoroutine(DisplayTextOnScreen("+"));
+                    yield return OnStimulusRunBehavior();
+                }
+
+                marker.Write("off");
+
+                // Turn off stimulus 1 and turn on stimulus 2
+                stim1.enabled = false;
+                stim2.enabled = true;
+
+                mainCam.transform.Rotate(rotateAway);
+                yield return new WaitForSecondsRealtime(2f);
+                StartCoroutine(DisplayTextOnScreen("3"));
+                yield return new WaitForSecondsRealtime(3f); 
+
+                // Present Stimulus 2
+                SetMaterial(stim2Index);
+                mainCam.transform.Rotate(rotateBack);
+                stimulusString = ", "  + stim2Name;
+                markerString = "ssvep," + _selectableSPOs.Count.ToString() + "," + windowLength.ToString() + "," + realFreqFlash.ToString() + stimulusString;
+                marker.Write(markerString);
+
+                for(var flash = 0; flash <100*10; flash++) //(StimulusRunning)
+                //the number that flash is less than is the amount of seconds to flash for 
+                //100 = 1 second (frame rate is 100 Hz) so 10 seconds = flash < 100*10s
+                {
+                    StartCoroutine(DisplayTextOnScreen("+"));
+                    yield return OnStimulusRunBehavior();
+                }
+
+                marker.Write("off");
+
+                mainCam.transform.Rotate(rotateAway);
+                yield return new WaitForSecondsRealtime(2f);
+                StartCoroutine(DisplayTextOnScreen("3"));
+                yield return new WaitForSecondsRealtime(3f); 
+
+                //Turn both stimuli on
+                stim1.enabled = true;
+
+                mainCam.transform.Rotate(rotateBack);
+                stimulusString = ", Stim1: " + stim1Name + ", Stim2: " + stim2Name;
+                markerString = "ssvep," + _selectableSPOs.Count.ToString() + "," + windowLength.ToString() + "," + realFreqFlash.ToString() + stimulusString;
+                marker.Write(markerString);
+
+                for(var flash = 0; flash <100*10; flash++) //(StimulusRunning)
+                //the number that flash is less than is the amount of seconds to flash for 
+                //100 = 1 second (frame rate is 100 Hz) so 10 seconds = flash < 100*10s
+                {
+                    StartCoroutine(DisplayTextOnScreen("+"));
+                    yield return OnStimulusRunBehavior();
+                }
+                
+                marker.Write("off");
+                marker.Write("Pair 1 done");
+
+
+
+
+                // Simultaneous presentation
+                //yield return new WaitForSecondsRealtime(3f);
+                //_selectableSPOs[0].StartStimulus();
+                //_selectableSPOs[1].StartStimulus();
+                //yield return new WaitForSecondsRealtime(5f);
+
+                // Capture preference with keypress input
+                //_displayText.text = "Press 1 for Stimulus 1 or 2 for Stimulus 2";
+                //bool preference = GetUserPreference(); // Custom method for user input
+                //bracket.RecordMatchResult(currentPair, preference ? stim1Index : stim2Index);
+
+                // Stop both stimuli
+                //_selectableSPOs[0].StopStimulus();
+                //_selectableSPOs[1].StopStimulus();
+
+                // Pause before next match
+                yield return new WaitForSecondsRealtime(15f);
             }
 
-            marker.Write("off");
-
-            mainCam.transform.Rotate(rotateAway);
-            yield return new WaitForSecondsRealtime(2f);
-            StartCoroutine(DisplayTextOnScreen("3"));
-            yield return new WaitForSecondsRealtime(3f); 
-            
-            //SHOULD BE GOOD UNTIL HERE
-            
-
-
-
-
-            // Simultaneous presentation
-            //yield return new WaitForSecondsRealtime(3f);
-            //_selectableSPOs[0].StartStimulus();
-            //_selectableSPOs[1].StartStimulus();
-            //yield return new WaitForSecondsRealtime(5f);
-
-            // Capture preference with keypress input
-            //_displayText.text = "Press 1 for Stimulus 1 or 2 for Stimulus 2";
-            //bool preference = GetUserPreference(); // Custom method for user input
-            //bracket.RecordMatchResult(currentPair, preference ? stim1Index : stim2Index);
-
-            // Stop both stimuli
-            //_selectableSPOs[0].StopStimulus();
-            //_selectableSPOs[1].StopStimulus();
-
-            // Pause before next match
-            yield return new WaitForSecondsRealtime(15f);
-        }
-
-            // Finalize
-            mainCam.transform.Rotate(rotateAway);
-            StartCoroutine(DisplayTextOnScreen("EndOfSession"));
-            StopCoroutineReference(ref _runStimulus);
-            StopCoroutineReference(ref _sendMarkers);
+                // Finalize
+                mainCam.transform.Rotate(rotateAway);
+                StartCoroutine(DisplayTextOnScreen("EndOfSession"));
+                StopCoroutineReference(ref _runStimulus);
+                StopCoroutineReference(ref _sendMarkers);
         }
     
 
