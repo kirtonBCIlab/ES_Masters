@@ -29,6 +29,8 @@ namespace BCIEssentials.ControllerBehaviors
 
         private DoubleEliminationBracket bracket;
 
+        private SpriteRenderer stim1;
+        private SpriteRenderer stim2;
 
         protected override void Start()
         {
@@ -47,6 +49,23 @@ namespace BCIEssentials.ControllerBehaviors
             setFreqFlash = 10;
             PopulateObjectList();
             RunStimulus();
+        }
+
+        private void GetSPOs()
+        {
+            marker.Write("inside getSPOs");
+            stim1 = _selectableSPOs[0].GetComponent<SpriteRenderer>();
+
+            if (stim1 != null)
+            {
+                marker.Write("object 1 found");
+            }
+
+            stim2 = _selectableSPOs[1].GetComponent<SpriteRenderer>();
+            if (stim2 != null)
+            {
+                 marker.Write("object 2 found");
+            }
         }
 
         public override void PopulateObjectList(SpoPopulationMethod populationMethod = SpoPopulationMethod.Tag)
@@ -104,6 +123,8 @@ namespace BCIEssentials.ControllerBehaviors
             
         protected override IEnumerator RunStimulus()
         {
+
+        GetSPOs();
         // Camera setup for transitions
         var rotateAway = Vector3.zero;
         rotateAway.y = 90f;
@@ -145,6 +166,9 @@ namespace BCIEssentials.ControllerBehaviors
             stimulusString = ", "  + stim1Name;
             markerString = "ssvep," + _selectableSPOs.Count.ToString() + "," + windowLength.ToString() + "," + realFreqFlash.ToString() + stimulusString;
             marker.Write(markerString);
+
+            //TUrn off stim 2
+           // _selectableSPOs[1].SetActive(false);
 
             for(var flash = 0; flash <100*10; flash++) //(StimulusRunning)
             //the number that flash is less than is the amount of seconds to flash for 

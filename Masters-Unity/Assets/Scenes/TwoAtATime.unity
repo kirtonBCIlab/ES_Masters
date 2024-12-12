@@ -238,7 +238,9 @@ MonoBehaviour:
   setupRequired: 1
   targetFrameRate: 100
   _hotkeysEnabled: 1
-  _selectableSPOs: []
+  _selectableSPOs:
+  - {fileID: 0}
+  - {fileID: 0}
   windowLength: 1
   interWindowInterval: 0
   numTrainingSelections: 0
