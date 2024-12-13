@@ -95,36 +95,8 @@ public class DoubleEliminationBracket
 
     private void SetNextMatch()
     {
-        if (winnerList.Count == 3 && !winnerBracketComplete)
-        {
-            // Create a match for the first two winners
-            int participant1 = winnerList.Dequeue();
-            int participant2 = winnerList.Dequeue();
-
-            winnerBracket.Enqueue(new Match(participant1, participant2));
-            Debug.Log($"Match created: Stimulus {participant1} vs. Stimulus {participant2}");
-
-            // Move the third participant directly to the next round (bye)
-            int byeParticipant = winnerList.Dequeue();
-            winnerList.Enqueue(byeParticipant);
-            Debug.Log($"Stimulus {byeParticipant} gets a bye to the next round.");
-        }
-        else if (loserList.Count == 3 && !loserBracketComplete)
-        {
-            // Create a match for the first two winners
-            int participant1 = loserList.Dequeue();
-            int participant2 = loserList.Dequeue();
-
-            loserBracket.Enqueue(new Match(participant1, participant2));
-            Debug.Log($"Match created: Stimulus {participant1} vs. Stimulus {participant2}");
-
-            // Move the third participant directly to the next round (bye)
-            int byeParticipant = loserList.Dequeue();
-            loserList.Enqueue(byeParticipant);
-            Debug.Log($"Stimulus {byeParticipant} gets a bye to the next round.");
-        }
         // Check if both winner and loser lists have enough players to create a match
-        else if (winnerList.Count >= 2 && !winnerBracketComplete)
+        if (winnerList.Count >= 2 && !winnerBracketComplete)
         {
             // Create the next winner bracket match from the winner list
             winnerBracket.Enqueue(new Match(winnerList.Dequeue(), winnerList.Dequeue()));
