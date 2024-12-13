@@ -143,17 +143,21 @@ public class DoubleEliminationBracket
         }
 
         // Handle bye situation for the winner bracket
-        if (winnerBracket.Count == 0 && winnerList.Count == 1)
+        if (winnerBracket.Count == 0 && winnerList.Count == 1 && !winnerBracketComplete)
         {
+            // Handle the bye situation and create the final winner bracket match
             int winnerFromBye = winnerList.Dequeue();
-            winnerBracket.Enqueue(new Match(winnerFromBye, null));
+            if (winnerBracket.Count == 0)
+            {
+                winnerBracket.Enqueue(new Match(winnerFromBye, null)); // Add the bye directly to the next match
+            }
         }
 
-        if (winnerBracket.Count > 0)
+        if (winnerBracket.Count > 0 && !winnerBracketComplete)
         {
             currentMatch = winnerBracket.Dequeue();
 
-            // Mark the winner bracket as complete after the final match in the winner's bracket
+            // Mark the winner bracket as complete only after Match 11
             if (winnerBracket.Count == 0 && winnerList.Count == 0)
             {
                 winnerBracketComplete = true;
