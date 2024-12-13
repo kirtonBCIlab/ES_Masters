@@ -18,6 +18,7 @@ public class DoubleEliminationBracket
 
     private bool winnerBracketComplete = false; // Tracks if the winner bracket is complete
     private bool loserBracketComplete = false;  // Tracks if the loser bracket is complete
+    private bool firstLosersProcessed = false;
     private int currentRound = 1; // Initialize the round counter
 
     public DoubleEliminationBracket(Dictionary<int, string> stimuli)
@@ -66,7 +67,7 @@ public class DoubleEliminationBracket
         // Get the losing index (the other stimulus in the match)
         int losingIndex = currentMatch.GetOtherStimulus(winningIndex);
 
-        if (currentRound < 10 || currentRound > 20)
+        if (currentRound < 10 || currentRound > 23)
         {
             if (currentRound == 7 || currentRound == 8 || currentRound == 9)
             {
@@ -113,15 +114,14 @@ public class DoubleEliminationBracket
         {
             ProcessWinnerBracket();
         }
-        else
+        else if (!firstLosersProcessed)
         {
             // Process loser's bracket and inject winner bracket losers if needed
             ProcessLoserBracket();
-
-            if (loserBracket.Count == 0 && loserList.Count > 1 && winnerBracketComplete)
-            {
-                InjectWinnerBracketLoser();
-            }
+        }
+        else
+        {        
+            InjectWinnerBracketLoser();
         }
 
         // Handle final match logic
@@ -184,25 +184,12 @@ public class DoubleEliminationBracket
                 return; // Exit to wait for more players from the winner's bracket
             }
         }
-
-        // Handle bye situation for the losers bracket
-        if (loserBracket.Count == 0 && loserList.Count == 1)
-        {
-            int winnerFromBye = loserList.Dequeue();
-            loserBracket.Enqueue(new Match(winnerFromBye, null));
-        }
-
         // Process matches in the loser's bracket
         if (loserBracket.Count > 0)
         {
             currentMatch = loserBracket.Dequeue();
         }
 
-        // Mark the loser's bracket as complete if conditions are met
-        if (loserBracket.Count == 0 && loserList.Count <= 1)
-        {
-            loserBracketComplete = true;
-        }
     }
 
     private void InjectWinnerBracketLoser()
@@ -217,6 +204,29 @@ public class DoubleEliminationBracket
             loserBracket.Enqueue(new Match(loserFromWinnerBracket, winnerBracketLoser));
             Debug.Log($"Injected loser from winner's bracket into loser's bracket: {loserFromWinnerBracket} vs. {winnerBracketLoser}");
         }
+
+        // Handle bye situation for the loser bracket
+        if (loserBracket.Count == 0 && winnerList.Count == 1 && !loserBracketComplete)
+        {
+            // Handle the bye situation and create the final winner bracket match
+            int winnerFromBye = loserList.Dequeue();
+            if (loserBracket.Count == 0)
+            {
+                loserBracket.Enqueue(new Match(winnerFromBye, null)); // Add the bye directly to the next match
+            }
+        }
+
+        if (loserBracket.Count > 0 && !loserBracketComplete)
+        {
+            currentMatch = loserBracket.Dequeue();
+
+            // Mark the winner bracket as complete only after Match 11
+            if (loserBracket.Count == 0 && loserList.Count == 0)
+            {
+                loserBracketComplete = true;
+            }
+        }
+
     }
 
     public bool IsComplete()
