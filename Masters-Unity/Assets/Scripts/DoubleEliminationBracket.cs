@@ -113,6 +113,7 @@ public class DoubleEliminationBracket
         if (!winnerBracketComplete)
         {
             ProcessWinnerBracket();
+            // NEED TO SAVE WINNER
         }
         else if (!firstLosersProcessed)
         {
@@ -214,7 +215,7 @@ public class DoubleEliminationBracket
             {
                 loserBracket.Enqueue(new Match(winnerFromBye, null)); // Add the bye directly to the next match
             }
-        }
+        }   
 
         if (loserBracket.Count > 0 && !loserBracketComplete)
         {
