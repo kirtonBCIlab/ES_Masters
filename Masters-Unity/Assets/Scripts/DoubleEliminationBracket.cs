@@ -102,6 +102,16 @@ public class DoubleEliminationBracket
             winnerBracket.Enqueue(new Match(winnerList.Dequeue(), winnerList.Dequeue()));
         }
 
+        if (winnerBracket.Count == 0 && winnerList.Count == 1 && !winnerBracketComplete)
+        {
+            // Handle the bye situation and create the final winner bracket match
+            int winnerFromBye = winnerList.Dequeue();
+            if (winnerBracket.Count == 0)
+            {
+                winnerBracket.Enqueue(new Match(winnerFromBye, null)); // Add the bye directly to the next match
+            }
+        }
+
         if (loserList.Count >= 2 && !loserBracketComplete)
         {
             // Create the next loser bracket match from the loser list
@@ -112,24 +122,25 @@ public class DoubleEliminationBracket
         {
             currentMatch = winnerBracket.Dequeue();
 
-            if (winnerBracket.Count == 0 && winnerList.Count == 1)
-                {
-                    winnerBracketComplete = true;
-                }
+            // Mark the winner bracket as complete only after Match 11
+            if (winnerBracket.Count == 0 && winnerList.Count == 0)
+            {
+                winnerBracketComplete = true;
+            }
         }
         else if (loserBracket.Count > 0 && !loserBracketComplete)
         {
             currentMatch = loserBracket.Dequeue();
 
-            if(loserBracket.Count == 0 && loserList.Count == 1)
+            // Mark the loser bracket as complete if no more matches can be created
+            if (loserBracket.Count == 0 && loserList.Count == 1)
             {
                 loserBracketComplete = true;
             }
         }
-    
         else if (winnerBracketComplete && loserBracketComplete && winnerList.Count == 1 && loserList.Count == 1)
         {
-            // Create final match between winner and loser
+            // Create the final match between the winner and the loser
             Debug.Log("Preparing final match...");
             winnerBracket.Enqueue(new Match(winnerList.Dequeue(), loserList.Dequeue()));
             currentMatch = winnerBracket.Dequeue();
