@@ -19,6 +19,9 @@ public class DoubleEliminationBracket
     private bool winnerBracketComplete = false; // Tracks if the winner bracket is complete
     private bool loserBracketComplete = false;  // Tracks if the loser bracket is complete
     private bool firstLosersProcessed = false;
+    private bool loserBracketRound2Complete = false;
+    private int winnerWinner;
+    private int loserWinner;
     private int currentRound = 1; // Initialize the round counter
 
     public DoubleEliminationBracket(Dictionary<int, string> stimuli)
@@ -31,6 +34,8 @@ public class DoubleEliminationBracket
         secondRoundLoserList = new Queue<int>();
         eliminated = new List<int>();
         winner = null;
+        winnerWinner = -1;
+        loserWinner = -1;
 
         InitializeBracket();
     }
@@ -88,17 +93,36 @@ public class DoubleEliminationBracket
             Debug.Log($"eliminated contents: {eliminated.Count}");
         }
 
-        winnerList.Enqueue(winningIndex);
+
+        // Save winner of winners bracket
+        if(currentRound == 11)
+        {
+            winnerWinner = winningIndex;
+            Debug.Log($"Winner saved {winnerWinner}");
+        }
+        else if (currentRound == 19)
+        {
+            loserWinner = winningIndex;
+            Debug.Log("Winner of losers saved");
+        }
+        else if (currentRound == 20)
+        {
+            winner = winningIndex;
+            Debug.Log($"Final match reached. Winner is Stimulus {winner}");
+            currentMatch = null;
+        }
+        else
+        {
+            winnerList.Enqueue(winningIndex);
+        }
 
         // Log the winner and loser
         Debug.Log($"Round {currentRound} result: Stimulus {winningIndex} wins, Stimulus {losingIndex} {(currentRound >= 10 && currentRound <= 20 ? "(not recorded)" : "loses")}");
 
-        // Check for completion or set up the next match
-        if (winnerBracket.Count == 0 && loserBracket.Count == 0 && loserList.Count == 1 && winnerList.Count == 1)
+        if(loserBracketComplete)
         {
-            winner = winnerList.Dequeue(); // Final match reached
-            Debug.Log($"Final match reached. Winner is Stimulus {winner}");
-            currentMatch = null; // No more matches after the final
+            SetLastMatch();
+            currentRound++;
         }
         else
         {
@@ -110,28 +134,30 @@ public class DoubleEliminationBracket
 
     private void SetNextMatch()
     {
+        Debug.Log($"winnerBracketCOmplete: {winnerBracketComplete}");
         if (!winnerBracketComplete)
         {
             ProcessWinnerBracket();
-            // NEED TO SAVE WINNER
         }
         else if (!firstLosersProcessed)
         {
             // Process loser's bracket and inject winner bracket losers if needed
             ProcessLoserBracket();
         }
-        else
+        else if (!loserBracketRound2Complete)
         {        
             InjectWinnerBracketLoser();
         }
-
-        // Handle final match logic
-        if (winnerBracketComplete && loserBracketComplete && winnerList.Count == 1 && loserList.Count == 1)
+        else
         {
-            // Final match between the last winner and loser
-            winnerBracket.Enqueue(new Match(winnerList.Dequeue(), loserList.Dequeue()));
-            currentMatch = winnerBracket.Dequeue();
+            Last2OfLosers();
         }
+    }
+
+    private void SetLastMatch()
+    {
+        winnerBracket.Enqueue(new Match(winnerWinner, loserWinner));
+        currentMatch = winnerBracket.Dequeue();
     }
 
 
@@ -141,17 +167,6 @@ public class DoubleEliminationBracket
         if (winnerList.Count >= 2)
         {
             winnerBracket.Enqueue(new Match(winnerList.Dequeue(), winnerList.Dequeue()));
-        }
-
-        // Handle bye situation for the winner bracket
-        if (winnerBracket.Count == 0 && winnerList.Count == 1 && !winnerBracketComplete)
-        {
-            // Handle the bye situation and create the final winner bracket match
-            int winnerFromBye = winnerList.Dequeue();
-            if (winnerBracket.Count == 0)
-            {
-                winnerBracket.Enqueue(new Match(winnerFromBye, null)); // Add the bye directly to the next match
-            }
         }
 
         if (winnerBracket.Count > 0 && !winnerBracketComplete)
@@ -169,65 +184,83 @@ public class DoubleEliminationBracket
     private void ProcessLoserBracket()
     {
         // Process the first three matches in the loser's bracket
-        if (!loserBracketComplete && loserBracket.Count == 0 && loserList.Count >= 2)
+        if (!loserBracketComplete && loserBracket.Count == 0)
         {
             int processedMatches = 0;
             while (processedMatches < 3 && loserList.Count >= 2)
             {
                 loserBracket.Enqueue(new Match(loserList.Dequeue(), loserList.Dequeue()));
+                Debug.Log("Inside adding matches to loser while loop 190");
                 processedMatches++;
             }
 
             // After processing first three matches, stop to wait for second-round losers from the winner's bracket
-            if (processedMatches == 3 && loserList.Count > 0)
+            if (processedMatches == 3)
             {
                 Debug.Log("First three matches in the loser's bracket processed. Waiting for second-round losers.");
-                return; // Exit to wait for more players from the winner's bracket
+                //return; // Exit to wait for more players from the winner's bracket
             }
         }
         // Process matches in the loser's bracket
         if (loserBracket.Count > 0)
         {
             currentMatch = loserBracket.Dequeue();
-        }
 
+            if (loserBracket.Count == 0)
+            {
+                firstLosersProcessed= true;
+            }
+        }
     }
 
     private void InjectWinnerBracketLoser()
     {
         // Inject losers from the second round of the winner's bracket into the loser's bracket
-        if (winnerBracketComplete && secondRoundLoserList.Count >= 1 && winnerList.Count > 0)
+        if (secondRoundLoserList.Count > 0 && winnerList.Count > 0)
         {
-            int loserFromWinnerBracket = secondRoundLoserList.Dequeue();
-            int winnerBracketLoser = winnerList.Dequeue();
+            int addedMatches = 0;
+            while (addedMatches < 3 )
+            {
+                int loserFromWinnerBracket = secondRoundLoserList.Dequeue();
+                int winnerBracketLoser = winnerList.Dequeue();
 
-            // Add a match to the loser's bracket with the current loser's bracket winner
-            loserBracket.Enqueue(new Match(loserFromWinnerBracket, winnerBracketLoser));
-            Debug.Log($"Injected loser from winner's bracket into loser's bracket: {loserFromWinnerBracket} vs. {winnerBracketLoser}");
+                // Add a match to the loser's bracket with the current loser's bracket winner
+                loserBracket.Enqueue(new Match(loserFromWinnerBracket, winnerBracketLoser));
+                Debug.Log($"Injected loser from winner's bracket into loser's bracket: {loserFromWinnerBracket} vs. {winnerBracketLoser}");
+                addedMatches++;
+            }
         }
 
-        // Handle bye situation for the loser bracket
-        if (loserBracket.Count == 0 && winnerList.Count == 1 && !loserBracketComplete)
-        {
-            // Handle the bye situation and create the final winner bracket match
-            int winnerFromBye = loserList.Dequeue();
-            if (loserBracket.Count == 0)
-            {
-                loserBracket.Enqueue(new Match(winnerFromBye, null)); // Add the bye directly to the next match
-            }
-        }   
-
-        if (loserBracket.Count > 0 && !loserBracketComplete)
+        if (loserBracket.Count > 0 && !loserBracketRound2Complete)
         {
             currentMatch = loserBracket.Dequeue();
 
             // Mark the winner bracket as complete only after Match 11
-            if (loserBracket.Count == 0 && loserList.Count == 0)
+            if (loserBracket.Count == 0)
+            {
+                loserBracketRound2Complete = true;
+            }
+        }
+
+    }
+
+    private void Last2OfLosers()
+    {
+        if (winnerList.Count >= 2)
+        {
+            winnerBracket.Enqueue(new Match(winnerList.Dequeue(), winnerList.Dequeue()));
+        }
+
+        if (winnerBracket.Count > 0 && !loserBracketComplete)
+        {
+            currentMatch = winnerBracket.Dequeue();
+
+            // Mark the winner bracket as complete only after Match 11
+            if (winnerBracket.Count == 0 && winnerList.Count == 0)
             {
                 loserBracketComplete = true;
             }
         }
-
     }
 
     public bool IsComplete()
