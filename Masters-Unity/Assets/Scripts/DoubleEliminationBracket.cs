@@ -16,13 +16,13 @@ public class DoubleEliminationBracket
     private List<int> eliminated;
     private int? winner;
 
-    private bool winnerBracketComplete = false; // Tracks if the winner bracket is complete
-    private bool loserBracketComplete = false;  // Tracks if the loser bracket is complete
-    private bool firstLosersProcessed = false;
+    private bool winnerBracketComplete = false; 
+    private bool loserBracketComplete = false; 
+    private bool loserBracketRound1Complete = false;
     private bool loserBracketRound2Complete = false;
     private int winnerWinner;
     private int loserWinner;
-    private int currentRound = 1; // Initialize the round counter
+    private int currentRound = 1;
 
     public DoubleEliminationBracket(Dictionary<int, string> stimuli)
     {
@@ -72,53 +72,50 @@ public class DoubleEliminationBracket
         // Get the losing index (the other stimulus in the match)
         int losingIndex = currentMatch.GetOtherStimulus(winningIndex);
 
-        if (currentRound < 10 || currentRound > 23)
+        //handle losers
+        if (currentRound < 10)
         {
             if (currentRound == 7 || currentRound == 8 || currentRound == 9)
             {
+                //if the loser lost in the 2nd round of the winner bracket, save it in a special list
                 secondRoundLoserList.Enqueue(losingIndex);
-                Debug.Log($"secondRoundLoserList contents: {secondRoundLoserList.Count}");
             }
             else
             {
-                // Move to the loser bracket if not eliminated
+                //if the loser lost in the 1st round of the winner bracket, save it in the normal loser list
                 loserList.Enqueue(losingIndex);
-                Debug.Log($"LoserList contents: {loserList.Count}");
             }
         }
         else
         {
-            //Eliminate if already in the loser bracket
+            //if the loser loses after round 10, they are eliminated
             eliminated.Add(losingIndex);
-            Debug.Log($"eliminated contents: {eliminated.Count}");
         }
 
-
-        // Save winner of winners bracket
+        //handle losers
         if(currentRound == 11)
         {
+            // Save winner of winners bracket
             winnerWinner = winningIndex;
-            Debug.Log($"Winner saved {winnerWinner}");
         }
         else if (currentRound == 19)
         {
+            // save winner of losers bracket
             loserWinner = winningIndex;
-            Debug.Log("Winner of losers saved");
         }
         else if (currentRound == 20)
         {
+            //save winner of whole bracket
             winner = winningIndex;
-            Debug.Log($"Final match reached. Winner is Stimulus {winner}");
             currentMatch = null;
         }
         else
         {
+            //add the winner of the match to the winner list if it has no special circumstances
             winnerList.Enqueue(winningIndex);
         }
 
-        // Log the winner and loser
-        Debug.Log($"Round {currentRound} result: Stimulus {winningIndex} wins, Stimulus {losingIndex} {(currentRound >= 10 && currentRound <= 20 ? "(not recorded)" : "loses")}");
-
+        //Handle last match
         if(loserBracketComplete)
         {
             SetLastMatch();
@@ -134,28 +131,31 @@ public class DoubleEliminationBracket
 
     private void SetNextMatch()
     {
-        Debug.Log($"winnerBracketCOmplete: {winnerBracketComplete}");
         if (!winnerBracketComplete)
         {
+            //process full winner's bracket
             ProcessWinnerBracket();
         }
-        else if (!firstLosersProcessed)
+        else if (!loserBracketRound1Complete)
         {
-            // Process loser's bracket and inject winner bracket losers if needed
+            //process first round of losers bracket
             ProcessLoserBracket();
         }
         else if (!loserBracketRound2Complete)
-        {        
+        {     
+            //process 2nd round of the losers bracket   
             InjectWinnerBracketLoser();
         }
         else
         {
+            //process the end of the lsoers bracket
             Last2OfLosers();
         }
     }
 
     private void SetLastMatch()
     {
+        //winner of losers bracket vs winner of winners bracket
         winnerBracket.Enqueue(new Match(winnerWinner, loserWinner));
         currentMatch = winnerBracket.Dequeue();
     }
@@ -169,6 +169,7 @@ public class DoubleEliminationBracket
             winnerBracket.Enqueue(new Match(winnerList.Dequeue(), winnerList.Dequeue()));
         }
 
+        //get next match from winner bracket
         if (winnerBracket.Count > 0 && !winnerBracketComplete)
         {
             currentMatch = winnerBracket.Dequeue();
@@ -190,17 +191,10 @@ public class DoubleEliminationBracket
             while (processedMatches < 3 && loserList.Count >= 2)
             {
                 loserBracket.Enqueue(new Match(loserList.Dequeue(), loserList.Dequeue()));
-                Debug.Log("Inside adding matches to loser while loop 190");
                 processedMatches++;
             }
-
-            // After processing first three matches, stop to wait for second-round losers from the winner's bracket
-            if (processedMatches == 3)
-            {
-                Debug.Log("First three matches in the loser's bracket processed. Waiting for second-round losers.");
-                //return; // Exit to wait for more players from the winner's bracket
-            }
         }
+
         // Process matches in the loser's bracket
         if (loserBracket.Count > 0)
         {
@@ -208,7 +202,7 @@ public class DoubleEliminationBracket
 
             if (loserBracket.Count == 0)
             {
-                firstLosersProcessed= true;
+                loserBracketRound1Complete = true;
             }
         }
     }
@@ -226,7 +220,6 @@ public class DoubleEliminationBracket
 
                 // Add a match to the loser's bracket with the current loser's bracket winner
                 loserBracket.Enqueue(new Match(loserFromWinnerBracket, winnerBracketLoser));
-                Debug.Log($"Injected loser from winner's bracket into loser's bracket: {loserFromWinnerBracket} vs. {winnerBracketLoser}");
                 addedMatches++;
             }
         }
@@ -241,7 +234,6 @@ public class DoubleEliminationBracket
                 loserBracketRound2Complete = true;
             }
         }
-
     }
 
     private void Last2OfLosers()
@@ -255,7 +247,7 @@ public class DoubleEliminationBracket
         {
             currentMatch = winnerBracket.Dequeue();
 
-            // Mark the winner bracket as complete only after Match 11
+            // Mark the winner bracket as complete only after Match 19
             if (winnerBracket.Count == 0 && winnerList.Count == 0)
             {
                 loserBracketComplete = true;
@@ -271,11 +263,6 @@ public class DoubleEliminationBracket
     public string GetWinner()
     {
         return winner.HasValue ? stimuliDict[winner.Value] : null;
-    }
-
-    public List<string> GetEliminated()
-    {
-        return eliminated.Select(index => stimuliDict[index]).ToList();
     }
 
     public class Match

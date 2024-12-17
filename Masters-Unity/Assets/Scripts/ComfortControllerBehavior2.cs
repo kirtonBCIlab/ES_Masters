@@ -246,12 +246,13 @@ namespace BCIEssentials.ControllerBehaviors
                     Debug.Log("No preference chosen");
                 }
 
-
                 // Reset preference to null so the value doesn't carry over to the next pair
                 preference = null;
 
                 pairNum = pairNum + 1;
             }
+
+                Debug.Log($"Winner overall: {bracket.GetWinner()}");
 
                 // Finalize
                 mainCam.transform.Rotate(rotateAway);
@@ -259,8 +260,6 @@ namespace BCIEssentials.ControllerBehaviors
                 StopCoroutineReference(ref _runStimulus);
                 StopCoroutineReference(ref _sendMarkers);
         }
-    
-        //private bool preference = false; // Store the user's preference
 
         private IEnumerator GetUserPreferenceCoroutine()
         {
@@ -286,8 +285,6 @@ namespace BCIEssentials.ControllerBehaviors
                 yield return null;
             }
         }
-
-
 
         //Helper Methods
         public IEnumerator DisplayTextOnScreen(string textOption)
