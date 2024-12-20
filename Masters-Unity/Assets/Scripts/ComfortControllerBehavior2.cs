@@ -264,6 +264,7 @@ namespace BCIEssentials.ControllerBehaviors
         private IEnumerator GetUserPreferenceCoroutine()
         {
             bool preferenceCaptured = false;
+            //marker write "start pref collection
             // Wait for user input
             while (!preferenceCaptured)
             {
@@ -272,12 +273,14 @@ namespace BCIEssentials.ControllerBehaviors
                 {
                     preference = true; // Stimulus 1 selected
                     preferenceCaptured = true;
+                    //marker write chose 1
                     Debug.Log("Stimulus 1 selected successfully in the controller");
                 }
                 else if (Input.GetKeyDown(KeyCode.Alpha2) || Input.GetKeyDown(KeyCode.Keypad2))
                 {
                     preference = false; // Stimulus 2 selected
                     preferenceCaptured = true;
+                    //marker write chose 2
                     Debug.Log("Stimulus 2 selected successfully in the controller");
                 }
 
