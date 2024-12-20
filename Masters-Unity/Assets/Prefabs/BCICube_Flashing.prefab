@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 8680933289109701472}
   - component: {fileID: -8162223777960210150}
   - component: {fileID: 7970331816264042245}
+  - component: {fileID: 6389763785613651752}
   m_Layer: 0
   m_Name: BCICube_Flashing
   m_TagString: BCI
@@ -20,14 +21,13 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &1048484350530938659
-Transform:
+--- !u!224 &1048484350530938659
+RectTransform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1048484350530938663}
-  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -35,6 +35,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 1, y: 1}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &7639228323464969584
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -144,7 +149,6 @@ MonoBehaviour:
   materialList: {fileID: 2100000, guid: e4b1fccede50e234785a7d95ca4cd77c, type: 2}
   _contrastLevel: 0
   _size: 0
-  setMaterial: {fileID: 2100000, guid: e4b1fccede50e234785a7d95ca4cd77c, type: 2}
 --- !u!212 &7970331816264042245
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -197,3 +201,11 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!222 &6389763785613651752
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1048484350530938663}
+  m_CullTransparentMesh: 1

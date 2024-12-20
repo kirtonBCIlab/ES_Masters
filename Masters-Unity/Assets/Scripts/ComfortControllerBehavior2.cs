@@ -22,6 +22,8 @@ namespace BCIEssentials.ControllerBehaviors
         private int[] frame_on_count = new int[99];
 
         public Camera mainCam;
+        public Text _displayMarker1;
+        public Text _displayMarker2;
         public Text _displayText;
         private string stimulusString = "";
         private string markerString = "";
@@ -45,7 +47,9 @@ namespace BCIEssentials.ControllerBehaviors
             mainCam = Camera.main;
             mainCam.enabled = true;
         
-            _displayText = GameObject.Find("TextToDisplay").GetComponent<Text>();
+            _displayMarker1 = GameObject.Find("Marker1").GetComponent<Text>();
+            _displayMarker2 = GameObject.Find("Marker2").GetComponent<Text>();
+            _displayText = GameObject.Find("Text").GetComponent<Text>();
 
             // randomize order of stimulus presentation 
             Randomize();
@@ -159,6 +163,12 @@ namespace BCIEssentials.ControllerBehaviors
                 stim2.enabled = false;
                 stim1Object.transform.position = new Vector3(1, 0, 0);
         
+                // Reset + marker positions
+                RectTransform marker1Rect = _displayMarker1.GetComponent<RectTransform>();
+                RectTransform marker2Rect = _displayMarker2.GetComponent<RectTransform>();
+                marker1Rect.anchoredPosition = new Vector2(0, marker1Rect.anchoredPosition.y);
+                marker2Rect.anchoredPosition = new Vector2(0, marker2Rect.anchoredPosition.y);
+
                 // Present Stimulus 1
                 StartCoroutine(DisplayTextOnScreen("5")); // 5-second countdown
                 yield return new WaitForSecondsRealtime(5f);
@@ -172,7 +182,8 @@ namespace BCIEssentials.ControllerBehaviors
                 //the number that flash is less than is the amount of seconds to flash for 
                 //100 = 1 second (frame rate is 100 Hz) so 10 seconds = flash < 100*10s
                 {
-                    StartCoroutine(DisplayTextOnScreen("+"));
+                    ScalePlusSignToStimulus(stim1Object, false);
+                    StartCoroutine(DisplayTextOnScreen("+1"));
                     yield return OnStimulusRunBehavior();
                 }
 
@@ -199,7 +210,8 @@ namespace BCIEssentials.ControllerBehaviors
                 //the number that flash is less than is the amount of seconds to flash for 
                 //100 = 1 second (frame rate is 100 Hz) so 10 seconds = flash < 100*10s
                 {
-                    StartCoroutine(DisplayTextOnScreen("+"));
+                    ScalePlusSignToStimulus(stim2Object, false);
+                    StartCoroutine(DisplayTextOnScreen("+2"));
                     yield return OnStimulusRunBehavior();
                 }
 
@@ -224,7 +236,10 @@ namespace BCIEssentials.ControllerBehaviors
                 //the number that flash is less than is the amount of seconds to flash for 
                 //100 = 1 second (frame rate is 100 Hz) so 10 seconds = flash < 100*10s
                 {
-                    StartCoroutine(DisplayTextOnScreen("+"));
+                    ScalePlusSignToStimulus(stim1Object, true);
+                    ScalePlusSignToStimulus(stim2Object, true);
+                    StartCoroutine(DisplayTextOnScreen("+1"));
+                    StartCoroutine(DisplayTextOnScreen("+2"));
                     yield return OnStimulusRunBehavior();
                 }
                 
@@ -290,6 +305,82 @@ namespace BCIEssentials.ControllerBehaviors
         }
 
         //Helper Methods
+        private void ScalePlusSignToStimulus(GameObject stimulus, bool bothDisplayed)
+        {
+            if (stimulus != null && _displayMarker1 != null && _displayMarker2)
+            {
+                var currentPair = bracket.GetCurrentMatch(); 
+
+                // Extract stimuli indices
+                int stim1Index = currentPair.Stimulus1;
+                int stim2Index = currentPair.Stimulus2 ?? -1;
+
+                // Get names from orderDict
+                string stim1Name = orderDict[stim1Index];
+                string stim2Name = orderDict[stim2Index];
+
+                RectTransform marker1Rect = _displayMarker1.GetComponent<RectTransform>();
+                RectTransform marker2Rect = _displayMarker2.GetComponent<RectTransform>();
+
+
+                if(bothDisplayed)
+                {                    
+                    marker1Rect.anchoredPosition = new Vector2(-130, marker1Rect.anchoredPosition.y);
+                    marker2Rect.anchoredPosition = new Vector2(130, marker2Rect.anchoredPosition.y);
+                }
+
+                else
+                {
+                    if (stim1Name.Contains("Size1"))
+                    {
+                        _displayMarker1.fontSize = 10;
+                        marker1Rect.anchoredPosition = new Vector2(marker1Rect.anchoredPosition.x, 0);
+                    }
+                    else if (stim1Name.Contains("Size2"))
+                    {
+                        _displayMarker1.fontSize = 30;
+                        marker1Rect.anchoredPosition = new Vector2(marker1Rect.anchoredPosition.x, 10);
+                    }
+                    else
+                    {
+                        _displayMarker1.fontSize = 50;
+                        marker1Rect.anchoredPosition = new Vector2(marker1Rect.anchoredPosition.x, 20);
+
+                    }
+
+                    if (stim2Name.Contains("Size1"))
+                    {
+                        _displayMarker2.fontSize = 10;
+                        marker2Rect.anchoredPosition = new Vector2(marker2Rect.anchoredPosition.x, 0);
+
+                    }
+                    else if (stim2Name.Contains("Size2"))
+                    {
+                        _displayMarker2.fontSize = 30;
+                        marker2Rect.anchoredPosition = new Vector2(marker2Rect.anchoredPosition.x, 10);
+
+                    }
+                    else
+                    {
+                        _displayMarker2.fontSize = 50;
+                        marker2Rect.anchoredPosition = new Vector2(marker2Rect.anchoredPosition.x, 20);
+
+                    } 
+                }
+
+                // Get the size of the stimulus
+                //Vector3 stimulusScale = stimulus.transform.localScale;
+
+                
+
+                // Adjust font size proportionally (tune multiplier as needed)
+                //float baseFontSize = 10; // Default font size for "+" sign
+                //float scaleMultiplier = 2; // Adjust this multiplier based on your requirement
+
+                //_displayText1.fontSize = Mathf.RoundToInt(baseFontSize * Mathf.Max(stimulusScale.x, stimulusScale.y) * scaleMultiplier);
+            }
+        }
+
         public IEnumerator DisplayTextOnScreen(string textOption)
         {
             if(textOption == "3")
@@ -319,11 +410,17 @@ namespace BCIEssentials.ControllerBehaviors
                 _displayText.text = "End";
                 yield return new WaitForSecondsRealtime(2.0f);
             }
-            else if(textOption == "+")
+            else if(textOption == "+1")
             {
-                _displayText.text = "+";
+                _displayMarker1.text = "+";
                 yield return new WaitForSecondsRealtime(1.0f);
-                _displayText.text = "";
+                _displayMarker1.text = "";
+            }
+            else if(textOption == "+2")
+            {
+                _displayMarker2.text = "+";
+                yield return new WaitForSecondsRealtime(1.0f);
+                _displayMarker2.text = "";
             }
             else if (textOption == "Choose")
             {
