@@ -166,8 +166,8 @@ namespace BCIEssentials.ControllerBehaviors
                 // Reset + marker positions
                 RectTransform marker1Rect = _displayMarker1.GetComponent<RectTransform>();
                 RectTransform marker2Rect = _displayMarker2.GetComponent<RectTransform>();
-                marker1Rect.anchoredPosition = new Vector2(0, marker1Rect.anchoredPosition.y);
-                marker2Rect.anchoredPosition = new Vector2(0, marker2Rect.anchoredPosition.y);
+               //arker1Rect.anchoredPosition = new Vector2(0, marker1Rect.anchoredPosition.y);
+               //arker2Rect.anchoredPosition = new Vector2(0, marker2Rect.anchoredPosition.y);
 
                 // Present Stimulus 1
                 StartCoroutine(DisplayTextOnScreen("5")); // 5-second countdown
@@ -307,7 +307,7 @@ namespace BCIEssentials.ControllerBehaviors
         //Helper Methods
         private void ScalePlusSignToStimulus(GameObject stimulus, bool bothDisplayed)
         {
-            if (stimulus != null && _displayMarker1 != null && _displayMarker2)
+            if (stimulus != null && _displayMarker1 != null && _displayMarker2 != null)
             {
                 var currentPair = bracket.GetCurrentMatch(); 
 
@@ -333,37 +333,46 @@ namespace BCIEssentials.ControllerBehaviors
                 {
                     if (stim1Name.Contains("Size1"))
                     {
-                        _displayMarker1.fontSize = 10;
-                        marker1Rect.anchoredPosition = new Vector2(marker1Rect.anchoredPosition.x, 0);
+                        _displayMarker1.fontSize = 50;
+                        marker1Rect.localPosition = new Vector3(0f,20f,0f);
                     }
                     else if (stim1Name.Contains("Size2"))
                     {
-                        _displayMarker1.fontSize = 30;
-                        marker1Rect.anchoredPosition = new Vector2(marker1Rect.anchoredPosition.x, 10);
+                        _displayMarker1.fontSize = 50;
+                        marker1Rect.localPosition = new Vector3(0f,20f,0f);
+
+                      //marker1Rect.anchoredPosition = new Vector2(marker1Rect.anchoredPosition.x, -10f);
+                      //marker1Rect.anchoredPosition = new Vector2(marker1Rect.anchoredPosition.y, 20f);
                     }
                     else
                     {
                         _displayMarker1.fontSize = 50;
-                        marker1Rect.anchoredPosition = new Vector2(marker1Rect.anchoredPosition.x, 20);
+                        marker1Rect.localPosition = new Vector3(0f,20f,0f);
 
+                     ///marker1Rect.anchoredPosition = new Vector2(marker1Rect.anchoredPosition.x, 0);
+                      //marker1Rect.anchoredPosition = new Vector2(marker1Rect.anchoredPosition.y, 20f);
                     }
 
                     if (stim2Name.Contains("Size1"))
                     {
-                        _displayMarker2.fontSize = 10;
-                        marker2Rect.anchoredPosition = new Vector2(marker2Rect.anchoredPosition.x, 0);
-
+                        _displayMarker2.fontSize = 50;
+                        marker2Rect.localPosition = new Vector3(0f,20f,0f);
                     }
                     else if (stim2Name.Contains("Size2"))
                     {
-                        _displayMarker2.fontSize = 30;
-                        marker2Rect.anchoredPosition = new Vector2(marker2Rect.anchoredPosition.x, 10);
+                        _displayMarker2.fontSize = 50;
+                        marker2Rect.localPosition = new Vector3(0f,20f,0f);
+                      //marker2Rect.anchoredPosition = new Vector2(marker2Rect.anchoredPosition.x, -10f);
+                      //marker1Rect.anchoredPosition = new Vector2(marker1Rect.anchoredPosition.y, 20f);
 
                     }
                     else
                     {
                         _displayMarker2.fontSize = 50;
-                        marker2Rect.anchoredPosition = new Vector2(marker2Rect.anchoredPosition.x, 20);
+                        marker2Rect.localPosition = new Vector3(0f,20f,0f);
+                      //marker2Rect.anchoredPosition = new Vector2(marker2Rect.anchoredPosition.x, 0);
+                      //marker1Rect.anchoredPosition = new Vector2(marker1Rect.anchoredPosition.y, 20f);
+
 
                     } 
                 }
