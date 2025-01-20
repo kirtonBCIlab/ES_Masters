@@ -178,7 +178,7 @@ namespace BCIEssentials.ControllerBehaviors
                 marker.Write(markerString);
 
 
-                for(var flash = 0; flash <100*2; flash++) //(StimulusRunning)
+                for(var flash = 0; flash <100*10; flash++) //(StimulusRunning)
                 //the number that flash is less than is the amount of seconds to flash for 
                 //100 = 1 second (frame rate is 100 Hz) so 10 seconds = flash < 100*10s
                 {
@@ -206,7 +206,7 @@ namespace BCIEssentials.ControllerBehaviors
                 markerString = "ssvep," + _selectableSPOs.Count.ToString() + "," + windowLength.ToString() + "," + realFreqFlash.ToString() + stimulusString;
                 marker.Write(markerString);
 
-                for(var flash = 0; flash <100*2; flash++) //(StimulusRunning)
+                for(var flash = 0; flash <100*10; flash++) //(StimulusRunning)
                 //the number that flash is less than is the amount of seconds to flash for 
                 //100 = 1 second (frame rate is 100 Hz) so 10 seconds = flash < 100*10s
                 {
