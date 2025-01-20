@@ -166,9 +166,7 @@ namespace BCIEssentials.ControllerBehaviors
                 // Reset + marker positions
                 RectTransform marker1Rect = _displayMarker1.GetComponent<RectTransform>();
                 RectTransform marker2Rect = _displayMarker2.GetComponent<RectTransform>();
-                marker1Rect.anchoredPosition = new Vector2(0, marker1Rect.anchoredPosition.y);
-                marker2Rect.anchoredPosition = new Vector2(0, marker2Rect.anchoredPosition.y);
-
+            
                 // Present Stimulus 1
                 StartCoroutine(DisplayTextOnScreen("5")); // 5-second countdown
                 yield return new WaitForSecondsRealtime(5f);
@@ -232,7 +230,7 @@ namespace BCIEssentials.ControllerBehaviors
                 markerString = "ssvep," + _selectableSPOs.Count.ToString() + "," + windowLength.ToString() + "," + realFreqFlash.ToString() + stimulusString;
                 marker.Write(markerString);
 
-                for(var flash = 0; flash <100*2; flash++) //(StimulusRunning)
+                for(var flash = 0; flash <100*10; flash++) //(StimulusRunning)
                 //the number that flash is less than is the amount of seconds to flash for 
                 //100 = 1 second (frame rate is 100 Hz) so 10 seconds = flash < 100*10s
                 {
@@ -248,13 +246,12 @@ namespace BCIEssentials.ControllerBehaviors
                 StartCoroutine(GetUserPreferenceCoroutine());
                 yield return new WaitUntil(() => preference != null);
 
-                // Record the winner in the bracket
-                // Stim1 = 'true' recorded, Stim2 = 'false' recorded
+                // Record the winner in the bracket: stim1 = 'true' recorded, Stim2 = 'false' recorded
                 if (preference.HasValue)
                 {
                     bracket.RecordMatchResult(preference.Value ? stim1Index : stim2Index);
                     StartCoroutine(DisplayTextOnScreen("Break"));
-                    yield return new WaitForSecondsRealtime(5.0f);
+                    yield return new WaitForSecondsRealtime(10.0f); //will be combined with a 5 second countdown for a total 15 second break
                 }
                 else
                 {
@@ -263,17 +260,16 @@ namespace BCIEssentials.ControllerBehaviors
 
                 // Reset preference to null so the value doesn't carry over to the next pair
                 preference = null;
-
                 pairNum = pairNum + 1;
             }
+                
+            Debug.Log($"Winner overall: {bracket.GetWinner()}");
 
-                Debug.Log($"Winner overall: {bracket.GetWinner()}");
-
-                // Finalize
-                mainCam.transform.Rotate(rotateAway);
-                StartCoroutine(DisplayTextOnScreen("EndOfSession"));
-                StopCoroutineReference(ref _runStimulus);
-                StopCoroutineReference(ref _sendMarkers);
+            // Finalize
+            mainCam.transform.Rotate(rotateAway);
+            StartCoroutine(DisplayTextOnScreen("EndOfSession"));
+            StopCoroutineReference(ref _runStimulus);
+            StopCoroutineReference(ref _sendMarkers);
         }
 
         private IEnumerator GetUserPreferenceCoroutine()
@@ -307,7 +303,7 @@ namespace BCIEssentials.ControllerBehaviors
         //Helper Methods
         private void ScalePlusSignToStimulus(GameObject stimulus, bool bothDisplayed)
         {
-            if (stimulus != null && _displayMarker1 != null && _displayMarker2)
+            if (stimulus != null && _displayMarker1 != null && _displayMarker2 != null)
             {
                 var currentPair = bracket.GetCurrentMatch(); 
 
@@ -322,62 +318,45 @@ namespace BCIEssentials.ControllerBehaviors
                 RectTransform marker1Rect = _displayMarker1.GetComponent<RectTransform>();
                 RectTransform marker2Rect = _displayMarker2.GetComponent<RectTransform>();
 
-
                 if(bothDisplayed)
                 {                    
-                    marker1Rect.anchoredPosition = new Vector2(-130, marker1Rect.anchoredPosition.y);
-                    marker2Rect.anchoredPosition = new Vector2(130, marker2Rect.anchoredPosition.y);
+                    marker1Rect.localPosition = new Vector3(-340f,20f,0f);
+                    marker2Rect.localPosition = new Vector3(340f,20f,0f);
                 }
-
                 else
                 {
                     if (stim1Name.Contains("Size1"))
                     {
-                        _displayMarker1.fontSize = 10;
-                        marker1Rect.anchoredPosition = new Vector2(marker1Rect.anchoredPosition.x, 0);
+                        _displayMarker1.fontSize = 50;
+                        marker1Rect.localPosition = new Vector3(0f,20f,0f);
                     }
                     else if (stim1Name.Contains("Size2"))
                     {
-                        _displayMarker1.fontSize = 30;
-                        marker1Rect.anchoredPosition = new Vector2(marker1Rect.anchoredPosition.x, 10);
+                        _displayMarker1.fontSize = 50;
+                        marker1Rect.localPosition = new Vector3(0f,20f,0f);
                     }
                     else
                     {
                         _displayMarker1.fontSize = 50;
-                        marker1Rect.anchoredPosition = new Vector2(marker1Rect.anchoredPosition.x, 20);
-
+                        marker1Rect.localPosition = new Vector3(0f,20f,0f);
                     }
 
                     if (stim2Name.Contains("Size1"))
                     {
-                        _displayMarker2.fontSize = 10;
-                        marker2Rect.anchoredPosition = new Vector2(marker2Rect.anchoredPosition.x, 0);
-
+                        _displayMarker2.fontSize = 50;
+                        marker2Rect.localPosition = new Vector3(0f,20f,0f);
                     }
                     else if (stim2Name.Contains("Size2"))
                     {
-                        _displayMarker2.fontSize = 30;
-                        marker2Rect.anchoredPosition = new Vector2(marker2Rect.anchoredPosition.x, 10);
-
+                        _displayMarker2.fontSize = 50;
+                        marker2Rect.localPosition = new Vector3(0f,20f,0f);
                     }
                     else
                     {
                         _displayMarker2.fontSize = 50;
-                        marker2Rect.anchoredPosition = new Vector2(marker2Rect.anchoredPosition.x, 20);
-
+                        marker2Rect.localPosition = new Vector3(0f,20f,0f);
                     } 
                 }
-
-                // Get the size of the stimulus
-                //Vector3 stimulusScale = stimulus.transform.localScale;
-
-                
-
-                // Adjust font size proportionally (tune multiplier as needed)
-                //float baseFontSize = 10; // Default font size for "+" sign
-                //float scaleMultiplier = 2; // Adjust this multiplier based on your requirement
-
-                //_displayText1.fontSize = Mathf.RoundToInt(baseFontSize * Mathf.Max(stimulusScale.x, stimulusScale.y) * scaleMultiplier);
             }
         }
 
@@ -426,15 +405,13 @@ namespace BCIEssentials.ControllerBehaviors
             {
                 _displayText.text = "Press 1 or 2";
                 yield return new WaitForSecondsRealtime(1.0f);
-                //_displayText.text = "";
             }
             else if (textOption == "Break")
             {
                 _displayText.text = "Break";
-                yield return new WaitForSecondsRealtime(5.0f);
+                yield return new WaitForSecondsRealtime(10.0f);
                 _displayText.text = "";
             }
-
         } 
 
         private void SetMaterialStim1(int key)
@@ -599,75 +576,71 @@ namespace BCIEssentials.ControllerBehaviors
 
         private void Randomize()
         {
-                orderDict.Add(0, "Contrast1Size1");
-                orderDict.Add(1, "Contrast1Size2");
-                orderDict.Add(2, "Contrast1Size3");
-                orderDict.Add(3, "Contrast2Size1");
-                orderDict.Add(4, "Contrast2Size2");
-                orderDict.Add(5, "Contrast2Size3");
-                orderDict.Add(6, "Contrast3Size1");
-                orderDict.Add(7, "Contrast3Size2");
-                orderDict.Add(8, "Contrast3Size3");
-                orderDict.Add(9, "Contrast4Size1");
-                orderDict.Add(10, "Contrast4Size2");
-                orderDict.Add(11, "Contrast4Size3");  
+            orderDict.Add(0, "Contrast1Size1");
+            orderDict.Add(1, "Contrast1Size2");
+            orderDict.Add(2, "Contrast1Size3");
+            orderDict.Add(3, "Contrast2Size1");
+            orderDict.Add(4, "Contrast2Size2");
+            orderDict.Add(5, "Contrast2Size3");
+            orderDict.Add(6, "Contrast3Size1");
+            orderDict.Add(7, "Contrast3Size2");
+            orderDict.Add(8, "Contrast3Size3");
+            orderDict.Add(9, "Contrast4Size1");
+            orderDict.Add(10, "Contrast4Size2");
+            orderDict.Add(11, "Contrast4Size3");  
 
+            System.Random random = new System.Random();
+            List<int> keys = new List<int>(orderDict.Keys);
+            int num = keys.Count;
 
-                System.Random random = new System.Random();
-                List<int> keys = new List<int>(orderDict.Keys);
-                int num = keys.Count;
+            while (num > 1)
+            {
+                num--;
+                int k = random.Next(num + 1);
+                int temp = keys[k];
+                keys[k] = keys[num];
+                keys[num] = temp;
+            }
 
-                while (num > 1)
-                {
-                    num--;
-                    int k = random.Next(num + 1);
-                    int temp = keys[k];
-                    keys[k] = keys[num];
-                    keys[num] = temp;
-                }
+            List<string> values = new List<string>(orderDict.Values);        
+            int n = values.Count;
+         
+            while (n > 1)
+            {
+                n--;
+                int k = random.Next(n + 1);
+                string temp = values[k];
+                values[k] = values[n];
+                values[n] = temp;
+            }
 
-                List<string> values = new List<string>(orderDict.Values);
+            Dictionary<int, string> intDict = new Dictionary<int, string>();
                     
-                int n = values.Count;
-                while (n > 1)
-                {
-                    n--;
-                    int k = random.Next(n + 1);
-                    string temp = values[k];
-                    values[k] = values[n];
-                    values[n] = temp;
-                }
+            for (int i = 0; i < keys.Count; i++)
+            {
+                intDict.Add(keys[i], values[i]);
+            }
 
-                Dictionary<int, string> intDict = new Dictionary<int, string>();
-                    
-                for (int i = 0; i < keys.Count; i++)
-                {
-                    intDict.Add(keys[i], values[i]);
-                }
+            List<KeyValuePair<int, string>> keyValuePairs = new List<KeyValuePair<int, string>>(intDict);
+            int c = keyValuePairs.Count;
+                
+            while (c > 1)
+            {
+                c--;
+                int k = random.Next(c + 1);
+                KeyValuePair<int, string> temp = keyValuePairs[k];
+                keyValuePairs[k] = keyValuePairs[c];
+                keyValuePairs[c] = temp;
+            }
 
-                List<KeyValuePair<int, string>> keyValuePairs = new List<KeyValuePair<int, string>>(intDict);
-                    
-                int c = keyValuePairs.Count;
-                while (c > 1)
-                {
-                    c--;
-                    int k = random.Next(c + 1);
-                    KeyValuePair<int, string> temp = keyValuePairs[k];
-                    keyValuePairs[k] = keyValuePairs[c];
-                    keyValuePairs[c] = temp;
-                }
+            Dictionary<int, string> randomDict = new Dictionary<int, string>();
 
-                Dictionary<int, string> randomDict = new Dictionary<int, string>();
+            foreach (var k in keyValuePairs)
+                randomDict.Add(k.Key, k.Value);
 
-                foreach (var k in keyValuePairs)
-                    randomDict.Add(k.Key, k.Value);
-
-                orderDict = new Dictionary<int, string>(randomDict);     
-            }    
-
-          
-
- }
+            orderDict = new Dictionary<int, string>(randomDict);     
+        }    
+    }
 }
 
 
