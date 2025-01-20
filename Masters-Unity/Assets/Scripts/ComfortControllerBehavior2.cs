@@ -166,9 +166,7 @@ namespace BCIEssentials.ControllerBehaviors
                 // Reset + marker positions
                 RectTransform marker1Rect = _displayMarker1.GetComponent<RectTransform>();
                 RectTransform marker2Rect = _displayMarker2.GetComponent<RectTransform>();
-               //arker1Rect.anchoredPosition = new Vector2(0, marker1Rect.anchoredPosition.y);
-               //arker2Rect.anchoredPosition = new Vector2(0, marker2Rect.anchoredPosition.y);
-
+            
                 // Present Stimulus 1
                 StartCoroutine(DisplayTextOnScreen("5")); // 5-second countdown
                 yield return new WaitForSecondsRealtime(5f);
@@ -325,10 +323,9 @@ namespace BCIEssentials.ControllerBehaviors
 
                 if(bothDisplayed)
                 {                    
-                    marker1Rect.anchoredPosition = new Vector2(-130, marker1Rect.anchoredPosition.y);
-                    marker2Rect.anchoredPosition = new Vector2(130, marker2Rect.anchoredPosition.y);
+                    marker1Rect.localPosition = new Vector3(-340f,20f,0f);
+                    marker2Rect.localPosition = new Vector3(340f,20f,0f);
                 }
-
                 else
                 {
                     if (stim1Name.Contains("Size1"))
@@ -340,17 +337,11 @@ namespace BCIEssentials.ControllerBehaviors
                     {
                         _displayMarker1.fontSize = 50;
                         marker1Rect.localPosition = new Vector3(0f,20f,0f);
-
-                      //marker1Rect.anchoredPosition = new Vector2(marker1Rect.anchoredPosition.x, -10f);
-                      //marker1Rect.anchoredPosition = new Vector2(marker1Rect.anchoredPosition.y, 20f);
                     }
                     else
                     {
                         _displayMarker1.fontSize = 50;
                         marker1Rect.localPosition = new Vector3(0f,20f,0f);
-
-                     ///marker1Rect.anchoredPosition = new Vector2(marker1Rect.anchoredPosition.x, 0);
-                      //marker1Rect.anchoredPosition = new Vector2(marker1Rect.anchoredPosition.y, 20f);
                     }
 
                     if (stim2Name.Contains("Size1"))
@@ -362,31 +353,13 @@ namespace BCIEssentials.ControllerBehaviors
                     {
                         _displayMarker2.fontSize = 50;
                         marker2Rect.localPosition = new Vector3(0f,20f,0f);
-                      //marker2Rect.anchoredPosition = new Vector2(marker2Rect.anchoredPosition.x, -10f);
-                      //marker1Rect.anchoredPosition = new Vector2(marker1Rect.anchoredPosition.y, 20f);
-
                     }
                     else
                     {
                         _displayMarker2.fontSize = 50;
                         marker2Rect.localPosition = new Vector3(0f,20f,0f);
-                      //marker2Rect.anchoredPosition = new Vector2(marker2Rect.anchoredPosition.x, 0);
-                      //marker1Rect.anchoredPosition = new Vector2(marker1Rect.anchoredPosition.y, 20f);
-
-
                     } 
                 }
-
-                // Get the size of the stimulus
-                //Vector3 stimulusScale = stimulus.transform.localScale;
-
-                
-
-                // Adjust font size proportionally (tune multiplier as needed)
-                //float baseFontSize = 10; // Default font size for "+" sign
-                //float scaleMultiplier = 2; // Adjust this multiplier based on your requirement
-
-                //_displayText1.fontSize = Mathf.RoundToInt(baseFontSize * Mathf.Max(stimulusScale.x, stimulusScale.y) * scaleMultiplier);
             }
         }
 
