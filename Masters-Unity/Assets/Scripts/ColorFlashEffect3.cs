@@ -149,7 +149,6 @@ namespace BCIEssentials.StimulusEffects
             transform.localScale = newSize;
         }
 
-
         public int ConvertContrastLevel(ContrastLevel _contrastLevel)
         {
             if(_contrastLevel == ContrastLevel.Contrast1)
