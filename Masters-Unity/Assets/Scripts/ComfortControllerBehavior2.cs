@@ -230,7 +230,7 @@ namespace BCIEssentials.ControllerBehaviors
                 markerString = "ssvep," + _selectableSPOs.Count.ToString() + "," + windowLength.ToString() + "," + realFreqFlash.ToString() + stimulusString;
                 marker.Write(markerString);
 
-                for(var flash = 0; flash <100*2; flash++) //(StimulusRunning)
+                for(var flash = 0; flash <100*10; flash++) //(StimulusRunning)
                 //the number that flash is less than is the amount of seconds to flash for 
                 //100 = 1 second (frame rate is 100 Hz) so 10 seconds = flash < 100*10s
                 {
@@ -246,13 +246,12 @@ namespace BCIEssentials.ControllerBehaviors
                 StartCoroutine(GetUserPreferenceCoroutine());
                 yield return new WaitUntil(() => preference != null);
 
-                // Record the winner in the bracket
-                // Stim1 = 'true' recorded, Stim2 = 'false' recorded
+                // Record the winner in the bracket: stim1 = 'true' recorded, Stim2 = 'false' recorded
                 if (preference.HasValue)
                 {
                     bracket.RecordMatchResult(preference.Value ? stim1Index : stim2Index);
                     StartCoroutine(DisplayTextOnScreen("Break"));
-                    yield return new WaitForSecondsRealtime(5.0f);
+                    yield return new WaitForSecondsRealtime(10.0f); //will be combined with a 5 second countdown for a total 15 second break
                 }
                 else
                 {
@@ -261,17 +260,16 @@ namespace BCIEssentials.ControllerBehaviors
 
                 // Reset preference to null so the value doesn't carry over to the next pair
                 preference = null;
-
                 pairNum = pairNum + 1;
             }
+                
+            Debug.Log($"Winner overall: {bracket.GetWinner()}");
 
-                Debug.Log($"Winner overall: {bracket.GetWinner()}");
-
-                // Finalize
-                mainCam.transform.Rotate(rotateAway);
-                StartCoroutine(DisplayTextOnScreen("EndOfSession"));
-                StopCoroutineReference(ref _runStimulus);
-                StopCoroutineReference(ref _sendMarkers);
+            // Finalize
+            mainCam.transform.Rotate(rotateAway);
+            StartCoroutine(DisplayTextOnScreen("EndOfSession"));
+            StopCoroutineReference(ref _runStimulus);
+            StopCoroutineReference(ref _sendMarkers);
         }
 
         private IEnumerator GetUserPreferenceCoroutine()
@@ -413,7 +411,7 @@ namespace BCIEssentials.ControllerBehaviors
             else if (textOption == "Break")
             {
                 _displayText.text = "Break";
-                yield return new WaitForSecondsRealtime(5.0f);
+                yield return new WaitForSecondsRealtime(10.0f);
                 _displayText.text = "";
             }
 
