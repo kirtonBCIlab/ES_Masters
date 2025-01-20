@@ -318,7 +318,6 @@ namespace BCIEssentials.ControllerBehaviors
                 RectTransform marker1Rect = _displayMarker1.GetComponent<RectTransform>();
                 RectTransform marker2Rect = _displayMarker2.GetComponent<RectTransform>();
 
-
                 if(bothDisplayed)
                 {                    
                     marker1Rect.localPosition = new Vector3(-340f,20f,0f);
@@ -406,7 +405,6 @@ namespace BCIEssentials.ControllerBehaviors
             {
                 _displayText.text = "Press 1 or 2";
                 yield return new WaitForSecondsRealtime(1.0f);
-                //_displayText.text = "";
             }
             else if (textOption == "Break")
             {
@@ -414,7 +412,6 @@ namespace BCIEssentials.ControllerBehaviors
                 yield return new WaitForSecondsRealtime(10.0f);
                 _displayText.text = "";
             }
-
         } 
 
         private void SetMaterialStim1(int key)
@@ -579,75 +576,71 @@ namespace BCIEssentials.ControllerBehaviors
 
         private void Randomize()
         {
-                orderDict.Add(0, "Contrast1Size1");
-                orderDict.Add(1, "Contrast1Size2");
-                orderDict.Add(2, "Contrast1Size3");
-                orderDict.Add(3, "Contrast2Size1");
-                orderDict.Add(4, "Contrast2Size2");
-                orderDict.Add(5, "Contrast2Size3");
-                orderDict.Add(6, "Contrast3Size1");
-                orderDict.Add(7, "Contrast3Size2");
-                orderDict.Add(8, "Contrast3Size3");
-                orderDict.Add(9, "Contrast4Size1");
-                orderDict.Add(10, "Contrast4Size2");
-                orderDict.Add(11, "Contrast4Size3");  
+            orderDict.Add(0, "Contrast1Size1");
+            orderDict.Add(1, "Contrast1Size2");
+            orderDict.Add(2, "Contrast1Size3");
+            orderDict.Add(3, "Contrast2Size1");
+            orderDict.Add(4, "Contrast2Size2");
+            orderDict.Add(5, "Contrast2Size3");
+            orderDict.Add(6, "Contrast3Size1");
+            orderDict.Add(7, "Contrast3Size2");
+            orderDict.Add(8, "Contrast3Size3");
+            orderDict.Add(9, "Contrast4Size1");
+            orderDict.Add(10, "Contrast4Size2");
+            orderDict.Add(11, "Contrast4Size3");  
 
+            System.Random random = new System.Random();
+            List<int> keys = new List<int>(orderDict.Keys);
+            int num = keys.Count;
 
-                System.Random random = new System.Random();
-                List<int> keys = new List<int>(orderDict.Keys);
-                int num = keys.Count;
+            while (num > 1)
+            {
+                num--;
+                int k = random.Next(num + 1);
+                int temp = keys[k];
+                keys[k] = keys[num];
+                keys[num] = temp;
+            }
 
-                while (num > 1)
-                {
-                    num--;
-                    int k = random.Next(num + 1);
-                    int temp = keys[k];
-                    keys[k] = keys[num];
-                    keys[num] = temp;
-                }
+            List<string> values = new List<string>(orderDict.Values);        
+            int n = values.Count;
+         
+            while (n > 1)
+            {
+                n--;
+                int k = random.Next(n + 1);
+                string temp = values[k];
+                values[k] = values[n];
+                values[n] = temp;
+            }
 
-                List<string> values = new List<string>(orderDict.Values);
+            Dictionary<int, string> intDict = new Dictionary<int, string>();
                     
-                int n = values.Count;
-                while (n > 1)
-                {
-                    n--;
-                    int k = random.Next(n + 1);
-                    string temp = values[k];
-                    values[k] = values[n];
-                    values[n] = temp;
-                }
+            for (int i = 0; i < keys.Count; i++)
+            {
+                intDict.Add(keys[i], values[i]);
+            }
 
-                Dictionary<int, string> intDict = new Dictionary<int, string>();
-                    
-                for (int i = 0; i < keys.Count; i++)
-                {
-                    intDict.Add(keys[i], values[i]);
-                }
+            List<KeyValuePair<int, string>> keyValuePairs = new List<KeyValuePair<int, string>>(intDict);
+            int c = keyValuePairs.Count;
+                
+            while (c > 1)
+            {
+                c--;
+                int k = random.Next(c + 1);
+                KeyValuePair<int, string> temp = keyValuePairs[k];
+                keyValuePairs[k] = keyValuePairs[c];
+                keyValuePairs[c] = temp;
+            }
 
-                List<KeyValuePair<int, string>> keyValuePairs = new List<KeyValuePair<int, string>>(intDict);
-                    
-                int c = keyValuePairs.Count;
-                while (c > 1)
-                {
-                    c--;
-                    int k = random.Next(c + 1);
-                    KeyValuePair<int, string> temp = keyValuePairs[k];
-                    keyValuePairs[k] = keyValuePairs[c];
-                    keyValuePairs[c] = temp;
-                }
+            Dictionary<int, string> randomDict = new Dictionary<int, string>();
 
-                Dictionary<int, string> randomDict = new Dictionary<int, string>();
+            foreach (var k in keyValuePairs)
+                randomDict.Add(k.Key, k.Value);
 
-                foreach (var k in keyValuePairs)
-                    randomDict.Add(k.Key, k.Value);
-
-                orderDict = new Dictionary<int, string>(randomDict);     
-            }    
-
-          
-
- }
+            orderDict = new Dictionary<int, string>(randomDict);     
+        }    
+    }
 }
 
 
