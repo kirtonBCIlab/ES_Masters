@@ -133,19 +133,37 @@ namespace BCIEssentials.StimulusEffects
             switch (_size)
             {
                 case Size.Size1:
-                    newSize = new Vector3(0.5f, 0.5f, 0.5f); // Smaller size
+                    newSize = new Vector3(157.01093974f / 100f, 157.01093974f / 100f, 157.01093974f / 100f); // Scaled by 100 to match "Reference Pixels per Unit" setting
+                    // Debugging the calculated physical size in cm
+                    float pixels = 157.01093974f;
+                    float sizeInInches = pixels / 108.7855392633234f ; // DPI is 108.7855392633234  (calculated for 27" 2560 x 1440 resolution monitor)
+                    float sizeInCm = sizeInInches * 2.54f;
+                    Debug.Log($"Size in physical units: {sizeInCm} cm"); // Should print approximately 3.666 cm
                     break;
+
                 case Size.Size2:
-                    newSize = new Vector3(1f, 1f, 1f); // Default size
+                    newSize = new Vector3(261.7919719485197f / 100f, 261.7919719485197f / 100f, 261.7919719485197f / 100f); // Scaled by 100 to match "Reference Pixels per Unit" setting
+                    // Debugging the calculated physical size in cm
+                    float pixels2 = 261.7919719485197f;
+                    float sizeInInches2 = pixels2 / 108.7855392633234f ; // DPI is 108.7855392633234  (calculated for 27" 2560 x 1440 resolution monitor)
+                    float sizeInCm2 = sizeInInches2 * 2.54f;
+                    Debug.Log($"Size in physical units: {sizeInCm2} cm"); // Should print approximately 6.1125 cm
                     break;
+
                 case Size.Size3:
-                    newSize = new Vector3(1.5f, 1.5f, 1.5f); // Larger size
+                    newSize = new Vector3(366.7357541789091f / 100f, 366.7357541789091f / 100f, 366.7357541789091f / 100f); // Scaled by 100 to match "Reference Pixels per Unit" setting
+                    // Debugging the calculated physical size in cm
+                    float pixels3 = 366.7357541789091f;
+                    float sizeInInches3 = pixels3 / 108.7855392633234f ; // DPI is 108.7855392633234  (calculated for 27" 2560 x 1440 resolution monitor)
+                    float sizeInCm3 = sizeInInches3 * 2.54f;
+                    Debug.Log($"Size in physical units: {sizeInCm3} cm"); // Should print approximately 8.5628 cm
                     break;
             }
 
             // Apply the size change
             transform.localScale = newSize;
-        }   
+        }
+
 
         public int ConvertContrastLevel(ContrastLevel _contrastLevel)
         {
