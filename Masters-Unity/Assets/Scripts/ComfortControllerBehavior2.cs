@@ -211,6 +211,15 @@ namespace BCIEssentials.ControllerBehaviors
 
             pairNum = 1;
 
+            StartCoroutine(DisplayTextOnScreen("RS Open"));
+            marker.Write("Resting State, Eyes Open");
+            yield return new WaitForSecondsRealtime(60.0f);
+
+
+            StartCoroutine(DisplayTextOnScreen("RS Closed"));
+            marker.Write("Resting State, Eyes Closed");
+            yield return new WaitForSecondsRealtime(60.0f);
+
             // Loop through the double elimination bracket
             while (!bracket.IsComplete())
             {
@@ -347,7 +356,7 @@ namespace BCIEssentials.ControllerBehaviors
             StopCoroutineReference(ref _runStimulus);
             StopCoroutineReference(ref _sendMarkers);
 
-            string filepath = "C:\\Users\\admin\\Downloads\\test.csv";
+            string filepath = "D:\\Users\\BCI-Morpheus\\Documents\\ES-Masters\\Data\\Bracket\\P001-S001.csv";
             bracketInfo.ExportToCsv(filepath);
         }
 
@@ -489,6 +498,18 @@ namespace BCIEssentials.ControllerBehaviors
             {
                 _displayText.text = "Break";
                 yield return new WaitForSecondsRealtime(10.0f);
+                _displayText.text = "";
+            }
+            else if (textOption == "RS Open")
+            {
+                _displayText.text = "+";
+                yield return new WaitForSecondsRealtime(60.0f);
+                _displayText.text = "";
+            }
+            else if (textOption == "RS Closed")
+            {
+                _displayText.text = "Eyes Closed";
+                yield return new WaitForSecondsRealtime(60.0f);
                 _displayText.text = "";
             }
         } 
