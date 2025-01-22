@@ -5,6 +5,7 @@ using BCIEssentials.Controllers;
 using BCIEssentials.StimulusEffects;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using System.IO;
 
 namespace BCIEssentials.ControllerBehaviors
 {
@@ -37,8 +38,79 @@ namespace BCIEssentials.ControllerBehaviors
         private GameObject stim1Object;
         private GameObject stim2Object;
         private bool? preference;
-
         private int pairNum;
+
+        public class StimulusData
+        {
+            // Dictionary to hold stimulus indices and their corresponding names
+            public Dictionary<int, string> StimulusIndex { get; private set; }
+
+            // List of pairs for comparisons, with a pair number as a string
+            public List<(string pairNumber, string item1, string item2)> ComparisonPairs { get; private set; }
+
+            // List to hold winners
+            public List<int> Winners { get; private set; }
+
+            // Constructor to initialize the data structure
+            public StimulusData()
+            {
+                StimulusIndex = new Dictionary<int, string>();
+                ComparisonPairs = new List<(string, string, string)>();
+                Winners = new List<int>();
+            }
+
+            // Method to set the entire StimulusIndex dictionary
+            public void SetStimulusIndex(Dictionary<int, string> stimulusDictionary)
+            {
+                StimulusIndex = new Dictionary<int, string>(stimulusDictionary);
+            }
+
+            // Method to add a comparison pair with a pair number
+            public void AddComparisonPair(int pairNumber, string item1, string item2)
+            {
+                string pairNumberString = "Pair Number " + pairNumber.ToString(); // Convert pair number to string
+                ComparisonPairs.Add((pairNumberString, item1, item2));
+            }
+
+            // Method to add a winner
+            public void AddWinner(int winner)
+            {
+                Winners.Add(winner);
+            }
+            public void ExportToCsv(string filePath)
+            {
+                using (StreamWriter writer = new StreamWriter(filePath))
+                {
+                    // Write headers
+                    writer.WriteLine("Pair Number,Item 1,Item 2,Winner");
+
+                    // Iterate through ComparisonPairs and Winners
+                    for (int i = 0; i < ComparisonPairs.Count; i++)
+                    {
+                        string pairNumber = ComparisonPairs[i].pairNumber;
+                        string item1 = ComparisonPairs[i].item1;
+                        string item2 = ComparisonPairs[i].item2;
+
+                        // Get the corresponding winner (stimulus name) if it exists
+                        string winner = "N/A"; // Default value in case winner is not found
+                        if (i < Winners.Count)
+                        {
+                            int winnerIndex = Winners[i];
+                            // Get the stimulus name from the StimulusIndex dictionary using the winner index
+                            if (StimulusIndex.ContainsKey(winnerIndex))
+                            {
+                                winner = StimulusIndex[winnerIndex];
+                            }
+                        }
+
+                        // Write a row to the CSV
+                        writer.WriteLine($"{pairNumber},{item1},{item2},{winner}");
+                    }
+                }
+            }
+        }
+
+        public StimulusData bracketInfo = new StimulusData();
 
         protected override void Start()
         {
@@ -155,6 +227,8 @@ namespace BCIEssentials.ControllerBehaviors
                 string stim1Name = orderDict[stim1Index];
                 string stim2Name = orderDict[stim2Index];
 
+                bracketInfo.AddComparisonPair(pairNum, stim1Name, stim2Name);
+
                 // Set the materials for each stimulus
                 SetMaterialStim1(stim1Index);
                 SetMaterialStim2(stim2Index);
@@ -249,6 +323,8 @@ namespace BCIEssentials.ControllerBehaviors
                 // Record the winner in the bracket: stim1 = 'true' recorded, Stim2 = 'false' recorded
                 if (preference.HasValue)
                 {
+                    int winnerIndex = preference.Value ? stim1Index : stim2Index;
+                    bracketInfo.AddWinner(winnerIndex);
                     bracket.RecordMatchResult(preference.Value ? stim1Index : stim2Index);
                     StartCoroutine(DisplayTextOnScreen("Break"));
                     yield return new WaitForSecondsRealtime(10.0f); //will be combined with a 5 second countdown for a total 15 second break
@@ -270,6 +346,9 @@ namespace BCIEssentials.ControllerBehaviors
             StartCoroutine(DisplayTextOnScreen("EndOfSession"));
             StopCoroutineReference(ref _runStimulus);
             StopCoroutineReference(ref _sendMarkers);
+
+            string filepath = "C:\\Users\\admin\\Downloads\\test.csv";
+            bracketInfo.ExportToCsv(filepath);
         }
 
         private IEnumerator GetUserPreferenceCoroutine()
@@ -638,7 +717,8 @@ namespace BCIEssentials.ControllerBehaviors
             foreach (var k in keyValuePairs)
                 randomDict.Add(k.Key, k.Value);
 
-            orderDict = new Dictionary<int, string>(randomDict);     
+            orderDict = new Dictionary<int, string>(randomDict);    
+            bracketInfo.SetStimulusIndex(orderDict);
         }    
     }
 }
