@@ -37,3 +37,4 @@ sysinfo.txt
 
 # Hide data
 Masters-Processing/Data/*
+__pycache__/*
