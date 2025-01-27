@@ -34,3 +34,6 @@ sysinfo.txt
 
 # Visual Studio cache directory
 .vs/
+
+# Hide data
+Data/*
