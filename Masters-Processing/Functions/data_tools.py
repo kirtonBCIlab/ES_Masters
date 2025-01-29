@@ -90,46 +90,71 @@ def import_data(xdf_file: str) -> tuple[mne.io.Raw, pd.DataFrame, pd.DataFrame]:
 
 
 def create_epochs(
-    eeg: mne.io.Raw, markers: pd.DataFrame, time: list[float], events=list[str]
-) -> mne.Epochs:
+    eeg_data: mne.io.Raw,
+    eeg_ts: float,
+    markers: pd.DataFrame,
+    markers_ts: np.ndarray,
+    events:list[str], 
+    epoch_end: str
+    ) -> [list, np.ndarray]:
     """
-    Creates MNE epoch data from the desired markers (can be Unity or Python stream)
+    Creates Epoch data from the desired markers (can be Unity or Python stream)
 
     Parameters
     ----------
         eeg: mne.io.fiff.raw.Raw
-            EEG raw array in an MNE format
+            EEG raw array in an MNE format. Must include time vector.
+        marker_ts: np.ndarray
+            Time stamps of the markers
         markers: pd.DataFrame
             Markers used to create the epochs
-        time: list[float]
-            Times used for epoch data, must be len==2
         events: list[str]
             List of strings with the events to use for the epochs
+        epoch_end: str
+            The epochs will be trimmed to the next time this marker is found
 
     Returns
     -------
+        events_list: list
         eeg_epochs: mne.Epochs
     """
-    markers_np = np.zeros(markers.shape)
-    markers_np[:, :2] = markers.iloc[:, [0, 1]]
-    event_categories = pd.Categorical(markers["Event"])
-    markers_np[:, 2] = event_categories.codes
+    # Make sure that eeg is [channels, samples]
+    if eeg_data.shape[0] > eeg_data.shape[1]:
+        eeg_data = eeg_data.T
 
-    events_ids = np.zeros(markers.shape[0])
+    # Initialize empty list to store epochs
+    epochs = []
+    event_list = []
+    min_epoch_length = np.inf
+    
+    # Create event mask
     for event in events:
-        # - Missing implementation
-        # We have the categories in the data frame, where the 3rd column can be set as categories
-        # the code should look for the matching categories and provide just the indices that match the list of
-        # events. Then, create the epochs based on the markers from the selected events
+        event_mask = [event in marker_str[0].split(', ') for marker_str in markers]
+        event_times = markers_ts[event_mask]
 
-        # categories_of_interest = event_categories.categories.str.contains(event)
-        # events_ids[markers_np[categories_of_interest.tolist(), :]] = 1
-        break
+        for start_time in event_times:
+            end_mask = [epoch_end in marker_str[0].split(', ') for marker_str in markers]
+            end_times = markers_ts[end_mask]
+            end_time = end_times[end_times > start_time].min()
 
-    # eeg_epochs = mne.Epochs(eeg, )
+            # Trim to indices in eeg time stamps
+            start_idx = np.where(eeg_ts >= start_time)[0][0]
+            end_idx = np.where(eeg_ts >= end_time)[0][0]
+            epoch = eeg_data[:, start_idx:end_idx]
 
-    eeg_epochs = 0
-    return eeg_epochs
+            # Store epoch and corresponding event
+            epochs.append(epoch)
+            event_list.append(event)
+
+            # Update minimum epoch length
+            min_epoch_length = min(min_epoch_length, epoch.shape[1])   
+
+    # Trim epochs to same length
+    numpy_epochs = np.zeros((len(epochs), eeg_data.shape[0], min_epoch_length))
+    for (e,epoch) in  enumerate(epochs):
+        numpy_epochs[e,:,:] = epoch[:, :min_epoch_length]
+
+    return [event_list, numpy_epochs]
 
 
 # EKL Additions
