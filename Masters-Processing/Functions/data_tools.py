@@ -156,6 +156,36 @@ def create_epochs(
 
     return [event_list, numpy_epochs]
 
+def combine_epochs_by_label(events_epochs_individual, eeg_epochs_individual):
+    """
+    Combines epochs based on their labels by concatenating them along the time axis.
+
+    Parameters
+    ----------
+    events_epochs_individual : list of str
+        List of event labels corresponding to each epoch.
+    eeg_epochs_individual : list of np.ndarray
+        List of EEG epochs where each entry is (channels, time_samples).
+
+    Returns
+    -------
+    unique_events : list of str
+        List of unique event labels.
+    combined_epochs : list of np.ndarray
+        List of concatenated EEG epochs for each event.
+    """
+    unique_events = sorted(set(events_epochs_individual))
+    combined_epochs = []
+
+    for event in unique_events:
+        event_indices = [i for i, evt in enumerate(events_epochs_individual) if evt == event]
+        event_epochs = [eeg_epochs_individual[i] for i in event_indices]
+
+        # Concatenate epochs along the time axis
+        combined_epochs.append(np.concatenate(event_epochs, axis=1))
+
+    return unique_events, combined_epochs
+
 
 # EKL Additions
 def import_data_byType_noPython(
@@ -515,6 +545,40 @@ def epochs_stim_freq(
                     eeg_epochs_organized[s][f][t] = np.pad(eeg_epochs_organized[s][f][t], pad_dimensions, 'constant', constant_values=0).T
 
     return np.array(eeg_epochs_organized)
+
+import numpy as np
+
+def epochs_stim(eeg_epochs: list, labels: list, stimuli: dict) -> list:
+    """
+    Organizes EEG epochs into a list of lists based on stimulus.
+
+    Parameters
+    ----------
+    eeg_epochs : list 
+        List of EEG epochs in the shape [samples, chans].
+    labels : list
+        List of labels corresponding to each epoch.
+    stimuli : dict
+        Dictionary mapping unique stimuli indices to labels.
+
+    Returns
+    -------
+    eeg_epochs_organized : list
+        List of organized EEG epochs in the shape [stimuli][trials][samples, chans].
+    """
+    # Preallocate list for organized epochs
+    eeg_epochs_organized = [[] for _ in range(len(stimuli))]
+
+    # Organize epochs by stimulus
+    for e, label in enumerate(labels):
+        for stim_idx, stim_label in stimuli.items():
+            if label == stim_label:
+                eeg_epochs_organized[stim_idx].append(np.array(eeg_epochs[e]))
+                break
+
+    return [np.array(stim_list) for stim_list in eeg_epochs_organized]
+
+
 
 def labels_to_dict_and_array(labels:list) -> tuple[dict, np.ndarray]:
     """
