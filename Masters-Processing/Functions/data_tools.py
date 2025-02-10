@@ -223,6 +223,46 @@ def create_epochs_resting(
 
     return [event_list, numpy_epochs]
 
+import numpy as np
+
+import numpy as np
+
+def split_epoch_into_multiple(epoch: np.ndarray, num_epochs: int) -> np.ndarray:
+    """
+    Splits a single epoch into multiple smaller epochs of equal length.
+
+    Parameters
+    ----------
+    epoch: np.ndarray
+        A 3D numpy array representing the original epoch with the shape (trials, channels, time_points).
+    num_epochs: int
+        The number of smaller epochs to split the original epoch into.
+
+    Returns
+    -------
+    np.ndarray
+        A 4D numpy array with the shape (trials, num_epochs, channels, time_points_per_epoch),
+        where `time_points_per_epoch` is the length of the original epoch divided by num_epochs.
+    """
+    # Get the total number of time points in the original epoch
+    total_time_points = epoch.shape[2]  # The third dimension represents time points
+    
+    # Calculate the time points per smaller epoch
+    time_points_per_epoch = total_time_points // num_epochs
+    
+    # Initialize an array to store the split epochs
+    split_epochs = np.zeros((epoch.shape[0], num_epochs, epoch.shape[1], time_points_per_epoch))
+    
+    # Split the epoch into smaller epochs
+    for i in range(num_epochs):
+        start_idx = i * time_points_per_epoch
+        end_idx = (i + 1) * time_points_per_epoch
+        split_epochs[:, i, :, :] = epoch[:, :, start_idx:end_idx]
+    
+    return split_epochs
+
+
+
 def combine_epochs_by_label(events_epochs_individual, eeg_epochs_individual):
     """
     Combines epochs based on their labels by concatenating them along the time axis.
