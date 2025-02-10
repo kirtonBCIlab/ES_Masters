@@ -223,10 +223,6 @@ def create_epochs_resting(
 
     return [event_list, numpy_epochs]
 
-import numpy as np
-
-import numpy as np
-
 def split_epoch_into_multiple(epoch: np.ndarray, num_epochs: int) -> np.ndarray:
     """
     Splits a single epoch into multiple smaller epochs of equal length.
@@ -260,8 +256,6 @@ def split_epoch_into_multiple(epoch: np.ndarray, num_epochs: int) -> np.ndarray:
         split_epochs[:, i, :, :] = epoch[:, :, start_idx:end_idx]
     
     return split_epochs
-
-
 
 def combine_epochs_by_label(events_epochs_individual, eeg_epochs_individual):
     """
