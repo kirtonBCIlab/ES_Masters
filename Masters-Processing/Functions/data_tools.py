@@ -150,11 +150,112 @@ def create_epochs(
             min_epoch_length = min(min_epoch_length, epoch.shape[1])   
 
     # Trim epochs to same length
-    numpy_epochs = np.zeros((len(epochs), eeg_data.shape[0], min_epoch_length))
+    numpy_epochs = np.zeros((len(epochs), eeg_data.shape[0], int(min_epoch_length)))
     for (e,epoch) in  enumerate(epochs):
         numpy_epochs[e,:,:] = epoch[:, :min_epoch_length]
 
     return [event_list, numpy_epochs]
+
+def create_epochs_resting(
+    eeg_data: mne.io.Raw,
+    eeg_ts: float,
+    markers: pd.DataFrame,
+    markers_ts: np.ndarray,
+    events:list[str], 
+    epoch_end: str
+    ) -> [list, np.ndarray]:
+    """
+    Creates Epoch data from the desired markers (can be Unity or Python stream)
+
+    Parameters
+    ----------
+        eeg: mne.io.fiff.raw.Raw
+            EEG raw array in an MNE format. Must include time vector.
+        marker_ts: np.ndarray
+            Time stamps of the markers
+        markers: pd.DataFrame
+            Markers used to create the epochs
+        events: list[str]
+            List of strings with the events to use for the epochs
+        epoch_end: str
+            The epochs will be trimmed to the next time this marker is found
+
+    Returns
+    -------
+        events_list: list
+        eeg_epochs: mne.Epochs
+    """
+    # Make sure that eeg is [channels, samples]
+    if eeg_data.shape[0] > eeg_data.shape[1]:
+        eeg_data = eeg_data.T
+
+    # Initialize empty list to store epochs
+    epochs = []
+    event_list = []
+    min_epoch_length = np.inf
+    
+    # Create event mask
+    for event in events:
+        event_mask = [event in marker_str[0] for marker_str in markers]
+        event_times = markers_ts[event_mask]
+
+        for start_time in event_times:
+            end_mask = [epoch_end in marker_str[0] for marker_str in markers]
+            end_times = markers_ts[end_mask]
+            end_time = end_times[end_times > start_time].min()
+
+            # Trim to indices in eeg time stamps
+            start_idx = np.where(eeg_ts >= start_time)[0][0]
+            end_idx = np.where(eeg_ts >= end_time)[0][0]
+            epoch = eeg_data[:, start_idx:end_idx]
+
+            # Store epoch and corresponding event
+            epochs.append(epoch)
+            event_list.append(event)
+
+            # Update minimum epoch length
+            min_epoch_length = min(min_epoch_length, epoch.shape[1])   
+
+    # Trim epochs to same length
+    numpy_epochs = np.zeros((len(epochs), eeg_data.shape[0], int(min_epoch_length)))
+    for (e,epoch) in  enumerate(epochs):
+        numpy_epochs[e,:,:] = epoch[:, :min_epoch_length]
+
+    return [event_list, numpy_epochs]
+
+def split_epoch_into_multiple(epoch: np.ndarray, num_epochs: int) -> np.ndarray:
+    """
+    Splits a single epoch into multiple smaller epochs of equal length.
+
+    Parameters
+    ----------
+    epoch: np.ndarray
+        A 3D numpy array representing the original epoch with the shape (trials, channels, time_points).
+    num_epochs: int
+        The number of smaller epochs to split the original epoch into.
+
+    Returns
+    -------
+    np.ndarray
+        A 4D numpy array with the shape (trials, num_epochs, channels, time_points_per_epoch),
+        where `time_points_per_epoch` is the length of the original epoch divided by num_epochs.
+    """
+    # Get the total number of time points in the original epoch
+    total_time_points = epoch.shape[2]  # The third dimension represents time points
+    
+    # Calculate the time points per smaller epoch
+    time_points_per_epoch = total_time_points // num_epochs
+    
+    # Initialize an array to store the split epochs
+    split_epochs = np.zeros((epoch.shape[0], num_epochs, epoch.shape[1], time_points_per_epoch))
+    
+    # Split the epoch into smaller epochs
+    for i in range(num_epochs):
+        start_idx = i * time_points_per_epoch
+        end_idx = (i + 1) * time_points_per_epoch
+        split_epochs[:, i, :, :] = epoch[:, :, start_idx:end_idx]
+    
+    return split_epochs
 
 def combine_epochs_by_label(events_epochs_individual, eeg_epochs_individual):
     """
