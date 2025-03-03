@@ -103,3 +103,16 @@ class EloRanking:
         }
 
         return self.scores
+    
+    def export_rankings_to_csv(self, filename):
+        """
+        Organize stimulus names in order
+        Export the current rankings to a CSV file in transposed format.
+        """
+        with open(filename, "w") as f:
+            # Write stimuli as the first row
+            f.write(",".join(self.scores.keys()) + "\n")
+            # Write ratings as the second row
+            f.write(",".join(map(str, self.scores.values())) + "\n")
+
+    
