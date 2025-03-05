@@ -268,7 +268,7 @@ namespace BCIEssentials.ControllerBehaviors
                     yield return OnStimulusRunBehavior();
                 }
 
-                marker.Write("off");
+                marker.Write("off- 10s");
 
                 // Turn off stimulus 1 and turn on stimulus 2 and move stim2 to center of screen
                 stim1.enabled = false;
@@ -277,9 +277,12 @@ namespace BCIEssentials.ControllerBehaviors
 
 
                 mainCam.transform.Rotate(rotateAway);
-                yield return new WaitForSecondsRealtime(2f);
+                StartCoroutine(DisplayTextOnScreen("Comfort"));
+                yield return new WaitForSecondsRealtime(7f);
                 StartCoroutine(DisplayTextOnScreen("3"));
                 yield return new WaitForSecondsRealtime(3f); 
+
+                marker.Write("off- end");
 
                 // Present Stimulus 2
                 mainCam.transform.Rotate(rotateBack);
@@ -296,12 +299,15 @@ namespace BCIEssentials.ControllerBehaviors
                     yield return OnStimulusRunBehavior();
                 }
 
-                marker.Write("off");
+                marker.Write("off- 10s");
 
                 mainCam.transform.Rotate(rotateAway);
-                yield return new WaitForSecondsRealtime(2f);
+                StartCoroutine(DisplayTextOnScreen("Comfort"));
+                yield return new WaitForSecondsRealtime(7f);
                 StartCoroutine(DisplayTextOnScreen("3"));
                 yield return new WaitForSecondsRealtime(3f); 
+
+                marker.Write("off- end");
 
                 //Turn both stimuli on and move stimuli to either side of the screen
                 stim1.enabled = true;
@@ -493,6 +499,12 @@ namespace BCIEssentials.ControllerBehaviors
             {
                 _displayText.text = "Press 1 or 2";
                 yield return new WaitForSecondsRealtime(1.0f);
+            }
+            else if (textOption == "Comfort")
+            {
+                _displayText.text = "Rate Comfort 1 - 7";
+                yield return new WaitForSecondsRealtime(5.0f);
+                _displayText.text = "";
             }
             else if (textOption == "Break")
             {
