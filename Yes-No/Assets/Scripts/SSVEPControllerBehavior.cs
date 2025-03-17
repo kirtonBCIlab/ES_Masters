@@ -15,13 +15,11 @@ namespace BCIEssentials.ControllerBehaviors
         [SerializeField] private float[] setFreqFlash;
         [SerializeField] private float[] realFreqFlash;
 
-        [SerializeField] private enum StimulusType
+        public enum StimulusType
         {
             BW,
             Custom
-        };
-
-        [SerializeField] private StimulusType stimulusType;
+        }
 
         public enum ContrastLevel
         {
@@ -40,6 +38,7 @@ namespace BCIEssentials.ControllerBehaviors
         
         public ContrastLevel _contrastLevel;
         public Size _size;
+        private StimulusType _stimulusType;
 
         private int[] frames_on = new int[99];
         private int[] frame_count = new int[99];
@@ -69,7 +68,6 @@ namespace BCIEssentials.ControllerBehaviors
                 frames_on[i] = 0;
                 frame_count[i] = 0;
                 period = targetFrameRate / setFreqFlash[i];
-                // could add duty cycle selection here, but for now we will just get a duty cycle as close to 0.5 as possible
                 frame_off_count[i] = (int)Math.Ceiling(period / 2);
                 frame_on_count[i] = (int)Math.Floor(period / 2);
                 realFreqFlash[i] = (targetFrameRate / (float)(frame_off_count[i] + frame_on_count[i]));
@@ -77,6 +75,7 @@ namespace BCIEssentials.ControllerBehaviors
                 Debug.Log($"frequency {i + 1} : {realFreqFlash[i]}");
             }
         }
+
         protected override IEnumerator SendMarkers(int trainingIndex = 99)
         {
             // Make the marker string, this will change based on the paradigm
@@ -171,7 +170,7 @@ namespace BCIEssentials.ControllerBehaviors
         {
             ColorFlashEffect3 spoEffect;
 
-            if (stimulusType == StimulusType.BW)
+            if (_stimulusType == StimulusType.BW)
             {
                 foreach (var spo in _selectableSPOs)
                 {
@@ -217,9 +216,7 @@ namespace BCIEssentials.ControllerBehaviors
                     Debug.Log("Contrast Level: " + _contrastLevel);
                     Debug.Log("Size: " + _size);
                 }
-
             }
         }
-
     }
 }
