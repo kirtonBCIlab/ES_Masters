@@ -23,6 +23,24 @@ namespace BCIEssentials.ControllerBehaviors
 
         [SerializeField] private StimulusType stimulusType;
 
+        public enum ContrastLevel
+        {
+            Contrast1,
+            Contrast2,
+            Contrast3,
+            Contrast4,            
+        }
+
+        public enum Size
+        {
+            Size1,
+            Size2,
+            Size3,
+        }
+        
+        public ContrastLevel _contrastLevel;
+        public Size _size;
+
         private int[] frames_on = new int[99];
         private int[] frame_count = new int[99];
         private float period;
@@ -159,6 +177,45 @@ namespace BCIEssentials.ControllerBehaviors
                 {
                     spoEffect = spo.GetComponent<ColorFlashEffect3>();
                     spoEffect.SetContrast(ColorFlashEffect3.ContrastLevel.White);
+                }
+            }
+            else
+            {
+                foreach (var spo in _selectableSPOs)
+                {
+                    spoEffect = spo.GetComponent<ColorFlashEffect3>();
+                    if (_contrastLevel == ContrastLevel.Contrast1)
+                    {
+                        spoEffect.SetContrast(ColorFlashEffect3.ContrastLevel.Contrast1);
+                    }
+                    else if (_contrastLevel == ContrastLevel.Contrast2)
+                    {
+                        spoEffect.SetContrast(ColorFlashEffect3.ContrastLevel.Contrast2);
+                    }
+                    else if (_contrastLevel == ContrastLevel.Contrast3)
+                    {
+                        spoEffect.SetContrast(ColorFlashEffect3.ContrastLevel.Contrast3);
+                    }
+                    else if (_contrastLevel == ContrastLevel.Contrast4)
+                    {
+                    spoEffect.SetContrast(ColorFlashEffect3.ContrastLevel.Contrast4);
+                    }
+                
+                    if (_size == Size.Size1)
+                    {
+                        spoEffect.SetSize(ColorFlashEffect3.Size.Size1);
+                    }
+                    else if (_size == Size.Size2)
+                    {
+                        spoEffect.SetSize(ColorFlashEffect3.Size.Size2);
+                    }
+                    else if (_size == Size.Size3)
+                    {
+                        spoEffect.SetSize(ColorFlashEffect3.Size.Size3);
+                    }
+
+                    Debug.Log("Contrast Level: " + _contrastLevel);
+                    Debug.Log("Size: " + _size);
                 }
 
             }

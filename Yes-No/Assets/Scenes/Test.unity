@@ -335,7 +335,9 @@ MonoBehaviour:
   - 10
   - 15
   realFreqFlash: []
-  stimulusType: 0
+  stimulusType: 1
+  _contrastLevel: 3
+  _size: 0
   _displayText: {fileID: 296641096}
 --- !u!1 &796465901
 GameObject:
