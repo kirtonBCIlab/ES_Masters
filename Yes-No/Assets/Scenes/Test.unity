@@ -235,7 +235,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a183c01a805ed648ae373d6e8b3047e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _spoPrefab: {fileID: 7639228323464969584, guid: 47bbed2aefc6bf04fb52e3a0207f72aa, type: 3}
+  _spoPrefab: {fileID: 9211060018676842172, guid: 00aa676616acc1945af3ad6f4c876b89, type: 3}
   _numRows: 1
   _numColumns: 2
   _spacing: {x: 3, y: 1}
@@ -335,6 +335,7 @@ MonoBehaviour:
   - 10
   - 15
   realFreqFlash: []
+  stimulusType: 0
   _displayText: {fileID: 296641096}
 --- !u!1 &796465901
 GameObject:

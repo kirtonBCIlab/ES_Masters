@@ -15,13 +15,20 @@ namespace BCIEssentials.ControllerBehaviors
         [SerializeField] private float[] setFreqFlash;
         [SerializeField] private float[] realFreqFlash;
 
+        [SerializeField] private enum StimulusType
+        {
+            BW,
+            Custom
+        };
+
+        [SerializeField] private StimulusType stimulusType;
+
         private int[] frames_on = new int[99];
         private int[] frame_count = new int[99];
         private float period;
         private int[] frame_off_count = new int[99];
         private int[] frame_on_count = new int[99];
 
-        private string markerString = "";
         public Text _displayText;
 
         // Start is called before the first frame update
@@ -36,10 +43,8 @@ namespace BCIEssentials.ControllerBehaviors
        public override void PopulateObjectList(SpoPopulationMethod populationMethod = SpoPopulationMethod.Tag)
         {
             base.PopulateObjectList(populationMethod);
-            Debug.Log("PopulateObjectList- called base first line");
 
             realFreqFlash = new float[_selectableSPOs.Count];
-            Debug.Log("Real freq flash initialized");
 
             for (int i = 0; i < _selectableSPOs.Count; i++)
             {
@@ -128,23 +133,36 @@ namespace BCIEssentials.ControllerBehaviors
 
         protected override IEnumerator RunStimulus()
         {
-            Debug.Log("in RunStimulus");
-
+            // Set the stimulus type from the option chosen in the inspector
+            SetStimType();
+            
             _displayText.text = "Running Stimulus";
-            //yield return new WaitForSecondsRealtime();
 
-            for(var flash = 0; flash <100*10; flash++) //(StimulusRunning)
-            //the number that flash is less than is the amount of seconds to flash for 
-            //100 = 1 second (frame rate is 100 Hz) so 10 seconds = flash < 100*10s
+
+            //this currently displays the 2 stimuli for 10 seconds
+            //want it to display until a prediction is made and sent back by python
+            for(var flash = 0; flash <100*10; flash++) 
                 {
                     yield return OnStimulusRunBehavior();
                 }
                 
             _displayText.text = "Stimulus Complete";
-            yield return new WaitForSecondsRealtime(2);
         }
 
+        private void SetStimType()
+        {
+            ColorFlashEffect3 spoEffect;
 
+            if (stimulusType == StimulusType.BW)
+            {
+                foreach (var spo in _selectableSPOs)
+                {
+                    spoEffect = spo.GetComponent<ColorFlashEffect3>();
+                    spoEffect.SetContrast(ColorFlashEffect3.ContrastLevel.White);
+                }
+
+            }
+        }
 
     }
 }
