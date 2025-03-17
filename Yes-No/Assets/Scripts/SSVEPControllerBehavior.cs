@@ -153,9 +153,11 @@ namespace BCIEssentials.ControllerBehaviors
             // Set the stimulus type from the option chosen in the inspector
             SetStimType();
             
-            _displayText.text = "Running Stimulus";
+            _displayText.text = "True/False Question 1";
+            yield return new WaitForSeconds(5);
 
-
+            //this is perfect spacing for BW
+            _displayText.text = "True                      False";
             //this currently displays the 2 stimuli for 10 seconds
             //want it to display until a prediction is made and sent back by python
             for(var flash = 0; flash <100*10; flash++) 
