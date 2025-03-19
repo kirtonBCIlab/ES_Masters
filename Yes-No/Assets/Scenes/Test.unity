@@ -211,11 +211,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 443908830}
-  - component: {fileID: 443908829}
-  - component: {fileID: 443908833}
+  - component: {fileID: 443908836}
+  - component: {fileID: 443908835}
+  - component: {fileID: 443908834}
   - component: {fileID: 443908832}
   - component: {fileID: 443908831}
-  - component: {fileID: 443908834}
   m_Layer: 0
   m_Name: Controller
   m_TagString: Untagged
@@ -223,22 +223,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &443908829
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 443908828}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7a183c01a805ed648ae373d6e8b3047e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _spoPrefab: {fileID: 9211060018676842172, guid: 00aa676616acc1945af3ad6f4c876b89, type: 3}
-  _numRows: 1
-  _numColumns: 2
-  _spacing: {x: 3, y: 1}
 --- !u!4 &443908830
 Transform:
   m_ObjectHideFlags: 0
@@ -284,21 +268,6 @@ MonoBehaviour:
   StreamName: UnityMarkerStream
   StreamType: LSL_Marker_Strings
   StreamId: MyStreamID-Unity1234
---- !u!114 &443908833
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 443908828}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ffa8dfff27ddf714abcbba57f76469d1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _lslMarkerStream: {fileID: 443908832}
-  _lslResponseStream: {fileID: 443908831}
-  _dontDestroyActiveInstance: 1
 --- !u!114 &443908834
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -313,7 +282,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _selfRegister: 1
   _selfRegisterAsActive: 0
-  setup: {fileID: 443908829}
+  setup: {fileID: 443908836}
   setupRequired: 1
   targetFrameRate: 100
   _hotkeysEnabled: 1
@@ -335,10 +304,41 @@ MonoBehaviour:
   - 10
   - 15
   realFreqFlash: []
-  stimulusType: 1
+  _stimulusType: 1
   _contrastLevel: 3
-  _size: 0
+  _size: 2
   _displayText: {fileID: 296641096}
+--- !u!114 &443908835
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 443908828}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f990146382d172640b599efb37c44491, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _lslMarkerStream: {fileID: 443908832}
+  _lslResponseStream: {fileID: 443908831}
+  _dontDestroyActiveInstance: 1
+--- !u!114 &443908836
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 443908828}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1f10e627d494cd44bf679e28e0b2164, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _spoPrefab: {fileID: 4091452275841445562, guid: 00aa676616acc1945af3ad6f4c876b89, type: 3}
+  _numRows: 1
+  _numColumns: 2
+  _spacing: {x: 3, y: 1}
 --- !u!1 &796465901
 GameObject:
   m_ObjectHideFlags: 0

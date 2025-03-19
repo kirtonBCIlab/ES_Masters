@@ -8,37 +8,12 @@ using System.Collections.Generic;
 
 namespace BCIEssentials.ControllerBehaviors
 {
-    public class SSVEPControllerBehavior : BCIControllerBehavior
+    public class SSVEPControllerBehavior : BCIControllerBehavior_variant
     {
         public override BCIBehaviorType BehaviorType => BCIBehaviorType.SSVEP;
 
         [SerializeField] private float[] setFreqFlash;
         [SerializeField] private float[] realFreqFlash;
-
-        public enum StimulusType
-        {
-            BW,
-            Custom
-        }
-
-        public enum ContrastLevel
-        {
-            Contrast1,
-            Contrast2,
-            Contrast3,
-            Contrast4,            
-        }
-
-        public enum Size
-        {
-            Size1,
-            Size2,
-            Size3,
-        }
-        
-        public ContrastLevel _contrastLevel;
-        public Size _size;
-        private StimulusType _stimulusType;
 
         private int[] frames_on = new int[99];
         private int[] frame_count = new int[99];
@@ -46,7 +21,32 @@ namespace BCIEssentials.ControllerBehaviors
         private int[] frame_off_count = new int[99];
         private int[] frame_on_count = new int[99];
 
-        public Text _displayText;
+        public enum StimulusType
+        {
+            BW,
+            Custom
+        }
+        public enum ContrastLevel
+        {
+            Contrast1,
+            Contrast2,
+            Contrast3,
+            Contrast4,            
+        }
+        public enum Size
+        {
+            Size1,
+            Size2,
+            Size3,
+        }
+
+        [Header("Stimulus Parameters")]
+        [SerializeField] public StimulusType _stimulusType;
+        public ContrastLevel _contrastLevel;
+        public Size _size;
+
+        [Header("Text Object")]
+        [SerializeField] public Text _displayText;
 
         // Start is called before the first frame update
         protected override void Start()
@@ -152,12 +152,20 @@ namespace BCIEssentials.ControllerBehaviors
         {
             // Set the stimulus type from the option chosen in the inspector
             SetStimType();
+
+            //Set StimulusRunning to false to prevent markers from being sent before the stimulus starts
+            StimulusRunning = false;
             
+            //Display the first question for 5 seconds
             _displayText.text = "True/False Question 1";
             yield return new WaitForSeconds(5);
 
-            //this is perfect spacing for BW
-            _displayText.text = "True                      False";
+            //Set StimulusRunning to true and call the coroutine to send markers
+            StimulusRunning = true;
+            StartCoroutine(SendMarkers());
+
+            _displayText.text = "True                      False";  //this is perfect spacing for BW
+
             //this currently displays the 2 stimuli for 10 seconds
             //want it to display until a prediction is made and sent back by python
             for(var flash = 0; flash <100*10; flash++) 
@@ -165,7 +173,16 @@ namespace BCIEssentials.ControllerBehaviors
                     yield return OnStimulusRunBehavior();
                 }
                 
+            //Set StimulusRunning to false and stop the coroutine to send markers
+            StimulusRunning = false;
+            StopCoroutine(SendMarkers());
+
             _displayText.text = "Stimulus Complete";
+
+            //display next Q 5 seconds
+            //display T/F
+            //Flash and wait for prediction
+            //Repeat for 10 questions
         }
 
         private void SetStimType()
