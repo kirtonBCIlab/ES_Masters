@@ -116,6 +116,17 @@ namespace BCIEssentials.StimulusEffects
             _effectRoutine = null;
         }
 
+        public void CueColorChange()
+        {
+            _renderer.material.SetColor("_Color", Color.red);
+            transform.localScale = new Vector3(150 / 325f, 150f / 325f, 150f / 325f);
+        }
+
+        public void SetBlack()
+        {
+            _renderer.material.SetColor("_Color", Color.black);
+        }
+
 /// <summary>
 /// //////////Helper methods
 /// </summary>

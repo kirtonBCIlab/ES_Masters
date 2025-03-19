@@ -136,6 +136,17 @@ namespace BCIEssentials.ControllerBehaviors
             yield return null;
         }
 
+        protected IEnumerator CueStimulus()
+        {
+            if (_selectableSPOs.Count > 0)
+            {
+                int randomIndex = UnityEngine.Random.Range(0, _selectableSPOs.Count);
+                _selectableSPOs[randomIndex].Cue();
+                yield return new WaitForSecondsRealtime(1f);
+            }
+            yield return null;
+        }
+
         protected override IEnumerator OnStimulusRunComplete()
         {
             foreach (var spo in _selectableSPOs)
@@ -150,21 +161,18 @@ namespace BCIEssentials.ControllerBehaviors
 
         protected override IEnumerator RunStimulus()
         {
-            // Set the stimulus type from the option chosen in the inspector
-            SetStimType();
-
             //Set StimulusRunning to false to prevent markers from being sent before the stimulus starts
             StimulusRunning = false;
-            
-            //Display the first question for 5 seconds
-            _displayText.text = "True/False Question 1";
-            yield return new WaitForSeconds(5);
+
+            //flash the stimulus to look at to cue the user
+            yield return CueStimulus();
+
+            // Set the stimulus type from the option chosen in the inspector
+            SetStimType();
 
             //Set StimulusRunning to true and call the coroutine to send markers
             StimulusRunning = true;
             StartCoroutine(SendMarkers());
-
-            _displayText.text = "True                      False";  //this is perfect spacing for BW
 
             //this currently displays the 2 stimuli for 10 seconds
             //want it to display until a prediction is made and sent back by python
@@ -172,13 +180,49 @@ namespace BCIEssentials.ControllerBehaviors
                 {
                     yield return OnStimulusRunBehavior();
                 }
+
+            //Since not all stimuli flash an even number of times in 10 seconds, some end up with the 'flashOnColor" showing at the end of the 10 seconds
+            TurnStimuliBlack();
                 
             //Set StimulusRunning to false and stop the coroutine to send markers
             StimulusRunning = false;
             StopCoroutine(SendMarkers());
 
             _displayText.text = "Stimulus Complete";
+            yield return new WaitForSecondsRealtime(2f);
+            _displayText.text = "Next Stim";
+            yield return new WaitForSecondsRealtime(2f);
+            _displayText.text = " ";
+            
+            //flash the stimulus to look at to cue the user
+            yield return CueStimulus();
 
+            // Set the stimulus type from the option chosen in the inspector
+            SetStimType();
+
+            //Set StimulusRunning to true and call the coroutine to send markers
+            StimulusRunning = true;
+            StartCoroutine(SendMarkers());
+
+            //this currently displays the 2 stimuli for 10 seconds
+            //want it to display until a prediction is made and sent back by python
+            for(var flash = 0; flash <100*10; flash++) 
+                {
+                    yield return OnStimulusRunBehavior();
+                }
+
+            //Since not all stimuli flash an even number of times in 10 seconds, some end up with the 'flashOnColor" showing at the end of the 10 seconds
+            TurnStimuliBlack();
+                
+            //Set StimulusRunning to false and stop the coroutine to send markers
+            StimulusRunning = false;
+            StopCoroutine(SendMarkers());
+
+            _displayText.text = "Stimulus Complete";
+            yield return new WaitForSecondsRealtime(2f);
+            _displayText.text = "Done";
+
+           
             //display next Q 5 seconds
             //display T/F
             //Flash and wait for prediction
@@ -235,6 +279,17 @@ namespace BCIEssentials.ControllerBehaviors
                     Debug.Log("Contrast Level: " + _contrastLevel);
                     Debug.Log("Size: " + _size);
                 }
+            }
+        }
+
+        private void TurnStimuliBlack()
+        {
+            ColorFlashEffect3 spoEffect;
+
+            foreach (var spo in _selectableSPOs)
+            {
+                spoEffect = spo.GetComponent<ColorFlashEffect3>();
+                spoEffect.SetBlack(); 
             }
         }
     }

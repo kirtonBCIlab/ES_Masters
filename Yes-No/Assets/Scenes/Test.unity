@@ -157,7 +157,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 150}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &296641096
@@ -301,8 +301,10 @@ MonoBehaviour:
   trainTarget: 99
   myTag: BCI
   setFreqFlash:
+  - 8
   - 10
-  - 15
+  - 12.5
+  - 14
   realFreqFlash: []
   _stimulusType: 1
   _contrastLevel: 3
@@ -336,9 +338,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _spoPrefab: {fileID: 4091452275841445562, guid: 00aa676616acc1945af3ad6f4c876b89, type: 3}
-  _numRows: 1
+  _numRows: 2
   _numColumns: 2
-  _spacing: {x: 3, y: 1}
+  _spacing: {x: 2, y: 1.75}
 --- !u!1 &796465901
 GameObject:
   m_ObjectHideFlags: 0
