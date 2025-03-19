@@ -181,12 +181,13 @@ namespace BCIEssentials.ControllerBehaviors
                     yield return OnStimulusRunBehavior();
                 }
 
-            //Since not all stimuli flash an even number of times in 10 seconds, some end up with the 'flashOnColor" showing at the end of the 10 seconds
-            TurnStimuliBlack();
-                
             //Set StimulusRunning to false and stop the coroutine to send markers
             StimulusRunning = false;
             StopCoroutine(SendMarkers());
+            OnStimulusRunComplete();
+
+            //Since not all stimuli flash an even number of times in 10 seconds, some end up with the 'flashOnColor" showing at the end of the 10 seconds
+            TurnStimuliBlack();
 
             _displayText.text = "Stimulus Complete";
             yield return new WaitForSecondsRealtime(2f);
@@ -210,13 +211,14 @@ namespace BCIEssentials.ControllerBehaviors
                 {
                     yield return OnStimulusRunBehavior();
                 }
-
-            //Since not all stimuli flash an even number of times in 10 seconds, some end up with the 'flashOnColor" showing at the end of the 10 seconds
-            TurnStimuliBlack();
                 
             //Set StimulusRunning to false and stop the coroutine to send markers
             StimulusRunning = false;
             StopCoroutine(SendMarkers());
+            OnStimulusRunComplete();
+
+            //Since not all stimuli flash an even number of times in 10 seconds, some end up with the 'flashOnColor" showing at the end of the 10 seconds
+            TurnStimuliBlack();
 
             _displayText.text = "Stimulus Complete";
             yield return new WaitForSecondsRealtime(2f);

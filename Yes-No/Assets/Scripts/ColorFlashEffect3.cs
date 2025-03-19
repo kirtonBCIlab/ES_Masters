@@ -127,6 +127,12 @@ namespace BCIEssentials.StimulusEffects
             _renderer.material.SetColor("_Color", Color.black);
         }
 
+        public void SelectedFeedback()
+        {
+            _renderer.material.SetColor("_Color", Color.blue);
+            Invoke("SetBlack", 0.5f);
+        }
+
 /// <summary>
 /// //////////Helper methods
 /// </summary>

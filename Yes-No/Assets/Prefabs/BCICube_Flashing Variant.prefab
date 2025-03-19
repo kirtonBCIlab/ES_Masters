@@ -54,8 +54,16 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6190568516990124050, guid: 47bbed2aefc6bf04fb52e3a0207f72aa, type: 3}
       propertyPath: m_Materials.Array.size
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6190568516990124050, guid: 47bbed2aefc6bf04fb52e3a0207f72aa, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: d1362b3af475d344b8296c416c949f07, type: 2}
+    - target: {fileID: 6190568516990124050, guid: 47bbed2aefc6bf04fb52e3a0207f72aa, type: 3}
+      propertyPath: m_Materials.Array.data[1]
+      value: 
+      objectReference: {fileID: 2100000, guid: 593d1fac3f095864d9524c212d7b07fb, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -122,19 +130,7 @@ MonoBehaviour:
       - m_Target: {fileID: 4236183440281145019}
         m_TargetAssemblyTypeName: BCIEssentials.StimulusEffects.ColorFlashEffect3,
           Assembly-CSharp
-        m_MethodName: Play
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 4091452275841445562}
-        m_TargetAssemblyTypeName: BCIEssentials.StimulusObjects.SPO_variant, Bci4Kids.BciEssentials.Runtime
-        m_MethodName: StopStimulus
+        m_MethodName: SelectedFeedback
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
