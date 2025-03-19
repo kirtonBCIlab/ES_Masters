@@ -161,74 +161,51 @@ namespace BCIEssentials.ControllerBehaviors
 
         protected override IEnumerator RunStimulus()
         {
-            //Set StimulusRunning to false to prevent markers from being sent before the stimulus starts
-            StimulusRunning = false;
+            //Arbitrarily do 5 runs
+            for (int i = 0; i < 5; i++)
+            {
+                //Set StimulusRunning to false to prevent markers from being sent before the stimulus starts
+                StimulusRunning = false;
 
-            //flash the stimulus to look at to cue the user
-            yield return CueStimulus();
+                //Flash the stimulus to look at to cue the user
+                yield return CueStimulus();
 
-            // Set the stimulus type from the option chosen in the inspector
-            SetStimType();
+                //Set the stimulus type from the option chosen in the inspector
+                SetStimType();
 
-            //Set StimulusRunning to true and call the coroutine to send markers
-            StimulusRunning = true;
-            StartCoroutine(SendMarkers());
+                //Set StimulusRunning to true and call the coroutine to send markers
+                StimulusRunning = true;
+                StartCoroutine(SendMarkers());
 
-            //this currently displays the 2 stimuli for 10 seconds
-            //want it to display until a prediction is made and sent back by python
-            for(var flash = 0; flash <100*10; flash++) 
+                //This currently displays the 2 stimuli for 10 seconds
+                //Want it to display until a prediction is made and sent back by python
+                for(var flash = 0; flash <100*10; flash++) 
                 {
                     yield return OnStimulusRunBehavior();
                 }
 
-            //Set StimulusRunning to false and stop the coroutine to send markers
-            StimulusRunning = false;
-            StopCoroutine(SendMarkers());
-            OnStimulusRunComplete();
+                //Set StimulusRunning to false and stop the coroutine to send markers
+                StimulusRunning = false;
+                StopCoroutine(SendMarkers());
+                OnStimulusRunComplete();
 
-            //Since not all stimuli flash an even number of times in 10 seconds, some end up with the 'flashOnColor" showing at the end of the 10 seconds
-            TurnStimuliBlack();
+                //Since not all stimuli flash an even number of times in 10 seconds, some end up with the 'flashOnColor" showing at the end of the 10 seconds
+                TurnStimuliBlack();
 
-            _displayText.text = "Stimulus Complete";
-            yield return new WaitForSecondsRealtime(2f);
-            _displayText.text = "Next Stim";
-            yield return new WaitForSecondsRealtime(2f);
-            _displayText.text = " ";
+                //Display text for the user after every run except the last one
+                if (i < 4)
+                {
+                    yield return new WaitForSecondsRealtime(0.5f);
+                    _displayText.text = "Stimulus Complete";
+                    yield return new WaitForSecondsRealtime(2f);
+                    _displayText.text = "Next Stim";
+                    yield return new WaitForSecondsRealtime(2f);
+                    _displayText.text = " ";
+                }
             
-            //flash the stimulus to look at to cue the user
-            yield return CueStimulus();
-
-            // Set the stimulus type from the option chosen in the inspector
-            SetStimType();
-
-            //Set StimulusRunning to true and call the coroutine to send markers
-            StimulusRunning = true;
-            StartCoroutine(SendMarkers());
-
-            //this currently displays the 2 stimuli for 10 seconds
-            //want it to display until a prediction is made and sent back by python
-            for(var flash = 0; flash <100*10; flash++) 
-                {
-                    yield return OnStimulusRunBehavior();
-                }
-                
-            //Set StimulusRunning to false and stop the coroutine to send markers
-            StimulusRunning = false;
-            StopCoroutine(SendMarkers());
-            OnStimulusRunComplete();
-
-            //Since not all stimuli flash an even number of times in 10 seconds, some end up with the 'flashOnColor" showing at the end of the 10 seconds
-            TurnStimuliBlack();
-
-            _displayText.text = "Stimulus Complete";
-            yield return new WaitForSecondsRealtime(2f);
+                LastSelectedSPO = null;
+            }       
             _displayText.text = "Done";
-
-           
-            //display next Q 5 seconds
-            //display T/F
-            //Flash and wait for prediction
-            //Repeat for 10 questions
         }
 
         private void SetStimType()
