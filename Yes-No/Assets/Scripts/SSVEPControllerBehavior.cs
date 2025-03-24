@@ -71,8 +71,6 @@ namespace BCIEssentials.ControllerBehaviors
                 frame_off_count[i] = (int)Math.Ceiling(period / 2);
                 frame_on_count[i] = (int)Math.Floor(period / 2);
                 realFreqFlash[i] = (targetFrameRate / (float)(frame_off_count[i] + frame_on_count[i]));
-
-                Debug.Log($"frequency {i + 1} : {realFreqFlash[i]}");
             }
         }
 
@@ -173,13 +171,16 @@ namespace BCIEssentials.ControllerBehaviors
                 //Set the stimulus type from the option chosen in the inspector
                 SetStimType();
 
+                //Added this so the marker sends every time
+                marker.Write("Trial Started");
+
                 //Set StimulusRunning to true and call the coroutine to send markers
                 StimulusRunning = true;
                 StartCoroutine(SendMarkers());
 
                 //This currently displays the 2 stimuli for 10 seconds
                 //Want it to display until a prediction is made and sent back by python
-                for(var flash = 0; flash <100*10; flash++) 
+                for(var flash = 0; flash <100*5; flash++) 
                 {
                     yield return OnStimulusRunBehavior();
                 }
@@ -187,10 +188,11 @@ namespace BCIEssentials.ControllerBehaviors
                 //Set StimulusRunning to false and stop the coroutine to send markers
                 StimulusRunning = false;
                 StopCoroutine(SendMarkers());
-                OnStimulusRunComplete();
+                StopStimulusRun();
+                yield return OnStimulusRunComplete();
 
                 //Since not all stimuli flash an even number of times in 10 seconds, some end up with the 'flashOnColor" showing at the end of the 10 seconds
-                TurnStimuliBlack();
+                //TurnStimuliBlack();
 
                 //Display text for the user after every run except the last one
                 if (i < 4)
@@ -254,9 +256,6 @@ namespace BCIEssentials.ControllerBehaviors
                     {
                         spoEffect.SetSize(ColorFlashEffect3.Size.Size3);
                     }
-
-                    Debug.Log("Contrast Level: " + _contrastLevel);
-                    Debug.Log("Size: " + _size);
                 }
             }
         }
