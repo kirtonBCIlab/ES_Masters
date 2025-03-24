@@ -191,13 +191,10 @@ namespace BCIEssentials.ControllerBehaviors
                 StopStimulusRun();
                 yield return OnStimulusRunComplete();
 
-                //Since not all stimuli flash an even number of times in 10 seconds, some end up with the 'flashOnColor" showing at the end of the 10 seconds
-                //TurnStimuliBlack();
-
                 //Display text for the user after every run except the last one
                 if (i < 4)
                 {
-                    yield return new WaitForSecondsRealtime(0.5f);
+                    yield return new WaitForSecondsRealtime(2f); //this is enough to to see feedback
                     _displayText.text = "Stimulus Complete";
                     yield return new WaitForSecondsRealtime(2f);
                     _displayText.text = "Next Stim";
@@ -257,17 +254,6 @@ namespace BCIEssentials.ControllerBehaviors
                         spoEffect.SetSize(ColorFlashEffect3.Size.Size3);
                     }
                 }
-            }
-        }
-
-        private void TurnStimuliBlack()
-        {
-            ColorFlashEffect3 spoEffect;
-
-            foreach (var spo in _selectableSPOs)
-            {
-                spoEffect = spo.GetComponent<ColorFlashEffect3>();
-                spoEffect.SetBlack(); 
             }
         }
     }
