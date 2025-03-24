@@ -185,6 +185,8 @@ namespace BCIEssentials.ControllerBehaviors
                     yield return OnStimulusRunBehavior();
                 }
 
+                SetBlack();
+
                 //Set StimulusRunning to false and stop the coroutine to send markers
                 StimulusRunning = false;
                 StopCoroutine(SendMarkers());
@@ -254,6 +256,17 @@ namespace BCIEssentials.ControllerBehaviors
                         spoEffect.SetSize(ColorFlashEffect3.Size.Size3);
                     }
                 }
+            }
+        }
+
+        private void SetBlack()
+        {
+            ColorFlashEffect3 spoEffect;
+            
+            foreach (var spo in _selectableSPOs)
+            {
+                spoEffect = spo.GetComponent<ColorFlashEffect3>();
+                spoEffect.SetBlack();
             }
         }
     }

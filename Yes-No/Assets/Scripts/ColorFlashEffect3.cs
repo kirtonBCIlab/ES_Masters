@@ -124,19 +124,21 @@ namespace BCIEssentials.StimulusEffects
 
         public void SetBlack()
         {
-            _renderer.material.SetColor("_Color", Color.black);
+            Color clear = new Color(0,0,0,0);
+            _renderer.material.SetColor("_Color", clear);
+            Debug.Log("set to clear");
         }
 
-        public void SelectedFeedback()
-        {
-            Vector3 oldSize = Vector3.one; // Default size is (1, 1, 1)
-            Vector3 newSize = new Vector3(3,3,3);
+        //public void SelectedFeedback()
+        //{
+        //    Vector3 oldSize = Vector3.one; // Default size is (1, 1, 1)
+        //    Vector3 newSize = new Vector3(3,3,3);
             
-            transform.localScale = newSize;
-            _renderer.material.SetColor("_Color", Color.blue);
-            Invoke("SetBlack", 0.5f);
-            transform.localScale = oldSize;
-        }
+        //    transform.localScale = newSize;
+        //    _renderer.material.SetColor("_Color", Color.blue);
+        //    Invoke("SetBlack", 0.5f);
+        //    transform.localScale = oldSize;
+        //}
 
 /// <summary>
 /// //////////Helper methods
