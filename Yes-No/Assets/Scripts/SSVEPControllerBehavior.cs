@@ -81,7 +81,6 @@ namespace BCIEssentials.ControllerBehaviors
             }
         }
 
-
         protected override IEnumerator SendMarkers(int trainingIndex = 99)
         {
             int cue = GetCueStimulus();
