@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "com.bci4kids.bciessentials": {
-      "version": "https://github.com/kirtonBCIlab/bci-essentials-unity.git",
+      "version": "https://github.com/kirtonBCIlab/bci-essentials-unity.git#d46c10294437b962da9ef6452461e5c30999f52f",
       "depth": 0,
       "source": "git",
       "dependencies": {

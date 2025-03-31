@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "com.bci4kids.bciessentials": "https://github.com/kirtonBCIlab/bci-essentials-unity.git",
+    "com.bci4kids.bciessentials": "https://github.com/kirtonBCIlab/bci-essentials-unity.git#d46c10294437b962da9ef6452461e5c30999f52f",
     "com.labstreaminglayer.lsl4unity": "https://github.com/labstreaminglayer/LSL4Unity.git",
     "com.unity.2d.sprite": "1.0.0",
     "com.unity.collab-proxy": "2.2.0",
