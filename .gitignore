@@ -57,7 +57,6 @@ sysinfo.txt
 
 # Hide data
 Masters-Processing/Data/*
-Masters-Processing/.venv/*
 
 # Python cache files
 __pycache__/
