@@ -55,6 +55,8 @@ namespace BCIEssentials.ControllerBehaviors
         [Header("Text Object")]
         [SerializeField] public Text _displayText;
 
+        public int cuedIndex = -1000;
+
         // Start is called before the first frame update
         protected override void Start()
         {
@@ -74,7 +76,6 @@ namespace BCIEssentials.ControllerBehaviors
                 frames_on[i] = 0;
                 frame_count[i] = 0;
                 period = targetFrameRate / requestedFlashingFrequencies[i];
-                // could add duty cycle selection here, but for now we will just get a duty cycle as close to 0.5 as possible
                 frame_off_count[i] = (int)Math.Ceiling(period / 2);
                 frame_on_count[i] = (int)Math.Floor(period / 2);
                 realFlashingFrequencies[i] = (targetFrameRate / (float)(frame_off_count[i] + frame_on_count[i]));
@@ -83,13 +84,11 @@ namespace BCIEssentials.ControllerBehaviors
 
         protected override IEnumerator SendMarkers(int trainingIndex = 99)
         {
-            int cue = GetCueStimulus();
             // Make the marker string, this will change based on the paradigm
             while (StimulusRunning)
-            {
-                
+            {   
                 // Send the marker
-                OutStream.PushSSVEPMarker(_selectableSPOs.Count, windowLength, realFlashingFrequencies, cue);
+                OutStream.PushSSVEPMarker(_selectableSPOs.Count, windowLength, realFlashingFrequencies, cuedIndex);
 
                 // Wait the window length + the inter-window interval
                 yield return new WaitForSecondsRealtime(windowLength + interWindowInterval);
@@ -125,7 +124,6 @@ namespace BCIEssentials.ControllerBehaviors
 
         protected int GetCueStimulus()
         {
-            int cuedIndex = -1000;
             if (_selectableSPOs.Count > 0)
             {
                 cuedIndex = UnityEngine.Random.Range(0, _selectableSPOs.Count);
@@ -155,20 +153,21 @@ namespace BCIEssentials.ControllerBehaviors
                 StimulusRunning = false;
 
                 //Flash the stimulus to look at to cue the user
-                //yield return CueStimulus();
+                GetCueStimulus();
+                SendCue(cuedIndex);
+                yield return new WaitForSecondsRealtime(0.5f); //this is enough to to see feedback
 
                 //Set the stimulus type from the option chosen in the inspector
                 SetStimType();
 
-                //Added this so the marker sends every time
+                //Send "Trial Started marker" to the LSL stream
                 OutStream.PushTrialStartedMarker();
 
                 //Set StimulusRunning to true and call the coroutine to send markers
                 StimulusRunning = true;
                 StartCoroutine(SendMarkers());
 
-                //This currently displays the 2 stimuli for 10 seconds
-                //Want it to display until a prediction is made and sent back by python
+                //This currently displays the 2 stimuli for 5 seconds
                 for(var flash = 0; flash <100*5; flash++) 
                 {
                     yield return OnStimulusRunBehavior();
@@ -206,6 +205,7 @@ namespace BCIEssentials.ControllerBehaviors
                 {
                     spoEffect = spo.GetComponent<ColorFlashEffect3>();
                     spoEffect.SetContrast(ColorFlashEffect3.ContrastLevel.White);
+                    spoEffect.SetSize(ColorFlashEffect3.Size.Size3);
                 }
             }
             else
@@ -243,6 +243,22 @@ namespace BCIEssentials.ControllerBehaviors
                         spoEffect.SetSize(ColorFlashEffect3.Size.Size3);
                     }
                 }
+            }
+        }
+
+        private void SendCue(int index)
+        {
+            ColorFlashEffect3 spoEffect;
+        
+            if (index >= 0 && index < _selectableSPOs.Count)
+            {
+                spoEffect = _selectableSPOs[index].GetComponent<ColorFlashEffect3>();
+
+                spoEffect.CueColorChange();
+            }
+            else
+            {
+                Debug.LogWarning("Invalid index for cue stimulus.");
             }
         }
     }

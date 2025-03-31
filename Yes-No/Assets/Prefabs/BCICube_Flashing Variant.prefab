@@ -163,6 +163,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2100000, guid: 593d1fac3f095864d9524c212d7b07fb, type: 2}
     - target: {fileID: 7639228323464969584, guid: 47bbed2aefc6bf04fb52e3a0207f72aa, type: 3}
+      propertyPath: OnStimulusTriggered.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7639228323464969584, guid: 47bbed2aefc6bf04fb52e3a0207f72aa, type: 3}
       propertyPath: OnSelected.m_PersistentCalls.m_Calls.Array.data[1].m_Target
       value: 
       objectReference: {fileID: 2873081732073690485}
@@ -171,13 +175,33 @@ PrefabInstance:
       value: ShowFeedback
       objectReference: {fileID: 0}
     - target: {fileID: 7639228323464969584, guid: 47bbed2aefc6bf04fb52e3a0207f72aa, type: 3}
+      propertyPath: OnStimulusTriggered.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7639228323464969584, guid: 47bbed2aefc6bf04fb52e3a0207f72aa, type: 3}
       propertyPath: OnStimulusTriggered.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 2479006489806591166}
+    - target: {fileID: 7639228323464969584, guid: 47bbed2aefc6bf04fb52e3a0207f72aa, type: 3}
+      propertyPath: OnStimulusTriggered.m_PersistentCalls.m_Calls.Array.data[1].m_Target
       value: 
       objectReference: {fileID: 2479006489806591166}
     - target: {fileID: 7639228323464969584, guid: 47bbed2aefc6bf04fb52e3a0207f72aa, type: 3}
       propertyPath: OnStimulusEndTriggered.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 2479006489806591166}
+    - target: {fileID: 7639228323464969584, guid: 47bbed2aefc6bf04fb52e3a0207f72aa, type: 3}
+      propertyPath: OnStimulusTriggered.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7639228323464969584, guid: 47bbed2aefc6bf04fb52e3a0207f72aa, type: 3}
+      propertyPath: OnStimulusTriggered.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: SetOn
+      objectReference: {fileID: 0}
+    - target: {fileID: 7639228323464969584, guid: 47bbed2aefc6bf04fb52e3a0207f72aa, type: 3}
+      propertyPath: OnStimulusTriggered.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: SetOn
+      objectReference: {fileID: 0}
     - target: {fileID: 7639228323464969584, guid: 47bbed2aefc6bf04fb52e3a0207f72aa, type: 3}
       propertyPath: OnSelected.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
       value: BCIEssentials.Utilities.StarFeedback, Assembly-CSharp
@@ -187,8 +211,16 @@ PrefabInstance:
       value: BCIEssentials.StimulusEffects.ColorFlashEffect3, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 7639228323464969584, guid: 47bbed2aefc6bf04fb52e3a0207f72aa, type: 3}
+      propertyPath: OnStimulusTriggered.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
+      value: BCIEssentials.StimulusEffects.ColorFlashEffect3, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 7639228323464969584, guid: 47bbed2aefc6bf04fb52e3a0207f72aa, type: 3}
       propertyPath: OnStimulusEndTriggered.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
       value: BCIEssentials.StimulusEffects.ColorFlashEffect3, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 7639228323464969584, guid: 47bbed2aefc6bf04fb52e3a0207f72aa, type: 3}
+      propertyPath: OnStimulusTriggered.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 1244532572310973658, guid: 47bbed2aefc6bf04fb52e3a0207f72aa, type: 3}
