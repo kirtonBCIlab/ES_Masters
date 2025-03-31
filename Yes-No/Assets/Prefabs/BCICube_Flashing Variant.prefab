@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2295661374880037088}
   - component: {fileID: 4687980460869340661}
-  - component: {fileID: 5466465045170498184}
+  - component: {fileID: 2873081732073690485}
   m_Layer: 0
   m_Name: Star
   m_TagString: Untagged
@@ -85,7 +85,7 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &5466465045170498184
+--- !u!114 &2873081732073690485
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -152,7 +152,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6190568516990124050, guid: 47bbed2aefc6bf04fb52e3a0207f72aa, type: 3}
       propertyPath: m_Materials.Array.size
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6190568516990124050, guid: 47bbed2aefc6bf04fb52e3a0207f72aa, type: 3}
       propertyPath: m_Materials.Array.data[0]
@@ -162,7 +162,37 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[1]
       value: 
       objectReference: {fileID: 2100000, guid: 593d1fac3f095864d9524c212d7b07fb, type: 2}
-    m_RemovedComponents: []
+    - target: {fileID: 7639228323464969584, guid: 47bbed2aefc6bf04fb52e3a0207f72aa, type: 3}
+      propertyPath: OnSelected.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 2873081732073690485}
+    - target: {fileID: 7639228323464969584, guid: 47bbed2aefc6bf04fb52e3a0207f72aa, type: 3}
+      propertyPath: OnSelected.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: ShowFeedback
+      objectReference: {fileID: 0}
+    - target: {fileID: 7639228323464969584, guid: 47bbed2aefc6bf04fb52e3a0207f72aa, type: 3}
+      propertyPath: OnStimulusTriggered.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 2479006489806591166}
+    - target: {fileID: 7639228323464969584, guid: 47bbed2aefc6bf04fb52e3a0207f72aa, type: 3}
+      propertyPath: OnStimulusEndTriggered.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 2479006489806591166}
+    - target: {fileID: 7639228323464969584, guid: 47bbed2aefc6bf04fb52e3a0207f72aa, type: 3}
+      propertyPath: OnSelected.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
+      value: BCIEssentials.Utilities.StarFeedback, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 7639228323464969584, guid: 47bbed2aefc6bf04fb52e3a0207f72aa, type: 3}
+      propertyPath: OnStimulusTriggered.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: BCIEssentials.StimulusEffects.ColorFlashEffect3, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 7639228323464969584, guid: 47bbed2aefc6bf04fb52e3a0207f72aa, type: 3}
+      propertyPath: OnStimulusEndTriggered.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: BCIEssentials.StimulusEffects.ColorFlashEffect3, Assembly-CSharp
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 1244532572310973658, guid: 47bbed2aefc6bf04fb52e3a0207f72aa, type: 3}
+    - {fileID: 8680933289109701472, guid: 47bbed2aefc6bf04fb52e3a0207f72aa, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 1048484350530938659, guid: 47bbed2aefc6bf04fb52e3a0207f72aa, type: 3}
@@ -170,115 +200,15 @@ PrefabInstance:
       addedObject: {fileID: 2295661374880037088}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 1048484350530938663, guid: 47bbed2aefc6bf04fb52e3a0207f72aa, type: 3}
-      insertIndex: 3
-      addedObject: {fileID: 4091452275841445562}
-    - targetCorrespondingSourceObject: {fileID: 1048484350530938663, guid: 47bbed2aefc6bf04fb52e3a0207f72aa, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 4236183440281145019}
+      addedObject: {fileID: 2479006489806591166}
   m_SourcePrefab: {fileID: 100100000, guid: 47bbed2aefc6bf04fb52e3a0207f72aa, type: 3}
 --- !u!1 &1971249600371205355 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1048484350530938663, guid: 47bbed2aefc6bf04fb52e3a0207f72aa, type: 3}
   m_PrefabInstance: {fileID: 1573937595529970636}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &4091452275841445562
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1971249600371205355}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1330a7c29df0be549a47bbf631876988, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  StartStimulusEvent:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 4236183440281145019}
-        m_TargetAssemblyTypeName: BCIEssentials.StimulusEffects.ColorFlashEffect3,
-          Assembly-CSharp
-        m_MethodName: SetOn
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 4236183440281145019}
-        m_TargetAssemblyTypeName: BCIEssentials.StimulusEffects.ColorFlashEffect3,
-          Assembly-CSharp
-        m_MethodName: SetOn
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  StopStimulusEvent:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 4236183440281145019}
-        m_TargetAssemblyTypeName: BCIEssentials.StimulusEffects.ColorFlashEffect3,
-          Assembly-CSharp
-        m_MethodName: SetOff
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  OnSelectedEvent:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 5466465045170498184}
-        m_TargetAssemblyTypeName: StarFeedback, Assembly-CSharp
-        m_MethodName: ShowFeedback
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 1
-        m_CallState: 2
-  StartTrainingStimulusEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  StopTrainingStimulusEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  CueEvent:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 4236183440281145019}
-        m_TargetAssemblyTypeName: BCIEssentials.StimulusEffects.ColorFlashEffect3,
-          Assembly-CSharp
-        m_MethodName: CueColorChange
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  Selectable: 1
-  SelectablePoolIndex: 0
-  ObjectID: -100
---- !u!114 &4236183440281145019
+--- !u!114 &2479006489806591166
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

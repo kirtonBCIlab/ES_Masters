@@ -5,15 +5,21 @@ using BCIEssentials.Controllers;
 using BCIEssentials.StimulusEffects;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using BCIEssentials.LSLFramework;
 
 namespace BCIEssentials.ControllerBehaviors
 {
-    public class SSVEPControllerBehavior : BCIControllerBehavior_variant
+    public class SSVEPControllerBehavior : BCIControllerBehavior
     {
         public override BCIBehaviorType BehaviorType => BCIBehaviorType.SSVEP;
-
-        [SerializeField] private float[] setFreqFlash;
-        [SerializeField] private float[] realFreqFlash;
+        
+        [FoldoutGroup("Stimulus Frequencies")]
+        [SerializeField]
+        [Tooltip("User-defined set of target stimulus frequencies [Hz]")]
+        private float[] requestedFlashingFrequencies;
+        [SerializeField, EndFoldoutGroup, InspectorReadOnly]
+        [Tooltip("Calculated best-match achievable frequencies based on the application framerate [Hz]")]
+        private float[] realFlashingFrequencies;
 
         private int[] frames_on = new int[99];
         private int[] frame_count = new int[99];
@@ -26,6 +32,7 @@ namespace BCIEssentials.ControllerBehaviors
             BW,
             Custom
         }
+
         public enum ContrastLevel
         {
             Contrast1,
@@ -57,20 +64,23 @@ namespace BCIEssentials.ControllerBehaviors
             RunStimulus();
         }
 
-       public override void PopulateObjectList(SpoPopulationMethod populationMethod = SpoPopulationMethod.Tag)
+        public override void PopulateObjectList(SpoPopulationMethod populationMethod = SpoPopulationMethod.Tag)
         {
             base.PopulateObjectList(populationMethod);
 
-            realFreqFlash = new float[_selectableSPOs.Count];
+            realFlashingFrequencies = new float[_selectableSPOs.Count];
 
             for (int i = 0; i < _selectableSPOs.Count; i++)
             {
                 frames_on[i] = 0;
                 frame_count[i] = 0;
-                period = targetFrameRate / setFreqFlash[i];
+                period = targetFrameRate / requestedFlashingFrequencies[i];
+                // could add duty cycle selection here, but for now we will just get a duty cycle as close to 0.5 as possible
                 frame_off_count[i] = (int)Math.Ceiling(period / 2);
                 frame_on_count[i] = (int)Math.Floor(period / 2);
-                realFreqFlash[i] = (targetFrameRate / (float)(frame_off_count[i] + frame_on_count[i]));
+                realFlashingFrequencies[i] = (targetFrameRate / (float)(frame_off_count[i] + frame_on_count[i]));
+
+                Debug.Log($"frequency {i + 1} : {realFlashingFrequencies[i]}");
             }
         }
 
@@ -79,28 +89,11 @@ namespace BCIEssentials.ControllerBehaviors
             // Make the marker string, this will change based on the paradigm
             while (StimulusRunning)
             {
-                // Desired format is: ["ssvep", number of options, training target (-1 if n/a), window length, frequencies]
-                string freqString = "";
-                for (int i = 0; i < realFreqFlash.Length; i++)
-                {
-                    freqString = freqString + "," + realFreqFlash[i].ToString();
-                }
-
-                string trainingString;
-                if (trainingIndex <= _selectableSPOs.Count)
-                {
-                    trainingString = trainingIndex.ToString();
-                }
-                else
-                {
-                    trainingString = "-1";
-                }
-
-                string markerString = "ssvep," + _selectableSPOs.Count.ToString() + "," + trainingString + "," +
-                                      windowLength.ToString() + freqString;
-
+                
                 // Send the marker
-                marker.Write(markerString);
+                //marker.Write(markerString);
+                //Adding cued stimulus to the marker string
+                OutStream.PushSSVEPMarker(_selectableSPOs.Count, windowLength, realFlashingFrequencies, GetCueStimulus());
 
                 // Wait the window length + the inter-window interval
                 yield return new WaitForSecondsRealtime(windowLength + interWindowInterval);
@@ -134,16 +127,14 @@ namespace BCIEssentials.ControllerBehaviors
             yield return null;
         }
 
-        protected IEnumerator CueStimulus()
+        protected int GetCueStimulus()
         {
+            int cuedIndex = -1000;
             if (_selectableSPOs.Count > 0)
             {
-                int randomIndex = UnityEngine.Random.Range(0, _selectableSPOs.Count);
-                marker.Write("Cued Object " + randomIndex.ToString());
-                _selectableSPOs[randomIndex].Cue();
-                yield return new WaitForSecondsRealtime(1f);
+                cuedIndex = UnityEngine.Random.Range(0, _selectableSPOs.Count);
             }
-            yield return null;
+            return cuedIndex;
         }
 
         protected override IEnumerator OnStimulusRunComplete()
@@ -167,13 +158,13 @@ namespace BCIEssentials.ControllerBehaviors
                 StimulusRunning = false;
 
                 //Flash the stimulus to look at to cue the user
-                yield return CueStimulus();
+                //yield return CueStimulus();
 
                 //Set the stimulus type from the option chosen in the inspector
                 SetStimType();
 
                 //Added this so the marker sends every time
-                marker.Write("Trial Started");
+                OutStream.PushTrialStartedMarker();
 
                 //Set StimulusRunning to true and call the coroutine to send markers
                 StimulusRunning = true;
