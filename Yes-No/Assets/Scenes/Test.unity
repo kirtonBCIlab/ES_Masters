@@ -406,6 +406,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1068744786}
   - component: {fileID: 1068744785}
+  - component: {fileID: 1068744787}
   m_Layer: 0
   m_Name: Controller
   m_TagString: Untagged
@@ -447,10 +448,18 @@ MonoBehaviour:
   shamFeedback: 0
   trainTargetPersistent: 0
   trainTarget: 99
-  requestedFlashingFrequencies: []
-  realFlashingFrequencies: []
-  _stimulusType: 0
-  _contrastLevel: 0
+  requestedFlashingFrequencies:
+  - 7
+  - 10
+  - 12.5
+  - 14
+  realFlashingFrequencies:
+  - 0
+  - 0
+  - 0
+  - 0
+  _stimulusType: 1
+  _contrastLevel: 2
   _size: 0
   _displayText: {fileID: 296641096}
 --- !u!4 &1068744786
@@ -468,6 +477,41 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1068744787
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1068744784}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a87290c50443fd478300848cc424dbc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ToggleStimulusRunBinding:
+    BoundKey: 115
+  StartAutomatedTrainingBinding:
+    BoundKey: 116
+  StartIterativeTrainingBinding:
+    BoundKey: 105
+  StartUserTrainingBinding:
+    BoundKey: 117
+  StartSingleTrainingBinding:
+    BoundKey: 59
+  UpdateClassifierBinding:
+    BoundKey: 8
+  ObjectSelectionBindings:
+    Bindings:
+    - BoundKey: 48
+      Index: 0
+    - BoundKey: 49
+      Index: 1
+    - BoundKey: 50
+      Index: 2
+    - BoundKey: 51
+      Index: 3
+  Target: {fileID: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

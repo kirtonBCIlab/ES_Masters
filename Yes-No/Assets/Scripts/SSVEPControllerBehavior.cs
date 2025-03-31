@@ -59,7 +59,6 @@ namespace BCIEssentials.ControllerBehaviors
         protected override void Start()
         {
             base.Start();
-            
             PopulateObjectList();
             RunStimulus();
         }
@@ -79,21 +78,19 @@ namespace BCIEssentials.ControllerBehaviors
                 frame_off_count[i] = (int)Math.Ceiling(period / 2);
                 frame_on_count[i] = (int)Math.Floor(period / 2);
                 realFlashingFrequencies[i] = (targetFrameRate / (float)(frame_off_count[i] + frame_on_count[i]));
-
-                Debug.Log($"frequency {i + 1} : {realFlashingFrequencies[i]}");
             }
         }
 
+
         protected override IEnumerator SendMarkers(int trainingIndex = 99)
         {
+            int cue = GetCueStimulus();
             // Make the marker string, this will change based on the paradigm
             while (StimulusRunning)
             {
                 
                 // Send the marker
-                //marker.Write(markerString);
-                //Adding cued stimulus to the marker string
-                OutStream.PushSSVEPMarker(_selectableSPOs.Count, windowLength, realFlashingFrequencies, GetCueStimulus());
+                OutStream.PushSSVEPMarker(_selectableSPOs.Count, windowLength, realFlashingFrequencies, cue);
 
                 // Wait the window length + the inter-window interval
                 yield return new WaitForSecondsRealtime(windowLength + interWindowInterval);
@@ -133,6 +130,7 @@ namespace BCIEssentials.ControllerBehaviors
             if (_selectableSPOs.Count > 0)
             {
                 cuedIndex = UnityEngine.Random.Range(0, _selectableSPOs.Count);
+                Debug.Log($"Cued index: {cuedIndex}");
             }
             return cuedIndex;
         }
