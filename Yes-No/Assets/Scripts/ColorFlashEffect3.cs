@@ -116,30 +116,6 @@ namespace BCIEssentials.StimulusEffects
             _effectRoutine = null;
         }
 
-        public void CueColorChange()
-        {
-            _renderer.material.SetColor("_Color", Color.red);
-            transform.localScale = new Vector3(150 / 325f, 150f / 325f, 150f / 325f);
-        }
-
-        public void SetBlack()
-        {
-            Color clear = new Color(0,0,0,0);
-            _renderer.material.SetColor("_Color", clear);
-            Debug.Log("set to clear");
-        }
-
-        //public void SelectedFeedback()
-        //{
-        //    Vector3 oldSize = Vector3.one; // Default size is (1, 1, 1)
-        //    Vector3 newSize = new Vector3(3,3,3);
-            
-        //    transform.localScale = newSize;
-        //    _renderer.material.SetColor("_Color", Color.blue);
-        //    Invoke("SetBlack", 0.5f);
-        //    transform.localScale = oldSize;
-        //}
-
 /// <summary>
 /// //////////Helper methods
 /// </summary>
@@ -210,5 +186,12 @@ namespace BCIEssentials.StimulusEffects
             _size = x;
             SizeController();
         }
+
+        public void CueColorChange()
+        {
+            _renderer.material.SetColor("_Color", Color.red);
+            transform.localScale = new Vector3(150 / 325f, 150f / 325f, 150f / 325f);
+        }
+
     }
  }

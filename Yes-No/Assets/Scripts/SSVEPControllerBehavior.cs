@@ -139,6 +139,7 @@ namespace BCIEssentials.ControllerBehaviors
             if (_selectableSPOs.Count > 0)
             {
                 int randomIndex = UnityEngine.Random.Range(0, _selectableSPOs.Count);
+                marker.Write("Cued Object " + randomIndex.ToString());
                 _selectableSPOs[randomIndex].Cue();
                 yield return new WaitForSecondsRealtime(1f);
             }
@@ -184,8 +185,6 @@ namespace BCIEssentials.ControllerBehaviors
                 {
                     yield return OnStimulusRunBehavior();
                 }
-
-                SetBlack();
 
                 //Set StimulusRunning to false and stop the coroutine to send markers
                 StimulusRunning = false;
@@ -256,17 +255,6 @@ namespace BCIEssentials.ControllerBehaviors
                         spoEffect.SetSize(ColorFlashEffect3.Size.Size3);
                     }
                 }
-            }
-        }
-
-        private void SetBlack()
-        {
-            ColorFlashEffect3 spoEffect;
-            
-            foreach (var spo in _selectableSPOs)
-            {
-                spoEffect = spo.GetComponent<ColorFlashEffect3>();
-                spoEffect.SetBlack();
             }
         }
     }
