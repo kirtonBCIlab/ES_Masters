@@ -149,13 +149,16 @@ namespace BCIEssentials.ControllerBehaviors
             //Arbitrarily do 5 runs
             for (int i = 0; i < 5; i++)
             {
+                //Stop the base class coroutine to send markers
+                StopCoroutineReference(ref _sendMarkers);
+
                 //Set StimulusRunning to false to prevent markers from being sent before the stimulus starts
                 StimulusRunning = false;
 
                 //Flash the stimulus to look at to cue the user
                 GetCueStimulus();
                 SendCue(cuedIndex);
-                yield return new WaitForSecondsRealtime(0.5f); //this is enough to to see feedback
+                yield return new WaitForSecondsRealtime(0.5f); //flash cue and wait a bit before the stimuli start flashing
 
                 //Set the stimulus type from the option chosen in the inspector
                 SetStimType();
@@ -165,7 +168,7 @@ namespace BCIEssentials.ControllerBehaviors
 
                 //Set StimulusRunning to true and call the coroutine to send markers
                 StimulusRunning = true;
-                StartCoroutine(SendMarkers());
+                Coroutine markerSendingCoroutine = StartCoroutine(SendMarkers());
 
                 //This currently displays the 2 stimuli for 5 seconds
                 for(var flash = 0; flash <100*5; flash++) 
@@ -175,7 +178,7 @@ namespace BCIEssentials.ControllerBehaviors
 
                 //Set StimulusRunning to false and stop the coroutine to send markers
                 StimulusRunning = false;
-                StopCoroutine(SendMarkers());
+                StopCoroutine(markerSendingCoroutine);
                 StopStimulusRun();
                 yield return OnStimulusRunComplete();
 
