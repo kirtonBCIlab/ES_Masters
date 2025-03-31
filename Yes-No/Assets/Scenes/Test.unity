@@ -202,145 +202,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 296641094}
   m_CullTransparentMesh: 1
---- !u!1 &443908828
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 443908830}
-  - component: {fileID: 443908836}
-  - component: {fileID: 443908835}
-  - component: {fileID: 443908834}
-  - component: {fileID: 443908832}
-  - component: {fileID: 443908831}
-  m_Layer: 0
-  m_Name: Controller
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &443908830
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 443908828}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &443908831
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 443908828}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 725310e9dbbc07a40960a87df5dd5764, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _targetStreamName: PythonResponse
-  _resolveTimeout: 1
-  _pollFrequency: 0
---- !u!114 &443908832
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 443908828}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: abcc24b3277378e439b2519bf143cb32, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  StreamName: UnityMarkerStream
-  StreamType: LSL_Marker_Strings
-  StreamId: MyStreamID-Unity1234
---- !u!114 &443908834
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 443908828}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d8b57fbfa08e6f843b12646f3c96672b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _selfRegister: 1
-  _selfRegisterAsActive: 0
-  setup: {fileID: 443908836}
-  setupRequired: 1
-  targetFrameRate: 100
-  _hotkeysEnabled: 1
-  _selectableSPOs:
-  - {fileID: 0}
-  - {fileID: 0}
-  windowLength: 1
-  interWindowInterval: 0
-  numTrainingSelections: 0
-  numTrainWindows: 3
-  pauseBeforeTraining: 2
-  trainTargetPresentationTime: 3
-  trainBreak: 1
-  shamFeedback: 0
-  trainTargetPersistent: 0
-  trainTarget: 99
-  myTag: BCI
-  setFreqFlash:
-  - 8
-  - 10
-  - 12.5
-  - 14
-  realFreqFlash: []
-  _stimulusType: 1
-  _contrastLevel: 3
-  _size: 2
-  _displayText: {fileID: 296641096}
---- !u!114 &443908835
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 443908828}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f990146382d172640b599efb37c44491, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _lslMarkerStream: {fileID: 443908832}
-  _lslResponseStream: {fileID: 443908831}
-  _dontDestroyActiveInstance: 1
---- !u!114 &443908836
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 443908828}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b1f10e627d494cd44bf679e28e0b2164, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _spoPrefab: {fileID: 4091452275841445562, guid: 00aa676616acc1945af3ad6f4c876b89, type: 3}
-  _numRows: 2
-  _numColumns: 2
-  _spacing: {x: 2, y: 1.75}
 --- !u!1 &796465901
 GameObject:
   m_ObjectHideFlags: 0
@@ -479,7 +340,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 0}
+  m_BackGroundColor: {r: 0.003921569, g: 0.003921569, b: 0.003921569, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -535,10 +396,127 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1068744784
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1068744786}
+  - component: {fileID: 1068744785}
+  - component: {fileID: 1068744787}
+  m_Layer: 0
+  m_Name: Controller
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1068744785
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1068744784}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d8b57fbfa08e6f843b12646f3c96672b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetFrameRate: 100
+  _selfRegister: 1
+  _selfRegisterAsActive: 1
+  _selfRegistrationTarget: {fileID: 0}
+  SPOTag: BCI
+  _selectableSPOs:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  _spoFactory: {fileID: 11400000, guid: 6c7421d6ebb11a84998933d05daaa069, type: 2}
+  FactorySetupRequired: 1
+  windowLength: 1
+  interWindowInterval: 0
+  numTrainingSelections: 0
+  numTrainWindows: 3
+  pauseBeforeTraining: 2
+  trainTargetPresentationTime: 3
+  trainBreak: 1
+  shamFeedback: 0
+  trainTargetPersistent: 0
+  trainTarget: 99
+  requestedFlashingFrequencies:
+  - 7
+  - 10
+  - 12.5
+  - 14
+  realFlashingFrequencies:
+  - 0
+  - 0
+  - 0
+  - 0
+  _stimulusType: 0
+  _contrastLevel: 2
+  _size: 0
+  _displayText: {fileID: 296641096}
+  cuedIndex: -1000
+--- !u!4 &1068744786
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1068744784}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1068744787
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1068744784}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a87290c50443fd478300848cc424dbc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ToggleStimulusRunBinding:
+    BoundKey: 115
+  StartAutomatedTrainingBinding:
+    BoundKey: 116
+  StartIterativeTrainingBinding:
+    BoundKey: 105
+  StartUserTrainingBinding:
+    BoundKey: 117
+  StartSingleTrainingBinding:
+    BoundKey: 59
+  UpdateClassifierBinding:
+    BoundKey: 8
+  ObjectSelectionBindings:
+    Bindings:
+    - BoundKey: 48
+      Index: 0
+    - BoundKey: 49
+      Index: 1
+    - BoundKey: 50
+      Index: 2
+    - BoundKey: 51
+      Index: 3
+  Target: {fileID: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 963194228}
-  - {fileID: 443908830}
   - {fileID: 796465905}
+  - {fileID: 1068744786}

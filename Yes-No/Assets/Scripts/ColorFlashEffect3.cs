@@ -68,9 +68,9 @@ namespace BCIEssentials.StimulusEffects
                 return;
 
             AssignMaterialColor(_flashOnColor);
+
             IsOn = true;
         }
-
         public override void SetOff()
         {
             if (_renderer == null || _renderer.material == null)
@@ -189,7 +189,7 @@ namespace BCIEssentials.StimulusEffects
 
         public void CueColorChange()
         {
-            _renderer.material.SetColor("_Color", Color.red);
+            _renderer.material.SetColor("_Color", Color.blue);
             transform.localScale = new Vector3(150 / 325f, 150f / 325f, 150f / 325f);
         }
 

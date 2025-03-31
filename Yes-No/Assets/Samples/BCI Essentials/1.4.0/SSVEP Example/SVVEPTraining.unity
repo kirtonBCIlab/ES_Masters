@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657874, g: 0.49641275, b: 0.5748172, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -123,6 +123,121 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &1457281859
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1457281861}
+  - component: {fileID: 1457281860}
+  - component: {fileID: 1457281862}
+  m_Layer: 0
+  m_Name: SSVEP Behaviour
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1457281860
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1457281859}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce01ae687a6194a48adf9dab50c3130f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _selfRegister: 1
+  _selfRegisterAsActive: 1
+  SPOTag: BCI
+  _spoFactory: {fileID: 11400000, guid: 6c7421d6ebb11a84998933d05daaa069, type: 2}
+  FactorySetupRequired: 1
+  targetFrameRate: 165
+  windowLength: 1
+  interWindowInterval: 0
+  numTrainingSelections: 12
+  numTrainWindows: 6
+  pauseBeforeTraining: 2
+  trainTargetPresentationTime: 3
+  trainBreak: 1
+  shamFeedback: 0
+  trainTargetPersistent: 0
+  trainTarget: 99
+  requestedFlashingFrequencies:
+  - 6
+  - 10
+  - 12
+  - 15
+  - 18
+  - 20
+  realFlashingFrequencies: []
+--- !u!4 &1457281861
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1457281859}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1457281862
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1457281859}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a87290c50443fd478300848cc424dbc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ToggleStimulusRunBinding:
+    BoundKey: 115
+  StartAutomatedTrainingBinding:
+    BoundKey: 116
+  StartIterativeTrainingBinding:
+    BoundKey: 105
+  StartUserTrainingBinding:
+    BoundKey: 117
+  StartSingleTrainingBinding:
+    BoundKey: 59
+  UpdateClassifierBinding:
+    BoundKey: 8
+  ObjectSelectionBindings:
+    Bindings:
+    - BoundKey: 48
+      Index: 0
+    - BoundKey: 49
+      Index: 1
+    - BoundKey: 50
+      Index: 2
+    - BoundKey: 51
+      Index: 3
+    - BoundKey: 52
+      Index: 4
+    - BoundKey: 53
+      Index: 5
+    - BoundKey: 54
+      Index: 6
+    - BoundKey: 55
+      Index: 7
+    - BoundKey: 56
+      Index: 8
+    - BoundKey: 57
+      Index: 9
 --- !u!1 &1500707444
 GameObject:
   m_ObjectHideFlags: 0
@@ -301,124 +416,3 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
---- !u!4 &4280385884697554931
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4280385884697554932}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &4280385884697554932
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 4280385884697554931}
-  - component: {fileID: 4280385884697554944}
-  - component: {fileID: 4280385884697554943}
-  - component: {fileID: 4280385884697554942}
-  - component: {fileID: 4280385884697554941}
-  m_Layer: 0
-  m_Name: SVVEPController
-  m_TagString: MasterController
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &4280385884697554941
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4280385884697554932}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7a183c01a805ed648ae373d6e8b3047e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _spoPrefab: {fileID: 7639228323464969584, guid: b9c6f9c35efb1934dbfbcd51cf36d69a, type: 3}
-  _numColumns: 3
-  _numRows: 2
-  _spacing: {x: 2, y: 2}
---- !u!114 &4280385884697554942
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4280385884697554932}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 725310e9dbbc07a40960a87df5dd5764, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _targetStreamName: UnityMarkerStream
-  _resolveTimeout: 1
-  _pollFrequency: 0
---- !u!114 &4280385884697554943
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4280385884697554932}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: abcc24b3277378e439b2519bf143cb32, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  StreamName: UnityMarkerStream
-  StreamType: LSL_Marker_Strings
-  StreamId: MyStreamID-Unity1234
---- !u!114 &4280385884697554944
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4280385884697554932}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4dd56602d8b72e498f55bcf004f0d45, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  refreshRate: 165
-  setupRequired: 1
-  listExists: 0
-  objectList: []
-  objectsToRemove: []
-  windowLength: 1
-  interWindowInterval: 0
-  stimOn: 0
-  numTrainingSelections: 12
-  numTrainWindows: 6
-  pauseBeforeTraining: 2
-  trainTargetPersistent: 0
-  trainTargetPresentationTime: 3
-  trainBreak: 1
-  shamFeedback: 0
-  trainTarget: 99
-  _myTag: BCI
-  setup: {fileID: 0}
-  marker: {fileID: 0}
-  response: {fileID: 0}
-  setFreqFlash:
-  - 6
-  - 10
-  - 12
-  - 15
-  - 18
-  - 20
-  realFreqFlash: []

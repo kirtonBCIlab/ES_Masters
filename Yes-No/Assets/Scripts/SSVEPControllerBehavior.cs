@@ -5,15 +5,21 @@ using BCIEssentials.Controllers;
 using BCIEssentials.StimulusEffects;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using BCIEssentials.LSLFramework;
 
 namespace BCIEssentials.ControllerBehaviors
 {
-    public class SSVEPControllerBehavior : BCIControllerBehavior_variant
+    public class SSVEPControllerBehavior : BCIControllerBehavior
     {
         public override BCIBehaviorType BehaviorType => BCIBehaviorType.SSVEP;
-
-        [SerializeField] private float[] setFreqFlash;
-        [SerializeField] private float[] realFreqFlash;
+        
+        [FoldoutGroup("Stimulus Frequencies")]
+        [SerializeField]
+        [Tooltip("User-defined set of target stimulus frequencies [Hz]")]
+        private float[] requestedFlashingFrequencies;
+        [SerializeField, EndFoldoutGroup, InspectorReadOnly]
+        [Tooltip("Calculated best-match achievable frequencies based on the application framerate [Hz]")]
+        private float[] realFlashingFrequencies;
 
         private int[] frames_on = new int[99];
         private int[] frame_count = new int[99];
@@ -26,6 +32,7 @@ namespace BCIEssentials.ControllerBehaviors
             BW,
             Custom
         }
+
         public enum ContrastLevel
         {
             Contrast1,
@@ -48,29 +55,30 @@ namespace BCIEssentials.ControllerBehaviors
         [Header("Text Object")]
         [SerializeField] public Text _displayText;
 
+        public int cuedIndex = -1000;
+
         // Start is called before the first frame update
         protected override void Start()
         {
             base.Start();
-            
             PopulateObjectList();
             RunStimulus();
         }
 
-       public override void PopulateObjectList(SpoPopulationMethod populationMethod = SpoPopulationMethod.Tag)
+        public override void PopulateObjectList(SpoPopulationMethod populationMethod = SpoPopulationMethod.Tag)
         {
             base.PopulateObjectList(populationMethod);
 
-            realFreqFlash = new float[_selectableSPOs.Count];
+            realFlashingFrequencies = new float[_selectableSPOs.Count];
 
             for (int i = 0; i < _selectableSPOs.Count; i++)
             {
                 frames_on[i] = 0;
                 frame_count[i] = 0;
-                period = targetFrameRate / setFreqFlash[i];
+                period = targetFrameRate / requestedFlashingFrequencies[i];
                 frame_off_count[i] = (int)Math.Ceiling(period / 2);
                 frame_on_count[i] = (int)Math.Floor(period / 2);
-                realFreqFlash[i] = (targetFrameRate / (float)(frame_off_count[i] + frame_on_count[i]));
+                realFlashingFrequencies[i] = (targetFrameRate / (float)(frame_off_count[i] + frame_on_count[i]));
             }
         }
 
@@ -78,29 +86,9 @@ namespace BCIEssentials.ControllerBehaviors
         {
             // Make the marker string, this will change based on the paradigm
             while (StimulusRunning)
-            {
-                // Desired format is: ["ssvep", number of options, training target (-1 if n/a), window length, frequencies]
-                string freqString = "";
-                for (int i = 0; i < realFreqFlash.Length; i++)
-                {
-                    freqString = freqString + "," + realFreqFlash[i].ToString();
-                }
-
-                string trainingString;
-                if (trainingIndex <= _selectableSPOs.Count)
-                {
-                    trainingString = trainingIndex.ToString();
-                }
-                else
-                {
-                    trainingString = "-1";
-                }
-
-                string markerString = "ssvep," + _selectableSPOs.Count.ToString() + "," + trainingString + "," +
-                                      windowLength.ToString() + freqString;
-
+            {   
                 // Send the marker
-                marker.Write(markerString);
+                OutStream.PushSSVEPMarker(_selectableSPOs.Count, windowLength, realFlashingFrequencies, cuedIndex);
 
                 // Wait the window length + the inter-window interval
                 yield return new WaitForSecondsRealtime(windowLength + interWindowInterval);
@@ -134,16 +122,14 @@ namespace BCIEssentials.ControllerBehaviors
             yield return null;
         }
 
-        protected IEnumerator CueStimulus()
+        protected int GetCueStimulus()
         {
             if (_selectableSPOs.Count > 0)
             {
-                int randomIndex = UnityEngine.Random.Range(0, _selectableSPOs.Count);
-                marker.Write("Cued Object " + randomIndex.ToString());
-                _selectableSPOs[randomIndex].Cue();
-                yield return new WaitForSecondsRealtime(1f);
+                cuedIndex = UnityEngine.Random.Range(0, _selectableSPOs.Count);
+                Debug.Log($"Cued index: {cuedIndex}");
             }
-            yield return null;
+            return cuedIndex;
         }
 
         protected override IEnumerator OnStimulusRunComplete()
@@ -163,24 +149,28 @@ namespace BCIEssentials.ControllerBehaviors
             //Arbitrarily do 5 runs
             for (int i = 0; i < 5; i++)
             {
+                //Stop the base class coroutine to send markers
+                StopCoroutineReference(ref _sendMarkers);
+
                 //Set StimulusRunning to false to prevent markers from being sent before the stimulus starts
                 StimulusRunning = false;
 
                 //Flash the stimulus to look at to cue the user
-                yield return CueStimulus();
+                GetCueStimulus();
+                SendCue(cuedIndex);
+                yield return new WaitForSecondsRealtime(0.5f); //flash cue and wait a bit before the stimuli start flashing
 
                 //Set the stimulus type from the option chosen in the inspector
                 SetStimType();
 
-                //Added this so the marker sends every time
-                marker.Write("Trial Started");
+                //Send "Trial Started marker" to the LSL stream
+                OutStream.PushTrialStartedMarker();
 
                 //Set StimulusRunning to true and call the coroutine to send markers
                 StimulusRunning = true;
-                StartCoroutine(SendMarkers());
+                Coroutine markerSendingCoroutine = StartCoroutine(SendMarkers());
 
-                //This currently displays the 2 stimuli for 10 seconds
-                //Want it to display until a prediction is made and sent back by python
+                //This currently displays the 2 stimuli for 5 seconds
                 for(var flash = 0; flash <100*5; flash++) 
                 {
                     yield return OnStimulusRunBehavior();
@@ -188,7 +178,7 @@ namespace BCIEssentials.ControllerBehaviors
 
                 //Set StimulusRunning to false and stop the coroutine to send markers
                 StimulusRunning = false;
-                StopCoroutine(SendMarkers());
+                StopCoroutine(markerSendingCoroutine);
                 StopStimulusRun();
                 yield return OnStimulusRunComplete();
 
@@ -218,6 +208,7 @@ namespace BCIEssentials.ControllerBehaviors
                 {
                     spoEffect = spo.GetComponent<ColorFlashEffect3>();
                     spoEffect.SetContrast(ColorFlashEffect3.ContrastLevel.White);
+                    spoEffect.SetSize(ColorFlashEffect3.Size.Size3);
                 }
             }
             else
@@ -255,6 +246,22 @@ namespace BCIEssentials.ControllerBehaviors
                         spoEffect.SetSize(ColorFlashEffect3.Size.Size3);
                     }
                 }
+            }
+        }
+
+        private void SendCue(int index)
+        {
+            ColorFlashEffect3 spoEffect;
+        
+            if (index >= 0 && index < _selectableSPOs.Count)
+            {
+                spoEffect = _selectableSPOs[index].GetComponent<ColorFlashEffect3>();
+
+                spoEffect.CueColorChange();
+            }
+            else
+            {
+                Debug.LogWarning("Invalid index for cue stimulus.");
             }
         }
     }
