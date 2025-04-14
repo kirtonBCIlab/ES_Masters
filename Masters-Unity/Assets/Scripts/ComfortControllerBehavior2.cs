@@ -223,7 +223,7 @@ namespace BCIEssentials.ControllerBehaviors
             // Loop through the double elimination bracket
             while (!bracket.IsComplete())
             {
-                marker.Write("Pair number" + pairNum);
+                //marker.Write("Pair number" + pairNum);
                 // get the next pair in the bracket
                 var currentPair = bracket.GetCurrentMatch(); 
                 if (currentPair == null) break;
@@ -268,7 +268,7 @@ namespace BCIEssentials.ControllerBehaviors
                     yield return OnStimulusRunBehavior();
                 }
 
-                marker.Write("off- 10s");
+                marker.Write("stimulus ended");
 
                 // Turn off stimulus 1 and turn on stimulus 2 and move stim2 to center of screen
                 stim1.enabled = false;
@@ -282,7 +282,7 @@ namespace BCIEssentials.ControllerBehaviors
                 StartCoroutine(DisplayTextOnScreen("3"));
                 yield return new WaitForSecondsRealtime(3f); 
 
-                marker.Write("off- end");
+                marker.Write("baseline ended");
 
                 // Present Stimulus 2
                 mainCam.transform.Rotate(rotateBack);
@@ -299,7 +299,7 @@ namespace BCIEssentials.ControllerBehaviors
                     yield return OnStimulusRunBehavior();
                 }
 
-                marker.Write("off- 10s");
+                marker.Write("stimulus ended");
 
                 mainCam.transform.Rotate(rotateAway);
                 StartCoroutine(DisplayTextOnScreen("Comfort"));
@@ -307,7 +307,7 @@ namespace BCIEssentials.ControllerBehaviors
                 StartCoroutine(DisplayTextOnScreen("3"));
                 yield return new WaitForSecondsRealtime(3f); 
 
-                marker.Write("off- end");
+                marker.Write("baseline ended");
 
                 //Turn both stimuli on and move stimuli to either side of the screen
                 stim1.enabled = true;
@@ -379,14 +379,14 @@ namespace BCIEssentials.ControllerBehaviors
                     preference = true; // Stimulus 1 selected
                     preferenceCaptured = true;
                     //marker write chose 1
-                    Debug.Log("Stimulus 1 selected successfully in the controller");
+                    //Debug.Log("Stimulus 1 selected successfully in the controller");
                 }
                 else if (Input.GetKeyDown(KeyCode.Alpha2) || Input.GetKeyDown(KeyCode.Keypad2))
                 {
                     preference = false; // Stimulus 2 selected
                     preferenceCaptured = true;
                     //marker write chose 2
-                    Debug.Log("Stimulus 2 selected successfully in the controller");
+                    //Debug.Log("Stimulus 2 selected successfully in the controller");
                 }
 
                 // Yield until the next frame to prevent freezing
