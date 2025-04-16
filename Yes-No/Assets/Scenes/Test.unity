@@ -449,10 +449,10 @@ MonoBehaviour:
   trainTargetPersistent: 0
   trainTarget: 99
   requestedFlashingFrequencies:
-  - 7
+  - 6.25
   - 10
-  - 12.5
-  - 14
+  - 12
+  - 14.28
   realFlashingFrequencies:
   - 0
   - 0

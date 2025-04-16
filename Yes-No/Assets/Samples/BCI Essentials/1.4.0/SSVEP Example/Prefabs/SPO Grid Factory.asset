@@ -15,4 +15,4 @@ MonoBehaviour:
   _spoPrefab: {fileID: 9211060018676842172, guid: 00aa676616acc1945af3ad6f4c876b89, type: 3}
   _numRows: 2
   _numColumns: 2
-  _spacing: {x: 2, y: 1.75}
+  _spacing: {x: 4.5, y: 2.25}

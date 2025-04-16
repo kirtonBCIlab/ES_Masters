@@ -88,7 +88,7 @@ namespace BCIEssentials.ControllerBehaviors
             while (StimulusRunning)
             {   
                 // Send the marker
-                OutStream.PushSSVEPMarker(_selectableSPOs.Count, windowLength, realFlashingFrequencies, cuedIndex);
+                OutStream.PushSSVEPMarker(_selectableSPOs.Count, windowLength, realFlashingFrequencies, -1);
 
                 // Wait the window length + the inter-window interval
                 yield return new WaitForSecondsRealtime(windowLength + interWindowInterval);
@@ -147,7 +147,7 @@ namespace BCIEssentials.ControllerBehaviors
         protected override IEnumerator RunStimulus()
         {
             //Arbitrarily do 5 runs
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < 30; i++)
             {
                 //Stop the base class coroutine to send markers
                 StopCoroutineReference(ref _sendMarkers);
@@ -165,7 +165,7 @@ namespace BCIEssentials.ControllerBehaviors
 
                 //Send "Trial Started marker" to the LSL stream
                 OutStream.PushTrialStartedMarker();
-
+                
                 //Set StimulusRunning to true and call the coroutine to send markers
                 StimulusRunning = true;
                 Coroutine markerSendingCoroutine = StartCoroutine(SendMarkers());
@@ -183,7 +183,7 @@ namespace BCIEssentials.ControllerBehaviors
                 yield return OnStimulusRunComplete();
 
                 //Display text for the user after every run except the last one
-                if (i < 4)
+                if (i < 29)
                 {
                     yield return new WaitForSecondsRealtime(2f); //this is enough to to see feedback
                     _displayText.text = "Stimulus Complete";
