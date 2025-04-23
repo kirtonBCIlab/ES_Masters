@@ -127,7 +127,7 @@ namespace BCIEssentials.ControllerBehaviors
             if (_selectableSPOs.Count > 0)
             {
                 cuedIndex = UnityEngine.Random.Range(0, _selectableSPOs.Count);
-                Debug.Log($"Cued index: {cuedIndex}");
+                OutStream.PushString($"Cued index: {cuedIndex}");
             }
             return cuedIndex;
         }
