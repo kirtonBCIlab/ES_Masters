@@ -68,6 +68,11 @@ def create_epochs(filt_clean, eeg_ts, file_path):
     # Load markers
     marker_ts, markers = import_data.read_xdf_unity_markers(file_path)
 
+    #TEMP
+    markers = markers[:-1] # Dan practice data has an extra marker at the end that is not needed
+    marker_ts = marker_ts[:-1] # Remove the last marker timestamp and label
+
+
     # Create epochs for stimuli
     events_epochs, eeg_epochs = data_tools.create_epochs(
         eeg_data=filt_clean.get_data(),
@@ -271,8 +276,21 @@ def get_zscore(eeg_pxx, eeg_f, baseline_mean, baseline_std):
         # Store as a list or tuple
         ten_twenty_mean_zscores[stim_label] = selected.tolist()
 
-    z_scores = pd.DataFrame(ten_twenty_mean_zscores, index=freqs[fmask])
-    
+    stimuli = ten_twenty_mean_zscores.keys()
+
+    mean_zscores = {stim: [[], []] for stim in stimuli}  # index 0 = 10Hz, 1 = 20Hz
+
+    for f in range(len(ten_twenty_mean_zscores)):
+        for stim in stimuli:
+            mean_zscores[stim][0].append(ten_twenty_mean_zscores[stim][0])  # 10 Hz
+            mean_zscores[stim][1].append(ten_twenty_mean_zscores[stim][1])  # 20 Hz
+
+    z_scores = pd.DataFrame([
+        [stim for stim in mean_zscores.keys()],
+        [mean_zscores[stim][0][0] for stim in mean_zscores.keys()],  # 10 Hz
+        [mean_zscores[stim][1][0] for stim in mean_zscores.keys()]   # 20 Hz
+    ])    
+
     return z_scores
 
 def get_mean_comfort(comfort_file):
@@ -297,18 +315,12 @@ def get_best_stim(absolute_comfort_data, z_scores):
         absolute_comfort_list = [row.Contrast1Size1, row.Contrast1Size2, row.Contrast1Size3, row.Contrast2Size1, row.Contrast2Size2, row.Contrast2Size3, row.Contrast3Size1, row.Contrast3Size2, row.Contrast3Size3, row.Contrast4Size1, row.Contrast4Size2, row.Contrast4Size3]
         
     # Get z-score 10 Hz and 20 Hz rows explicitly
-    row_10 = z_scores.iloc[0]
-    row_20 = z_scores.iloc[1]
-
-    # Create lists from each
-    z_score_list_10 = [
-        row_10.Contrast1Size1, row_10.Contrast1Size2, row_10.Contrast1Size3, row_10.Contrast2Size1, row_10.Contrast2Size2, row_10.Contrast2Size3, row_10.Contrast3Size1, row_10.Contrast3Size2, row_10.Contrast3Size3, row_10.Contrast4Size1, row_10.Contrast4Size2, row_10.Contrast4Size3]
-
-    z_score_list_20 = [row_20.Contrast1Size1, row_20.Contrast1Size2, row_20.Contrast1Size3, row_20.Contrast2Size1, row_20.Contrast2Size2, row_20.Contrast2Size3, row_20.Contrast3Size1, row_20.Contrast3Size2, row_20.Contrast3Size3, row_20.Contrast4Size1, row_20.Contrast4Size2, row_20.Contrast4Size3]
+    row_10 = z_scores.iloc[1]
+    row_20 = z_scores.iloc[2]
 
     absolute_comfort_dict = dict(zip(stim_name_list, absolute_comfort_list))
-    z_score_dict_10 = dict(zip(stim_name_list, z_score_list_10))
-    z_score_dict_20 = dict(zip(stim_name_list, z_score_list_20))
+    z_score_dict_10 = dict(zip(stim_name_list, row_10))
+    z_score_dict_20 = dict(zip(stim_name_list, row_20))
 
     # Filter stims with z-score >= 2
     for stim, z_score10 in z_score_dict_10.items():
@@ -365,6 +377,12 @@ def main(file_path, comfort_file):
     abs_comfort = get_mean_comfort(comfort_file)
     best_stim = get_best_stim(abs_comfort, z_scores)
 
+    stimuli = ["Contrast1Size1", "Contrast1Size2", "Contrast1Size3", "Contrast2Size1", "Contrast2Size2", "Contrast2Size3", "Contrast3Size1", "Contrast3Size2", "Contrast3Size3", "Contrast4Size1", "Contrast4Size2", "Contrast4Size3"]
+
+    # Print list of stimuli with z-scores and comfort values
+    print("Stimuli with Z-scores and Comfort Values:")
+    for idx, stim in enumerate(stimuli):  # Use enumerate to get both index and stimulus
+        print(f"{stim}: Z-score 10Hz: {z_scores.iloc[1, idx]}, Z-score 20Hz: {z_scores.iloc[2, idx]}")
     print(f"The best stimulus based on comfort and z-scores: {best_stim}")
 
 if __name__ == "__main__":
