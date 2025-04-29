@@ -40,6 +40,8 @@ namespace BCIEssentials.ControllerBehaviors
         private bool? preference;
         private int pairNum;
 
+        int comfort = -1;
+
         public class StimulusData
         {
             // Dictionary to hold stimulus indices and their corresponding names
@@ -111,6 +113,79 @@ namespace BCIEssentials.ControllerBehaviors
         }
 
         public StimulusData bracketInfo = new StimulusData();
+
+        public class ComfortData
+        {
+            // Maps a stimulus ID (e.g., "C1S1") to a list of comfort scores
+            public Dictionary<string, List<int>> StimulusRatings { get; private set; }
+
+            // Optional mapping of stimulus index to label or description
+            public Dictionary<int, string> StimulusIndex { get; private set; }
+
+            public ComfortData()
+            {
+                StimulusRatings = new Dictionary<string, List<int>>();
+                StimulusIndex = new Dictionary<int, string>();
+            }
+
+            // Add a comfort score to a stimulus (e.g., "C1S1")
+            public void AddScore(string stimulusId, int score)
+            {
+                if (!StimulusRatings.ContainsKey(stimulusId))
+                {
+                    StimulusRatings[stimulusId] = new List<int>();
+                }
+                StimulusRatings[stimulusId].Add(score);
+            }
+
+            // Optional: Assign stimulus index to labels
+            public void SetStimulusIndex(Dictionary<int, string> stimulusDictionary)
+            {
+                StimulusIndex = new Dictionary<int, string>(stimulusDictionary);
+            }
+
+            // Compute the mean comfort score for a given stimulus
+            public double? GetMeanComfort(string stimulusId)
+            {
+                if (StimulusRatings.ContainsKey(stimulusId) && StimulusRatings[stimulusId].Count > 0)
+                {
+                    return null;
+                }
+                return null;
+            }
+
+            // Generate a 2-row table for export: stimulus names in row 1, mean scores in row 2
+            public List<List<string>> GetComfortDataForExport()
+            {
+                List<string> headerRow = new List<string>();
+                List<string> meanRow = new List<string>();
+
+                foreach (var stimulus in StimulusRatings.Keys)
+                {
+                    headerRow.Add(stimulus);
+                    var mean = GetMeanComfort(stimulus);
+                    meanRow.Add(mean.HasValue ? mean.Value.ToString("F2") : "N/A");
+                }
+
+                return new List<List<string>> { headerRow, meanRow };
+            }
+
+            // Optional: Write to CSV file if you're in Unity or .NET desktop
+            public void ExportToCsv(string filePath)
+            {
+                var exportData = GetComfortDataForExport();
+                using (var writer = new System.IO.StreamWriter(filePath))
+                {
+                    foreach (var row in exportData)
+                    {
+                        writer.WriteLine(string.Join(",", row));
+                    }
+                }
+            }
+        }
+
+        public ComfortData comfortData = new ComfortData();
+
 
         protected override void Start()
         {
@@ -213,17 +288,16 @@ namespace BCIEssentials.ControllerBehaviors
 
             StartCoroutine(DisplayTextOnScreen("RS Open"));
             marker.Write("Resting State, Eyes Open");
-            yield return new WaitForSecondsRealtime(60.0f);
+            yield return new WaitForSecondsRealtime(3.0f);
 
 
             StartCoroutine(DisplayTextOnScreen("RS Closed"));
             marker.Write("Resting State, Eyes Closed");
-            yield return new WaitForSecondsRealtime(60.0f);
+            yield return new WaitForSecondsRealtime(3.0f);
 
             // Loop through the double elimination bracket
             while (!bracket.IsComplete())
             {
-                //marker.Write("Pair number" + pairNum);
                 // get the next pair in the bracket
                 var currentPair = bracket.GetCurrentMatch(); 
                 if (currentPair == null) break;
@@ -258,7 +332,6 @@ namespace BCIEssentials.ControllerBehaviors
                 markerString = "ssvep," + _selectableSPOs.Count.ToString() + "," + windowLength.ToString() + "," + realFreqFlash.ToString() + stimulusString;
                 marker.Write(markerString);
 
-
                 for(var flash = 0; flash <100*10; flash++) //(StimulusRunning)
                 //the number that flash is less than is the amount of seconds to flash for 
                 //100 = 1 second (frame rate is 100 Hz) so 10 seconds = flash < 100*10s
@@ -270,15 +343,20 @@ namespace BCIEssentials.ControllerBehaviors
 
                 marker.Write("stimulus ended");
 
+                StartCoroutine(GetComfortScore());
+                yield return new WaitUntil(() => comfort != -1);
+
+                comfortData.AddScore(stim1Name, comfort); 
+                Debug.Log("Comfort score for" + stim1Name + " : " + comfort);
+                comfort = -1; // Reset comfort score for next stimulus
+
                 // Turn off stimulus 1 and turn on stimulus 2 and move stim2 to center of screen
                 stim1.enabled = false;
                 stim2.enabled = true;
                 stim2Object.transform.position = new Vector3(1, 0, 0);
 
-
                 mainCam.transform.Rotate(rotateAway);
-                StartCoroutine(DisplayTextOnScreen("Comfort"));
-                yield return new WaitForSecondsRealtime(7f);
+                yield return new WaitForSecondsRealtime(2f);
                 StartCoroutine(DisplayTextOnScreen("3"));
                 yield return new WaitForSecondsRealtime(3f); 
 
@@ -301,11 +379,17 @@ namespace BCIEssentials.ControllerBehaviors
 
                 marker.Write("stimulus ended");
 
+                StartCoroutine(GetComfortScore());
+                yield return new WaitUntil(() => comfort != -1);
+
+                comfortData.AddScore(stim2Name, comfort); 
+                Debug.Log("Comfort score for" + stim2Name + " : " + comfort);
+                comfort = -1; // Reset comfort score for next stimulus
+
                 mainCam.transform.Rotate(rotateAway);
-                StartCoroutine(DisplayTextOnScreen("Comfort"));
-                yield return new WaitForSecondsRealtime(7f);
+                yield return new WaitForSecondsRealtime(2f);
                 StartCoroutine(DisplayTextOnScreen("3"));
-                yield return new WaitForSecondsRealtime(3f); 
+                yield return new WaitForSecondsRealtime(3f);
 
                 marker.Write("baseline ended");
 
@@ -369,7 +453,6 @@ namespace BCIEssentials.ControllerBehaviors
         private IEnumerator GetUserPreferenceCoroutine()
         {
             bool preferenceCaptured = false;
-            //marker write "start pref collection
             // Wait for user input
             while (!preferenceCaptured)
             {
@@ -378,15 +461,51 @@ namespace BCIEssentials.ControllerBehaviors
                 {
                     preference = true; // Stimulus 1 selected
                     preferenceCaptured = true;
-                    //marker write chose 1
-                    //Debug.Log("Stimulus 1 selected successfully in the controller");
                 }
                 else if (Input.GetKeyDown(KeyCode.Alpha2) || Input.GetKeyDown(KeyCode.Keypad2))
                 {
                     preference = false; // Stimulus 2 selected
                     preferenceCaptured = true;
-                    //marker write chose 2
-                    //Debug.Log("Stimulus 2 selected successfully in the controller");
+                }
+
+                // Yield until the next frame to prevent freezing
+                yield return null;
+            }
+        }
+
+        //write a method similar to above to get a comfort score for values 1-5
+        private IEnumerator GetComfortScore()
+        {
+            bool scoreCaptured = false;
+
+            // Wait for user input
+            while (!scoreCaptured)
+            {
+                StartCoroutine(DisplayTextOnScreen("Comfort"));
+                if (Input.GetKeyDown(KeyCode.Alpha1) || Input.GetKeyDown(KeyCode.Keypad1))
+                {
+                    comfort = 1; // Comfort score 1
+                    scoreCaptured = true;
+                }
+                else if (Input.GetKeyDown(KeyCode.Alpha2) || Input.GetKeyDown(KeyCode.Keypad2))
+                {
+                    comfort = 2; // Comfort score 2
+                    scoreCaptured = true;
+                }
+                else if (Input.GetKeyDown(KeyCode.Alpha3) || Input.GetKeyDown(KeyCode.Keypad3))
+                {
+                    comfort = 3; // Comfort score 3
+                    scoreCaptured = true;
+                }
+                else if (Input.GetKeyDown(KeyCode.Alpha4) || Input.GetKeyDown(KeyCode.Keypad4))
+                {
+                    comfort = 4; // Comfort score 4
+                    scoreCaptured = true;
+                }
+                else if (Input.GetKeyDown(KeyCode.Alpha5) || Input.GetKeyDown(KeyCode.Keypad5))
+                {
+                    comfort = 5; // Comfort score 5
+                    scoreCaptured = true;
                 }
 
                 // Yield until the next frame to prevent freezing
@@ -502,8 +621,8 @@ namespace BCIEssentials.ControllerBehaviors
             }
             else if (textOption == "Comfort")
             {
-                _displayText.text = "Rate Comfort 1 - 7";
-                yield return new WaitForSecondsRealtime(5.0f);
+                _displayText.text = "Rate Comfort 1 - 5";
+                yield return new WaitForSecondsRealtime(1.0f);
                 _displayText.text = "";
             }
             else if (textOption == "Break")
@@ -752,6 +871,7 @@ namespace BCIEssentials.ControllerBehaviors
 
             orderDict = new Dictionary<int, string>(randomDict);    
             bracketInfo.SetStimulusIndex(orderDict);
+            comfortData.SetStimulusIndex(orderDict);
         }    
     }
 }
