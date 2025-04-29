@@ -59,11 +59,11 @@ def create_epochs(filt_clean, eeg_ts, file_path):
     
     # Define event markers for stimuli
     list_of_events = [f"Contrast{x+1}Size{y+1}" for x in range(4) for y in range(3)]
-    epoch_end = "off- 10s"
+    epoch_end = "stimulus ended"
 
     # Define baseline event
-    list_of_off_events = ["off- 10s"]
-    epoch_end_off = "off- end"
+    list_of_off_events = ["stimulus ended"]
+    epoch_end_off = "baseline ended"
 
     # Load markers
     marker_ts, markers = import_data.read_xdf_unity_markers(file_path)
@@ -90,7 +90,7 @@ def create_epochs(filt_clean, eeg_ts, file_path):
 
     # Map stimuli and baseline
     dict_of_stimuli = {i: event for i, event in enumerate(list_of_events)}
-    dict_of_stimuli_off = {0: "off- 10s"}
+    dict_of_stimuli_off = {0: "stimulus ended"}
 
     # Organize epochs
     eeg_epochs_organized = data_tools.epochs_stim(
@@ -255,16 +255,24 @@ def get_zscore(eeg_pxx, eeg_f, baseline_mean, baseline_std):
         eeg_zscore_mean_pxx[stim_label] = mean_zscore
 
     freqs = eeg_f[stim_label][0] 
-    fmask = (freqs == 10.0)
-    ten_mean_zscores = {}
+
+    # Create a mask for both 10 Hz and 20 Hz
+    fmask = (freqs == 10.0) | (freqs == 20.0)
+    ten_twenty_mean_zscores = {}
+
 
     # Compute filtered mean Z scores for each stimulus
     for stim_label in eeg_zscore_mean_pxx.keys():
-        zscores = eeg_zscore_mean_pxx[stim_label]  # Shape: (1281,)
-        ten_mean_zscores[stim_label] = zscores[fmask] # Shape: (num_freqs,)
+        zscores = eeg_zscore_mean_pxx[stim_label]
 
-    z_scores = pd.DataFrame(ten_mean_zscores)
+        # Use the mask to get values at 10 Hz and 20 Hz
+        selected = zscores[fmask]
 
+        # Store as a list or tuple
+        ten_twenty_mean_zscores[stim_label] = selected.tolist()
+
+    z_scores = pd.DataFrame(ten_twenty_mean_zscores, index=freqs[fmask])
+    
     return z_scores
 
 def get_mean_comfort(comfort_file):
@@ -287,25 +295,36 @@ def get_best_stim(absolute_comfort_data, z_scores):
 
     for idx, row in absolute_comfort_data.iterrows():
         absolute_comfort_list = [row.Contrast1Size1, row.Contrast1Size2, row.Contrast1Size3, row.Contrast2Size1, row.Contrast2Size2, row.Contrast2Size3, row.Contrast3Size1, row.Contrast3Size2, row.Contrast3Size3, row.Contrast4Size1, row.Contrast4Size2, row.Contrast4Size3]
-    
-    
-    for idx, row in z_scores.iterrows():
-        z_score_list = [row.Contrast1Size1, row.Contrast1Size2, row.Contrast1Size3, row.Contrast2Size1, row.Contrast2Size2, row.Contrast2Size3, row.Contrast3Size1, row.Contrast3Size2, row.Contrast3Size3, row.Contrast4Size1, row.Contrast4Size2, row.Contrast4Size3]
+        
+    # Get z-score 10 Hz and 20 Hz rows explicitly
+    row_10 = z_scores.iloc[0]
+    row_20 = z_scores.iloc[1]
+
+    # Create lists from each
+    z_score_list_10 = [
+        row_10.Contrast1Size1, row_10.Contrast1Size2, row_10.Contrast1Size3, row_10.Contrast2Size1, row_10.Contrast2Size2, row_10.Contrast2Size3, row_10.Contrast3Size1, row_10.Contrast3Size2, row_10.Contrast3Size3, row_10.Contrast4Size1, row_10.Contrast4Size2, row_10.Contrast4Size3]
+
+    z_score_list_20 = [row_20.Contrast1Size1, row_20.Contrast1Size2, row_20.Contrast1Size3, row_20.Contrast2Size1, row_20.Contrast2Size2, row_20.Contrast2Size3, row_20.Contrast3Size1, row_20.Contrast3Size2, row_20.Contrast3Size3, row_20.Contrast4Size1, row_20.Contrast4Size2, row_20.Contrast4Size3]
 
     absolute_comfort_dict = dict(zip(stim_name_list, absolute_comfort_list))
-    z_score_dict = dict(zip(stim_name_list, z_score_list))
+    z_score_dict_10 = dict(zip(stim_name_list, z_score_list_10))
+    z_score_dict_20 = dict(zip(stim_name_list, z_score_list_20))
 
     # Filter stims with z-score >= 2
-    for stim, z_score in z_score_dict.items():
-        if z_score >= 2:
-            kept_stim.append(stim)
+    for stim, z_score10 in z_score_dict_10.items():
+        for stim, z_score20 in z_score_dict_20.items():
+            if z_score10 >= 2 or z_score20 >= 2:
+                # Check if the stim is already in the kept_stim list
+                if stim not in kept_stim:
+                    # Append the stim to the kept_stim list
+                    kept_stim.append(stim)
 
-    # Find the stim (with Z-score > 2) with the lowest absolute comfort score
-    min_absolute_comfort = float("inf")
+    # Find the stim (with Z-score > 2) with the highest absolute comfort score
+    max_absolute_comfort = float("-inf")
 
     for stim in kept_stim:
-        if absolute_comfort_dict[stim] < min_absolute_comfort:
-            min_absolute_comfort = absolute_comfort_dict[stim]
+        if absolute_comfort_dict[stim] > max_absolute_comfort:
+            max_absolute_comfort = absolute_comfort_dict[stim]
             best_stim_absolute = stim
 
     return best_stim_absolute
