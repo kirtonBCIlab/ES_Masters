@@ -293,21 +293,11 @@ def get_zscore(eeg_pxx, eeg_f, baseline_mean, baseline_std):
 
     return z_scores
 
-def get_mean_comfort(comfort_file):
-    absolute_comfort_data = pd.read_csv(comfort_file)
-    
-    # Compute the mean Comfort_Value for each (Contrast, Size) pair
-    df_grouped = absolute_comfort_data.groupby(["Contrast", "Size"])["Comfort_Value"].mean().reset_index()
-    df_pivot = df_grouped.pivot_table(index=None, columns=["Contrast", "Size"], values="Comfort_Value")
-    df_pivot.columns = [f"Contrast{c}Size{s}" for c, s in df_pivot.columns]
-    df_final = df_pivot.reset_index(drop=True)
-
-    return df_final
-
-
-def get_best_stim(absolute_comfort_data, z_scores):
+def get_best_stim(absolute_comfort_data_file, z_scores):
     best_stim_absolute = None
     kept_stim = []
+
+    absolute_comfort_data = pd.read_csv(absolute_comfort_data_file)
 
     stim_name_list = ["Contrast1Size1", "Contrast1Size2", "Contrast1Size3", "Contrast2Size1", "Contrast2Size2", "Contrast2Size3", "Contrast3Size1", "Contrast3Size2", "Contrast3Size3", "Contrast4Size1", "Contrast4Size2", "Contrast4Size3"]
 
@@ -374,8 +364,7 @@ def main(file_path, comfort_file):
     z_scores = get_zscore(eeg_pxx, eeg_f, baseline_mean, baseline_std)
     
     # Get the best stimulus based on the comfort and z-scores
-    abs_comfort = get_mean_comfort(comfort_file)
-    best_stim = get_best_stim(abs_comfort, z_scores)
+    best_stim = get_best_stim(comfort_file, z_scores)
 
     stimuli = ["Contrast1Size1", "Contrast1Size2", "Contrast1Size3", "Contrast2Size1", "Contrast2Size2", "Contrast2Size3", "Contrast3Size1", "Contrast3Size2", "Contrast3Size3", "Contrast4Size1", "Contrast4Size2", "Contrast4Size3"]
 
