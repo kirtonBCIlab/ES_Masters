@@ -23,6 +23,7 @@ namespace BCIEssentials.ControllerBehaviors
         private int[] frame_on_count = new int[99];
 
         public Camera mainCam;
+        public AudioSource audioSource;
         public Text _displayMarker1;
         public Text _displayMarker2;
         public Text _displayText;
@@ -316,6 +317,8 @@ namespace BCIEssentials.ControllerBehaviors
             marker.Write("Resting State, Eyes Closed");
             yield return new WaitForSecondsRealtime(3.0f);
 
+            audioSource.Play();
+
             // Loop through the double elimination bracket
             while (!bracket.IsComplete())
             {
@@ -346,6 +349,7 @@ namespace BCIEssentials.ControllerBehaviors
                 RectTransform marker2Rect = _displayMarker2.GetComponent<RectTransform>();
             
                 // Present Stimulus 1
+                audioSource.Play();
                 StartCoroutine(DisplayTextOnScreen("5")); // 5-second countdown
                 yield return new WaitForSecondsRealtime(5f);
 
