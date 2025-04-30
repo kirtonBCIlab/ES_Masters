@@ -116,45 +116,62 @@ namespace BCIEssentials.ControllerBehaviors
 
         public class ComfortData
         {
-            // Maps a stimulus ID (e.g., "C1S1") to a list of comfort scores
             public Dictionary<string, List<int>> StimulusRatings { get; private set; }
-
-            // Optional mapping of stimulus index to label or description
-            public Dictionary<int, string> StimulusIndex { get; private set; }
 
             public ComfortData()
             {
                 StimulusRatings = new Dictionary<string, List<int>>();
-                StimulusIndex = new Dictionary<int, string>();
             }
 
-            // Add a comfort score to a stimulus (e.g., "C1S1")
-            public void AddScore(string stimulusId, int score)
+            // Method to set the entire StimulusIndex dictionary
+            public void SetStimulusNames(Dictionary<int, string> stimulusDictionary)
             {
-                if (!StimulusRatings.ContainsKey(stimulusId))
+                StimulusRatings.Clear(); // Clear existing ratings
+
+                // Initialize stimulus ratings with empty score lists
+                foreach (var kvp in stimulusDictionary)
                 {
-                    StimulusRatings[stimulusId] = new List<int>();
+                    if (!StimulusRatings.ContainsKey(kvp.Value))
+                    {
+                        StimulusRatings[kvp.Value] = new List<int>();
+                    }
                 }
-                StimulusRatings[stimulusId].Add(score);
             }
 
-            // Optional: Assign stimulus index to labels
-            public void SetStimulusIndex(Dictionary<int, string> stimulusDictionary)
+            // Add a score to a named stimulus
+            public void AddScore(string stimulusName, int score)
             {
-                StimulusIndex = new Dictionary<int, string>(stimulusDictionary);
+                if (!StimulusRatings.ContainsKey(stimulusName))
+                {
+                    Debug.LogWarning($"Stimulus name '{stimulusName}' not found in StimulusRatings.");
+                    return;
+                }
+
+                StimulusRatings[stimulusName].Add(score);
             }
 
             // Compute the mean comfort score for a given stimulus
-            public double? GetMeanComfort(string stimulusId)
+            public double GetMeanComfort(string stimulusId)
             {
-                if (StimulusRatings.ContainsKey(stimulusId) && StimulusRatings[stimulusId].Count > 0)
+                if (StimulusRatings.ContainsKey(stimulusId))
                 {
-                    return null;
+                    var scores = StimulusRatings[stimulusId];
+                    double mean = 0.0;
+                    foreach (var score in scores)
+                    {
+                        mean += score;
+                    }
+                    mean /= scores.Count;
+                    return mean;
                 }
-                return null;
+                else
+                {
+                    Debug.LogWarning($"Stimulus ID '{stimulusId}' not found in StimulusRatings.");
+                    return -1000000;
+                }
             }
 
-            // Generate a 2-row table for export: stimulus names in row 1, mean scores in row 2
+            // Generate a 2-row table for export: stimulus names in row 1, mean scores in row 2 (as strings)
             public List<List<string>> GetComfortDataForExport()
             {
                 List<string> headerRow = new List<string>();
@@ -163,8 +180,12 @@ namespace BCIEssentials.ControllerBehaviors
                 foreach (var stimulus in StimulusRatings.Keys)
                 {
                     headerRow.Add(stimulus);
-                    var mean = GetMeanComfort(stimulus);
-                    meanRow.Add(mean.HasValue ? mean.Value.ToString("F2") : "N/A");
+
+                    double? mean = GetMeanComfort(stimulus); 
+                    if (mean.HasValue)
+                        meanRow.Add(mean.Value.ToString("F4"));
+                    else
+                        meanRow.Add("N/A");
                 }
 
                 return new List<List<string>> { headerRow, meanRow };
@@ -174,7 +195,7 @@ namespace BCIEssentials.ControllerBehaviors
             public void ExportToCsv(string filePath)
             {
                 var exportData = GetComfortDataForExport();
-                using (var writer = new System.IO.StreamWriter(filePath))
+                using (var writer = new StreamWriter(filePath))
                 {
                     foreach (var row in exportData)
                     {
@@ -347,7 +368,7 @@ namespace BCIEssentials.ControllerBehaviors
                 yield return new WaitUntil(() => comfort != -1);
 
                 comfortData.AddScore(stim1Name, comfort); 
-                Debug.Log("Comfort score for" + stim1Name + " : " + comfort);
+                Debug.Log("Comfort score for " + stim1Name + " : " + comfort);
                 comfort = -1; // Reset comfort score for next stimulus
 
                 // Turn off stimulus 1 and turn on stimulus 2 and move stim2 to center of screen
@@ -383,7 +404,7 @@ namespace BCIEssentials.ControllerBehaviors
                 yield return new WaitUntil(() => comfort != -1);
 
                 comfortData.AddScore(stim2Name, comfort); 
-                Debug.Log("Comfort score for" + stim2Name + " : " + comfort);
+                Debug.Log("Comfort score for " + stim2Name + " : " + comfort);
                 comfort = -1; // Reset comfort score for next stimulus
 
                 mainCam.transform.Rotate(rotateAway);
@@ -446,10 +467,22 @@ namespace BCIEssentials.ControllerBehaviors
             StopCoroutineReference(ref _runStimulus);
             StopCoroutineReference(ref _sendMarkers);
 
-            string filepath = "D:\\Users\\BCI-Morpheus\\Documents\\ES-Masters\\Data\\Bracket\\P001-S001.csv";
-            bracketInfo.ExportToCsv(filepath);
+
+            // Ssave the bracket and comfort data to CSV files
+            string bracket_filepath = "c://Users//admin//Downloads//practice-bracket.csv";
+            bracketInfo.ExportToCsv(bracket_filepath);
+
+            string comfort_filepath = "c://Users//admin//Downloads//practice-comfort.csv";
+            comfortData.ExportToCsv(comfort_filepath);
         }
 
+
+
+
+
+
+
+//Helper Methods
         private IEnumerator GetUserPreferenceCoroutine()
         {
             bool preferenceCaptured = false;
@@ -473,7 +506,6 @@ namespace BCIEssentials.ControllerBehaviors
             }
         }
 
-        //write a method similar to above to get a comfort score for values 1-5
         private IEnumerator GetComfortScore()
         {
             bool scoreCaptured = false;
@@ -513,7 +545,6 @@ namespace BCIEssentials.ControllerBehaviors
             }
         }
 
-        //Helper Methods
         private void ScalePlusSignToStimulus(GameObject stimulus, bool bothDisplayed)
         {
             if (stimulus != null && _displayMarker1 != null && _displayMarker2 != null)
@@ -871,7 +902,7 @@ namespace BCIEssentials.ControllerBehaviors
 
             orderDict = new Dictionary<int, string>(randomDict);    
             bracketInfo.SetStimulusIndex(orderDict);
-            comfortData.SetStimulusIndex(orderDict);
+            comfortData.SetStimulusNames(orderDict);
         }    
     }
 }
