@@ -368,7 +368,7 @@ namespace BCIEssentials.ControllerBehaviors
                 yield return new WaitUntil(() => comfort != -1);
 
                 comfortData.AddScore(stim1Name, comfort); 
-                Debug.Log("Comfort score for " + stim1Name + " : " + comfort);
+                //Debug.Log("Comfort score for " + stim1Name + " : " + comfort);
                 comfort = -1; // Reset comfort score for next stimulus
 
                 // Turn off stimulus 1 and turn on stimulus 2 and move stim2 to center of screen
@@ -404,7 +404,7 @@ namespace BCIEssentials.ControllerBehaviors
                 yield return new WaitUntil(() => comfort != -1);
 
                 comfortData.AddScore(stim2Name, comfort); 
-                Debug.Log("Comfort score for " + stim2Name + " : " + comfort);
+                //Debug.Log("Comfort score for " + stim2Name + " : " + comfort);
                 comfort = -1; // Reset comfort score for next stimulus
 
                 mainCam.transform.Rotate(rotateAway);
