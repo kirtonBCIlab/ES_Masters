@@ -124,7 +124,6 @@ namespace BCIEssentials.ControllerBehaviors
                 StimulusRatings = new Dictionary<string, List<int>>();
             }
 
-            // Method to set the entire StimulusIndex dictionary
             public void SetStimulusNames(Dictionary<int, string> stimulusDictionary)
             {
                 StimulusRatings.Clear(); // Clear existing ratings
@@ -192,7 +191,7 @@ namespace BCIEssentials.ControllerBehaviors
                 return new List<List<string>> { headerRow, meanRow };
             }
 
-            // Optional: Write to CSV file if you're in Unity or .NET desktop
+            // Write to CSV file 
             public void ExportToCsv(string filePath)
             {
                 var exportData = GetComfortDataForExport();
@@ -372,7 +371,6 @@ namespace BCIEssentials.ControllerBehaviors
                 yield return new WaitUntil(() => comfort != -1);
 
                 comfortData.AddScore(stim1Name, comfort); 
-                //Debug.Log("Comfort score for " + stim1Name + " : " + comfort);
                 comfort = -1; // Reset comfort score for next stimulus
 
                 // Turn off stimulus 1 and turn on stimulus 2 and move stim2 to center of screen
@@ -408,7 +406,6 @@ namespace BCIEssentials.ControllerBehaviors
                 yield return new WaitUntil(() => comfort != -1);
 
                 comfortData.AddScore(stim2Name, comfort); 
-                //Debug.Log("Comfort score for " + stim2Name + " : " + comfort);
                 comfort = -1; // Reset comfort score for next stimulus
 
                 mainCam.transform.Rotate(rotateAway);
@@ -478,6 +475,8 @@ namespace BCIEssentials.ControllerBehaviors
 
             string comfort_filepath = "c://Users//admin//Downloads//practice-comfort.csv";
             comfortData.ExportToCsv(comfort_filepath);
+
+            Debug.Log("Bracket and comfort data exported to CSV files.");
         }
 
 
