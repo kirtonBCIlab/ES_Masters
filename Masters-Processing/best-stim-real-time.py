@@ -10,9 +10,8 @@ import scipy.signal as signal
 def import_eeg_data(file_path):
     """Imports EEG data from an XDF file and creates an MNE Raw object."""
     ch_names = ["Fz", "F4", "F8", "C3", "Cz", "C4", "T8", "P7", "P3", "P4", "P8", "PO7", "PO8", "O1", "Oz", "O2"]
-    
     # Read EEG data
-    eeg_ts, eeg_data, eeg_fs = data_tools.read_xdf(file_path, picks=ch_names)
+    eeg_ts, eeg_data, eeg_fs = import_data.read_xdf(file_path, picks=ch_names)
 
     # Create MNE array
     info = mne.create_info(ch_names, eeg_fs, ch_types='eeg')
@@ -69,9 +68,8 @@ def create_epochs(filt_clean, eeg_ts, file_path):
     marker_ts, markers = import_data.read_xdf_unity_markers(file_path)
 
     #TEMP
-    markers = markers[:-1] # Dan practice data has an extra marker at the end that is not needed
-    marker_ts = marker_ts[:-1] # Remove the last marker timestamp and label
-
+    #markers = markers[:-1] # Dan practice data has an extra marker at the end that is not needed
+    #marker_ts = marker_ts[:-1] # Remove the last marker timestamp and label
 
     # Create epochs for stimuli
     events_epochs, eeg_epochs = data_tools.create_epochs(
