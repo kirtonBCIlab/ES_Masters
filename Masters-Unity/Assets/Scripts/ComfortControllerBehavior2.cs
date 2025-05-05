@@ -309,12 +309,12 @@ namespace BCIEssentials.ControllerBehaviors
 
             StartCoroutine(DisplayTextOnScreen("RS Open"));
             marker.Write("Resting State, Eyes Open");
-            yield return new WaitForSecondsRealtime(3.0f);
+            yield return new WaitForSecondsRealtime(60.0f);
 
 
             StartCoroutine(DisplayTextOnScreen("RS Closed"));
             marker.Write("Resting State, Eyes Closed");
-            yield return new WaitForSecondsRealtime(3.0f);
+            yield return new WaitForSecondsRealtime(60.0f);
 
             audioSource.Play();
 
@@ -379,7 +379,7 @@ namespace BCIEssentials.ControllerBehaviors
                 stim2Object.transform.position = new Vector3(1, 0, 0);
 
                 mainCam.transform.Rotate(rotateAway);
-                yield return new WaitForSecondsRealtime(2f);
+                yield return new WaitForSecondsRealtime(7f);
                 StartCoroutine(DisplayTextOnScreen("3"));
                 yield return new WaitForSecondsRealtime(3f); 
 
@@ -409,7 +409,7 @@ namespace BCIEssentials.ControllerBehaviors
                 comfort = -1; // Reset comfort score for next stimulus
 
                 mainCam.transform.Rotate(rotateAway);
-                yield return new WaitForSecondsRealtime(2f);
+                yield return new WaitForSecondsRealtime(7f);
                 StartCoroutine(DisplayTextOnScreen("3"));
                 yield return new WaitForSecondsRealtime(3f);
 
@@ -470,10 +470,10 @@ namespace BCIEssentials.ControllerBehaviors
 
 
             // Ssave the bracket and comfort data to CSV files
-            string bracket_filepath = "c://Users//admin//Downloads//practice-bracket.csv";
+            string bracket_filepath = "D://Users//BCI-Morpheus//Documents//ES-Masters//Data//Bracket//Offline-Practice-Bracket.csv";
             bracketInfo.ExportToCsv(bracket_filepath);
 
-            string comfort_filepath = "c://Users//admin//Downloads//practice-comfort.csv";
+            string comfort_filepath = "D://Users//BCI-Morpheus//Documents//ES-Masters//Data//Bracket//Offline-Practice-Absolute.csv";
             comfortData.ExportToCsv(comfort_filepath);
 
             Debug.Log("Bracket and comfort data exported to CSV files.");
