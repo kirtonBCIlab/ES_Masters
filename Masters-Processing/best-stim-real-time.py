@@ -10,9 +10,8 @@ import scipy.signal as signal
 def import_eeg_data(file_path):
     """Imports EEG data from an XDF file and creates an MNE Raw object."""
     ch_names = ["Fz", "F4", "F8", "C3", "Cz", "C4", "T8", "P7", "P3", "P4", "P8", "PO7", "PO8", "O1", "Oz", "O2"]
-    
     # Read EEG data
-    eeg_ts, eeg_data, eeg_fs = data_tools.read_xdf(file_path, picks=ch_names)
+    eeg_ts, eeg_data, eeg_fs = import_data.read_xdf(file_path, picks=ch_names)
 
     # Create MNE array
     info = mne.create_info(ch_names, eeg_fs, ch_types='eeg')
@@ -69,9 +68,8 @@ def create_epochs(filt_clean, eeg_ts, file_path):
     marker_ts, markers = import_data.read_xdf_unity_markers(file_path)
 
     #TEMP
-    markers = markers[:-1] # Dan practice data has an extra marker at the end that is not needed
-    marker_ts = marker_ts[:-1] # Remove the last marker timestamp and label
-
+    #markers = markers[:-1] # Dan practice data has an extra marker at the end that is not needed
+    #marker_ts = marker_ts[:-1] # Remove the last marker timestamp and label
 
     # Create epochs for stimuli
     events_epochs, eeg_epochs = data_tools.create_epochs(
@@ -293,21 +291,11 @@ def get_zscore(eeg_pxx, eeg_f, baseline_mean, baseline_std):
 
     return z_scores
 
-def get_mean_comfort(comfort_file):
-    absolute_comfort_data = pd.read_csv(comfort_file)
-    
-    # Compute the mean Comfort_Value for each (Contrast, Size) pair
-    df_grouped = absolute_comfort_data.groupby(["Contrast", "Size"])["Comfort_Value"].mean().reset_index()
-    df_pivot = df_grouped.pivot_table(index=None, columns=["Contrast", "Size"], values="Comfort_Value")
-    df_pivot.columns = [f"Contrast{c}Size{s}" for c, s in df_pivot.columns]
-    df_final = df_pivot.reset_index(drop=True)
-
-    return df_final
-
-
-def get_best_stim(absolute_comfort_data, z_scores):
+def get_best_stim(absolute_comfort_data_file, z_scores):
     best_stim_absolute = None
     kept_stim = []
+
+    absolute_comfort_data = pd.read_csv(absolute_comfort_data_file)
 
     stim_name_list = ["Contrast1Size1", "Contrast1Size2", "Contrast1Size3", "Contrast2Size1", "Contrast2Size2", "Contrast2Size3", "Contrast3Size1", "Contrast3Size2", "Contrast3Size3", "Contrast4Size1", "Contrast4Size2", "Contrast4Size3"]
 
@@ -374,8 +362,7 @@ def main(file_path, comfort_file):
     z_scores = get_zscore(eeg_pxx, eeg_f, baseline_mean, baseline_std)
     
     # Get the best stimulus based on the comfort and z-scores
-    abs_comfort = get_mean_comfort(comfort_file)
-    best_stim = get_best_stim(abs_comfort, z_scores)
+    best_stim = get_best_stim(comfort_file, z_scores)
 
     stimuli = ["Contrast1Size1", "Contrast1Size2", "Contrast1Size3", "Contrast2Size1", "Contrast2Size2", "Contrast2Size3", "Contrast3Size1", "Contrast3Size2", "Contrast3Size3", "Contrast4Size1", "Contrast4Size2", "Contrast4Size3"]
 

@@ -158,7 +158,7 @@ namespace BCIEssentials.ControllerBehaviors
                 //Flash the stimulus to look at to cue the user
                 GetCueStimulus();
                 SendCue(cuedIndex);
-                yield return new WaitForSecondsRealtime(0.5f); //flash cue and wait a bit before the stimuli start flashing
+                yield return new WaitForSecondsRealtime(1f); //flash cue and wait a bit before the stimuli start flashing
 
                 //Set the stimulus type from the option chosen in the inspector
                 SetStimType();
@@ -185,10 +185,8 @@ namespace BCIEssentials.ControllerBehaviors
                 //Display text for the user after every run except the last one
                 if (i < 29)
                 {
-                    yield return new WaitForSecondsRealtime(2f); //this is enough to to see feedback
-                    _displayText.text = "Stimulus Complete";
-                    yield return new WaitForSecondsRealtime(2f);
-                    _displayText.text = "Next Stim";
+                    yield return new WaitForSecondsRealtime(4f); //this is enough to to see feedback
+                    _displayText.text = "Next Trial";
                     yield return new WaitForSecondsRealtime(2f);
                     _displayText.text = " ";
                 }
