@@ -354,15 +354,6 @@ namespace BCIEssentials.ControllerBehaviors
 
             pairNum = 1;
 
-            StartCoroutine(DisplayTextOnScreen("RS Open"));
-            marker.Write("Resting State, Eyes Open");
-            yield return new WaitForSecondsRealtime(60.0f);
-
-
-            StartCoroutine(DisplayTextOnScreen("RS Closed"));
-            marker.Write("Resting State, Eyes Closed");
-            yield return new WaitForSecondsRealtime(60.0f);
-
             audioSource.Play();
 
             // Loop through the double elimination bracket
@@ -496,6 +487,25 @@ namespace BCIEssentials.ControllerBehaviors
                     Debug.Log("No preference chosen");
                 }
 
+                if (pairNum == 5)
+                {
+                    StartCoroutine(DisplayTextOnScreen("1/4"));
+                    yield return new WaitForSecondsRealtime(2.0f);
+                    Debug.Log("1/4 of the way done");
+                }
+                else if (pairNum == 10)
+                {
+                    StartCoroutine(DisplayTextOnScreen("1/2"));
+                    yield return new WaitForSecondsRealtime(2.0f);
+                    Debug.Log("1/2 of the way done");
+                }
+                else if (pairNum == 15)
+                {
+                    StartCoroutine(DisplayTextOnScreen("3/4"));
+                    yield return new WaitForSecondsRealtime(2.0f);
+                    Debug.Log("3/4 of the way done");
+                }
+
                 // Reset preference to null so the value doesn't carry over to the next pair
                 preference = null;
                 pairNum = pairNum + 1;
@@ -627,7 +637,7 @@ namespace BCIEssentials.ControllerBehaviors
 
         public IEnumerator DisplayTextOnScreen(string textOption)
         {
-            if(textOption == "3")
+            if (textOption == "3")
             {
                 _displayText.text = "3";
                 yield return new WaitForSecondsRealtime(1.0f);
@@ -637,7 +647,7 @@ namespace BCIEssentials.ControllerBehaviors
                 yield return new WaitForSecondsRealtime(1.0f);
                 _displayText.text = "";
             }
-            else if(textOption == "5")
+            else if (textOption == "5")
             {
                 _displayText.text = "Starting in...";
                 yield return new WaitForSecondsRealtime(2.0f);
@@ -647,20 +657,20 @@ namespace BCIEssentials.ControllerBehaviors
                 yield return new WaitForSecondsRealtime(1.0f);
                 _displayText.text = "1 second";
                 yield return new WaitForSecondsRealtime(1.0f);
-               _displayText.text = "";
+                _displayText.text = "";
             }
-            else if(textOption == "EndOfSession")
+            else if (textOption == "EndOfSession")
             {
                 _displayText.text = "End";
                 yield return new WaitForSecondsRealtime(2.0f);
             }
-            else if(textOption == "+1")
+            else if (textOption == "+1")
             {
                 _displayMarker1.text = "+";
                 yield return new WaitForSecondsRealtime(1.0f);
                 _displayMarker1.text = "";
             }
-            else if(textOption == "+2")
+            else if (textOption == "+2")
             {
                 _displayMarker2.text = "+";
                 yield return new WaitForSecondsRealtime(1.0f);
@@ -683,17 +693,29 @@ namespace BCIEssentials.ControllerBehaviors
                 yield return new WaitForSecondsRealtime(5.0f);
                 _displayText.text = "";
             }
-            else if (textOption == "RS Open")
+            else if (textOption == "1/4")
             {
-                _displayText.text = "+";
-                yield return new WaitForSecondsRealtime(60.0f);
+                _displayText.text = "1/4 of the way done!";
+                _displayText.color = Color.green;
+                yield return new WaitForSecondsRealtime(2.0f);
                 _displayText.text = "";
+                _displayText.color = Color.white; // Reset color to white
             }
-            else if (textOption == "RS Closed")
+            else if (textOption == "1/2")
             {
-                _displayText.text = "Eyes Closed";
-                yield return new WaitForSecondsRealtime(60.0f);
+                _displayText.text = "1/2 of the way done!";
+                _displayText.color = Color.green;
+                yield return new WaitForSecondsRealtime(2.0f);
                 _displayText.text = "";
+                _displayText.color = Color.white;
+            }
+            else if (textOption == "3/4")
+            {
+                _displayText.text = "3/4 of the way done!";
+                _displayText.color = Color.green;
+                yield return new WaitForSecondsRealtime(2.0f);
+                _displayText.text = "";
+                _displayText.color = Color.white;
             }
         } 
 
