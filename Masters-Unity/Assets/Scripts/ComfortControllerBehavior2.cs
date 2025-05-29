@@ -356,12 +356,12 @@ namespace BCIEssentials.ControllerBehaviors
 
             StartCoroutine(DisplayTextOnScreen("RS Open"));
             marker.Write("Resting State, Eyes Open");
-            yield return new WaitForSecondsRealtime(5.0f);
+            yield return new WaitForSecondsRealtime(60.0f);
 
 
             StartCoroutine(DisplayTextOnScreen("RS Closed"));
             marker.Write("Resting State, Eyes Closed");
-            yield return new WaitForSecondsRealtime(5.0f);
+            yield return new WaitForSecondsRealtime(60.0f);
 
             audioSource.Play();
 
@@ -427,7 +427,7 @@ namespace BCIEssentials.ControllerBehaviors
                 stim2Object.transform.position = new Vector3(1, 0, 0);
 
                 mainCam.transform.Rotate(rotateAway);
-                yield return new WaitForSecondsRealtime(7f);
+                yield return new WaitForSecondsRealtime(2f);
                 StartCoroutine(DisplayTextOnScreen("3"));
                 yield return new WaitForSecondsRealtime(3f); 
 
@@ -458,7 +458,7 @@ namespace BCIEssentials.ControllerBehaviors
                 comfort = -1; // Reset comfort score for next stimulus
 
                 mainCam.transform.Rotate(rotateAway);
-                yield return new WaitForSecondsRealtime(7f);
+                yield return new WaitForSecondsRealtime(2f);
                 StartCoroutine(DisplayTextOnScreen("3"));
                 yield return new WaitForSecondsRealtime(3f);
 
@@ -489,7 +489,7 @@ namespace BCIEssentials.ControllerBehaviors
                     bracketInfo.AddWinner(winnerIndex);
                     bracket.RecordMatchResult(preference.Value ? stim1Index : stim2Index);
                     StartCoroutine(DisplayTextOnScreen("Break"));
-                    yield return new WaitForSecondsRealtime(10.0f); //will be combined with a 5 second countdown for a total 15 second break
+                    yield return new WaitForSecondsRealtime(5.0f); //will be combined with a 5 second countdown for a total 15 second break
                 }
                 else
                 {
@@ -680,7 +680,7 @@ namespace BCIEssentials.ControllerBehaviors
             else if (textOption == "Break")
             {
                 _displayText.text = "Break";
-                yield return new WaitForSecondsRealtime(10.0f);
+                yield return new WaitForSecondsRealtime(5.0f);
                 _displayText.text = "";
             }
             else if (textOption == "RS Open")
