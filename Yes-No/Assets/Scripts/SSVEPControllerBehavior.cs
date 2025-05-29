@@ -12,7 +12,7 @@ namespace BCIEssentials.ControllerBehaviors
     public class SSVEPControllerBehavior : BCIControllerBehavior
     {
         public override BCIBehaviorType BehaviorType => BCIBehaviorType.SSVEP;
-        
+
         [FoldoutGroup("Stimulus Frequencies")]
         [SerializeField]
         [Tooltip("User-defined set of target stimulus frequencies [Hz]")]
@@ -27,25 +27,11 @@ namespace BCIEssentials.ControllerBehaviors
         private int[] frame_off_count = new int[99];
         private int[] frame_on_count = new int[99];
 
-        public enum StimulusType
-        {
-            BW,
-            Custom
-        }
+        public enum StimulusType { BW, Custom }
 
-        public enum ContrastLevel
-        {
-            Contrast1,
-            Contrast2,
-            Contrast3,
-            Contrast4,            
-        }
-        public enum Size
-        {
-            Size1,
-            Size2,
-            Size3,
-        }
+        public enum ContrastLevel { Contrast1, Contrast2, Contrast3, Contrast4 }
+
+        public enum Size { Size1, Size2, Size3 }
 
         [Header("Stimulus Parameters")]
         [SerializeField] public StimulusType _stimulusType;
@@ -57,11 +43,15 @@ namespace BCIEssentials.ControllerBehaviors
 
         public int cuedIndex = -1000;
 
-        // Start is called before the first frame update
+        // New: Balanced cue tracking
+        private List<int> randomizedCueOrder;
+        private int cueIndexCounter = 0;
+
         protected override void Start()
         {
             base.Start();
             PopulateObjectList();
+            GenerateBalancedRandomCueOrder();
             RunStimulus();
         }
 
@@ -82,15 +72,53 @@ namespace BCIEssentials.ControllerBehaviors
             }
         }
 
+        private void GenerateBalancedRandomCueOrder()
+        {
+            randomizedCueOrder = new List<int>();
+
+            // Add each of the 4 stimuli 8 times (32 trials)
+            for (int i = 0; i < 4; i++)
+            {
+                for (int j = 0; j < 8; j++)
+                {
+                    randomizedCueOrder.Add(i);
+                }
+            }
+
+            // Shuffle the list
+            System.Random rng = new System.Random();
+            int n = randomizedCueOrder.Count;
+            while (n > 1)
+            {
+                n--;
+                int k = rng.Next(n + 1);
+                int temp = randomizedCueOrder[k];
+                randomizedCueOrder[k] = randomizedCueOrder[n];
+                randomizedCueOrder[n] = temp;
+            }
+        }
+
+        protected int GetCueStimulus()
+        {
+            if (cueIndexCounter < randomizedCueOrder.Count)
+            {
+                cuedIndex = randomizedCueOrder[cueIndexCounter];
+                cueIndexCounter++;
+                OutStream.PushString($"Cued index: {cuedIndex}");
+            }
+            else
+            {
+                Debug.LogWarning("Cue index out of bounds.");
+                cuedIndex = -1;
+            }
+            return cuedIndex;
+        }
+
         protected override IEnumerator SendMarkers(int trainingIndex = 99)
         {
-            // Make the marker string, this will change based on the paradigm
             while (StimulusRunning)
-            {   
-                // Send the marker
+            {
                 OutStream.PushSSVEPMarker(_selectableSPOs.Count, windowLength, realFlashingFrequencies, -1);
-
-                // Wait the window length + the inter-window interval
                 yield return new WaitForSecondsRealtime(windowLength + interWindowInterval);
             }
         }
@@ -118,18 +146,8 @@ namespace BCIEssentials.ControllerBehaviors
                         frame_count[i] = 0;
                     }
                 }
-            } 
-            yield return null;
-        }
-
-        protected int GetCueStimulus()
-        {
-            if (_selectableSPOs.Count > 0)
-            {
-                cuedIndex = UnityEngine.Random.Range(0, _selectableSPOs.Count);
-                OutStream.PushString($"Cued index: {cuedIndex}");
             }
-            return cuedIndex;
+            yield return null;
         }
 
         protected override IEnumerator OnStimulusRunComplete()
@@ -138,7 +156,7 @@ namespace BCIEssentials.ControllerBehaviors
             {
                 if (spo != null)
                 {
-                spo.StopStimulus();
+                    spo.StopStimulus();
                 }
             }
             yield return null;
@@ -146,53 +164,41 @@ namespace BCIEssentials.ControllerBehaviors
 
         protected override IEnumerator RunStimulus()
         {
-            //Arbitrarily do 5 runs
-            for (int i = 0; i < 30; i++)
+            for (int i = 0; i < 32; i++)  // 32 total trials
             {
-                //Stop the base class coroutine to send markers
                 StopCoroutineReference(ref _sendMarkers);
-
-                //Set StimulusRunning to false to prevent markers from being sent before the stimulus starts
                 StimulusRunning = false;
 
-                //Flash the stimulus to look at to cue the user
                 GetCueStimulus();
                 SendCue(cuedIndex);
-                yield return new WaitForSecondsRealtime(1f); //flash cue and wait a bit before the stimuli start flashing
+                yield return new WaitForSecondsRealtime(1f);
 
-                //Set the stimulus type from the option chosen in the inspector
                 SetStimType();
-
-                //Send "Trial Started marker" to the LSL stream
                 OutStream.PushTrialStartedMarker();
-                
-                //Set StimulusRunning to true and call the coroutine to send markers
+
                 StimulusRunning = true;
                 Coroutine markerSendingCoroutine = StartCoroutine(SendMarkers());
 
-                //This currently displays the 2 stimuli for 5 seconds
-                for(var flash = 0; flash <100*5; flash++) 
+                for (int flash = 0; flash < 100 * 5; flash++)
                 {
                     yield return OnStimulusRunBehavior();
                 }
 
-                //Set StimulusRunning to false and stop the coroutine to send markers
                 StimulusRunning = false;
                 StopCoroutine(markerSendingCoroutine);
                 StopStimulusRun();
                 yield return OnStimulusRunComplete();
 
-                //Display text for the user after every run except the last one
-                if (i < 29)
+                if (i < 31)
                 {
-                    yield return new WaitForSecondsRealtime(4f); //this is enough to to see feedback
+                    yield return new WaitForSecondsRealtime(4f);
                     _displayText.text = "Next Trial";
                     yield return new WaitForSecondsRealtime(2f);
                     _displayText.text = " ";
                 }
-            
+
                 LastSelectedSPO = null;
-            }       
+            }
             _displayText.text = "Done";
         }
 
@@ -200,48 +206,29 @@ namespace BCIEssentials.ControllerBehaviors
         {
             ColorFlashEffect3 spoEffect;
 
-            if (_stimulusType == StimulusType.BW)
+            foreach (var spo in _selectableSPOs)
             {
-                foreach (var spo in _selectableSPOs)
+                spoEffect = spo.GetComponent<ColorFlashEffect3>();
+                if (_stimulusType == StimulusType.BW)
                 {
-                    spoEffect = spo.GetComponent<ColorFlashEffect3>();
                     spoEffect.SetContrast(ColorFlashEffect3.ContrastLevel.White);
                     spoEffect.SetSize(ColorFlashEffect3.Size.Size3);
                 }
-            }
-            else
-            {
-                foreach (var spo in _selectableSPOs)
+                else
                 {
-                    spoEffect = spo.GetComponent<ColorFlashEffect3>();
-                    if (_contrastLevel == ContrastLevel.Contrast1)
+                    switch (_contrastLevel)
                     {
-                        spoEffect.SetContrast(ColorFlashEffect3.ContrastLevel.Contrast1);
+                        case ContrastLevel.Contrast1: spoEffect.SetContrast(ColorFlashEffect3.ContrastLevel.Contrast1); break;
+                        case ContrastLevel.Contrast2: spoEffect.SetContrast(ColorFlashEffect3.ContrastLevel.Contrast2); break;
+                        case ContrastLevel.Contrast3: spoEffect.SetContrast(ColorFlashEffect3.ContrastLevel.Contrast3); break;
+                        case ContrastLevel.Contrast4: spoEffect.SetContrast(ColorFlashEffect3.ContrastLevel.Contrast4); break;
                     }
-                    else if (_contrastLevel == ContrastLevel.Contrast2)
+
+                    switch (_size)
                     {
-                        spoEffect.SetContrast(ColorFlashEffect3.ContrastLevel.Contrast2);
-                    }
-                    else if (_contrastLevel == ContrastLevel.Contrast3)
-                    {
-                        spoEffect.SetContrast(ColorFlashEffect3.ContrastLevel.Contrast3);
-                    }
-                    else if (_contrastLevel == ContrastLevel.Contrast4)
-                    {
-                    spoEffect.SetContrast(ColorFlashEffect3.ContrastLevel.Contrast4);
-                    }
-                
-                    if (_size == Size.Size1)
-                    {
-                        spoEffect.SetSize(ColorFlashEffect3.Size.Size1);
-                    }
-                    else if (_size == Size.Size2)
-                    {
-                        spoEffect.SetSize(ColorFlashEffect3.Size.Size2);
-                    }
-                    else if (_size == Size.Size3)
-                    {
-                        spoEffect.SetSize(ColorFlashEffect3.Size.Size3);
+                        case Size.Size1: spoEffect.SetSize(ColorFlashEffect3.Size.Size1); break;
+                        case Size.Size2: spoEffect.SetSize(ColorFlashEffect3.Size.Size2); break;
+                        case Size.Size3: spoEffect.SetSize(ColorFlashEffect3.Size.Size3); break;
                     }
                 }
             }
@@ -249,12 +236,9 @@ namespace BCIEssentials.ControllerBehaviors
 
         private void SendCue(int index)
         {
-            ColorFlashEffect3 spoEffect;
-        
             if (index >= 0 && index < _selectableSPOs.Count)
             {
-                spoEffect = _selectableSPOs[index].GetComponent<ColorFlashEffect3>();
-
+                var spoEffect = _selectableSPOs[index].GetComponent<ColorFlashEffect3>();
                 spoEffect.CueColorChange();
             }
             else
