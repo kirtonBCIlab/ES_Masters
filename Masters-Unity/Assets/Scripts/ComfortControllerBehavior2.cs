@@ -281,6 +281,53 @@ namespace BCIEssentials.ControllerBehaviors
             yield return null;
         }
 
+        protected IEnumerator OnStimulusRunUntilKeyPress()
+        {
+            bool stopRequested = false;
+
+            while (!stopRequested)
+            {
+                for (int i = 0; i < _selectableSPOs.Count; i++)
+                {
+                    frame_count[i]++;
+                    if (frames_on[i] == 1)
+                    {
+                        if (frame_count[i] >= frame_on_count[i])
+                        {
+                            _selectableSPOs[i].StopStimulus();
+                            frames_on[i] = 0;
+                            frame_count[i] = 0;
+                        }
+                    }
+                    else
+                    {
+                        if (frame_count[i] >= frame_off_count[i])
+                        {
+                            _selectableSPOs[i].StartStimulus();
+                            frames_on[i] = 1;
+                            frame_count[i] = 0;
+                        }
+                    }
+                }
+
+                // Stop if either '1' or '2' key is pressed
+                if (Input.GetKeyDown(KeyCode.Alpha1) || Input.GetKeyDown(KeyCode.Alpha2))
+                {
+                    stopRequested = true;
+                    if (Input.GetKeyDown(KeyCode.Alpha1))
+                    {
+                        preference = true; // Stimulus 1 selected
+                    }
+                    else if (Input.GetKeyDown(KeyCode.Alpha2))
+                    {
+                        preference = false; // Stimulus 2 selected
+                    }
+                }
+
+                yield return null; // wait until next frame
+            }
+        }
+
         protected override IEnumerator OnStimulusRunComplete()
         {
             foreach (var spo in _selectableSPOs)
@@ -309,12 +356,12 @@ namespace BCIEssentials.ControllerBehaviors
 
             StartCoroutine(DisplayTextOnScreen("RS Open"));
             marker.Write("Resting State, Eyes Open");
-            yield return new WaitForSecondsRealtime(60.0f);
+            yield return new WaitForSecondsRealtime(5.0f);
 
 
             StartCoroutine(DisplayTextOnScreen("RS Closed"));
             marker.Write("Resting State, Eyes Closed");
-            yield return new WaitForSecondsRealtime(60.0f);
+            yield return new WaitForSecondsRealtime(5.0f);
 
             audioSource.Play();
 
@@ -351,14 +398,15 @@ namespace BCIEssentials.ControllerBehaviors
                 audioSource.Play();
                 StartCoroutine(DisplayTextOnScreen("5")); // 5-second countdown
                 yield return new WaitForSecondsRealtime(5f);
+                stim1.enabled = true;
 
                 stimulusString = ", "  + stim1Name;
                 markerString = "ssvep," + _selectableSPOs.Count.ToString() + "," + windowLength.ToString() + "," + realFreqFlash.ToString() + stimulusString;
                 marker.Write(markerString);
 
-                for(var flash = 0; flash <100*10; flash++) //(StimulusRunning)
+                for(var flash = 0; flash <100*5; flash++) //(StimulusRunning)
                 //the number that flash is less than is the amount of seconds to flash for 
-                //100 = 1 second (frame rate is 100 Hz) so 10 seconds = flash < 100*10s
+                //100 = 1 second (frame rate is 100 Hz) so 5 seconds = flash < 100*5s
                 {
                     ScalePlusSignToStimulus(stim1Object, false);
                     StartCoroutine(DisplayTextOnScreen("+1"));
@@ -367,6 +415,7 @@ namespace BCIEssentials.ControllerBehaviors
 
                 marker.Write("stimulus ended");
 
+                stim1.enabled = false;
                 StartCoroutine(GetComfortScore());
                 yield return new WaitUntil(() => comfort != -1);
 
@@ -374,7 +423,6 @@ namespace BCIEssentials.ControllerBehaviors
                 comfort = -1; // Reset comfort score for next stimulus
 
                 // Turn off stimulus 1 and turn on stimulus 2 and move stim2 to center of screen
-                stim1.enabled = false;
                 stim2.enabled = true;
                 stim2Object.transform.position = new Vector3(1, 0, 0);
 
@@ -391,9 +439,9 @@ namespace BCIEssentials.ControllerBehaviors
                 markerString = "ssvep," + _selectableSPOs.Count.ToString() + "," + windowLength.ToString() + "," + realFreqFlash.ToString() + stimulusString;
                 marker.Write(markerString);
 
-                for(var flash = 0; flash <100*10; flash++) //(StimulusRunning)
+                for(var flash = 0; flash <100*5; flash++) //(StimulusRunning)
                 //the number that flash is less than is the amount of seconds to flash for 
-                //100 = 1 second (frame rate is 100 Hz) so 10 seconds = flash < 100*10s
+                //100 = 1 second (frame rate is 100 Hz) so 5 seconds = flash < 100*5s
                 {
                     ScalePlusSignToStimulus(stim2Object, false);
                     StartCoroutine(DisplayTextOnScreen("+2"));
@@ -401,6 +449,7 @@ namespace BCIEssentials.ControllerBehaviors
                 }
 
                 marker.Write("stimulus ended");
+                stim2.enabled = false;
 
                 StartCoroutine(GetComfortScore());
                 yield return new WaitUntil(() => comfort != -1);
@@ -417,6 +466,7 @@ namespace BCIEssentials.ControllerBehaviors
 
                 //Turn both stimuli on and move stimuli to either side of the screen
                 stim1.enabled = true;
+                stim2.enabled = true;
                 stim1Object.transform.position = new Vector3(0, 0, 0);
                 stim2Object.transform.position = new Vector3(2, 0, 0);
 
@@ -425,21 +475,12 @@ namespace BCIEssentials.ControllerBehaviors
                 markerString = "ssvep," + _selectableSPOs.Count.ToString() + "," + windowLength.ToString() + "," + realFreqFlash.ToString() + stimulusString;
                 marker.Write(markerString);
 
-                for(var flash = 0; flash <100*10; flash++) //(StimulusRunning)
-                //the number that flash is less than is the amount of seconds to flash for 
-                //100 = 1 second (frame rate is 100 Hz) so 10 seconds = flash < 100*10s
-                {
-                    ScalePlusSignToStimulus(stim1Object, true);
-                    ScalePlusSignToStimulus(stim2Object, true);
-                    StartCoroutine(DisplayTextOnScreen("+1"));
-                    StartCoroutine(DisplayTextOnScreen("+2"));
-                    yield return OnStimulusRunBehavior();
-                }
-                
-                marker.Write("off");
 
-                StartCoroutine(GetUserPreferenceCoroutine());
+                StartCoroutine(OnStimulusRunUntilKeyPress());
                 yield return new WaitUntil(() => preference != null);
+                stim1.enabled = false;
+                stim2.enabled = false;
+                marker.Write("off");
 
                 // Record the winner in the bracket: stim1 = 'true' recorded, Stim2 = 'false' recorded
                 if (preference.HasValue)
@@ -486,29 +527,6 @@ namespace BCIEssentials.ControllerBehaviors
 
 
 //Helper Methods
-        private IEnumerator GetUserPreferenceCoroutine()
-        {
-            bool preferenceCaptured = false;
-            // Wait for user input
-            while (!preferenceCaptured)
-            {
-                StartCoroutine(DisplayTextOnScreen("Choose"));
-                if (Input.GetKeyDown(KeyCode.Alpha1) || Input.GetKeyDown(KeyCode.Keypad1))
-                {
-                    preference = true; // Stimulus 1 selected
-                    preferenceCaptured = true;
-                }
-                else if (Input.GetKeyDown(KeyCode.Alpha2) || Input.GetKeyDown(KeyCode.Keypad2))
-                {
-                    preference = false; // Stimulus 2 selected
-                    preferenceCaptured = true;
-                }
-
-                // Yield until the next frame to prevent freezing
-                yield return null;
-            }
-        }
-
         private IEnumerator GetComfortScore()
         {
             bool scoreCaptured = false;
@@ -650,7 +668,7 @@ namespace BCIEssentials.ControllerBehaviors
             }
             else if (textOption == "Choose")
             {
-                _displayText.text = "Press 1 or 2";
+                _displayText.text = "Left or Right?";
                 yield return new WaitForSecondsRealtime(1.0f);
             }
             else if (textOption == "Comfort")
