@@ -140,6 +140,13 @@ def read_xdf(file: str, picks: list[str]="all"):
     
     for stream in data:
         # Obtain data for SMARTING headset
+        # For mock EEG:
+        #if (stream["info"]["type"][0]=="EEG"):
+        #    eeg_ts = stream["time_stamps"]
+        #    eeg_np = stream["time_series"]
+        #    srate = float(stream["info"]["nominal_srate"][0])
+        #    break
+
         if (stream["info"]["source_id"][0]=="SMARTING" and stream["info"]["type"][0]=="EEG"):
             eeg_ts = stream["time_stamps"]
             eeg_np = stream["time_series"]
@@ -158,6 +165,8 @@ def read_xdf(file: str, picks: list[str]="all"):
     # - https://mbraintrain.com/wp-content/uploads/2021/02/RBE-24-STD.pdf
     n_chans = len(stream['info']['desc'][0]['channels'][0]['channel'])
     chans_names = [stream['info']['desc'][0]['channels'][0]['channel'][i]['label'][0] for i in range(n_chans)]
+    #chans_names = [stream['info']['desc'][0]['channels'][0]['channel'][i]['name'][0] for i in range(n_chans)]
+
     # chans_dict = {
     #     0:"Fp1", 1:"Fp2", 2:"F3", 3:"F4", 4:"C3", 5:"C4", 6:"P3",
     #     7:"P4", 8:"O1", 9:"O2", 10:"F7", 11:"F8", 12:"T7", 13:"T8",
