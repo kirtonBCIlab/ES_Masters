@@ -95,7 +95,9 @@ def create_epochs(
     markers: pd.DataFrame,
     markers_ts: np.ndarray,
     events:list[str], 
-    epoch_end: str
+    epoch_end: str,
+    max_length: int= -1000,
+    baseline: bool = False
     ) -> [list, np.ndarray]:
     """
     Creates Epoch data from the desired markers (can be Unity or Python stream)
@@ -149,10 +151,16 @@ def create_epochs(
             # Update minimum epoch length
             min_epoch_length = min(min_epoch_length, epoch.shape[1])   
 
-    # Trim epochs to same length
-    numpy_epochs = np.zeros((len(epochs), eeg_data.shape[0], int(min_epoch_length)))
-    for (e,epoch) in  enumerate(epochs):
-        numpy_epochs[e,:,:] = epoch[:, :min_epoch_length]
+    # Trim baseline epochs to same length as max "on" epoch length supplied as max_length
+    if baseline:
+        numpy_epochs = np.zeros((len(epochs), eeg_data.shape[0], max_length))
+        for (e,epoch) in  enumerate(epochs):
+            numpy_epochs[e,:,:] = epoch[:, :max_length]
+    # Trim epochs to same length (minimum length of "on" epochs)
+    else:
+        numpy_epochs = np.zeros((len(epochs), eeg_data.shape[0], int(min_epoch_length)))
+        for (e,epoch) in  enumerate(epochs):
+            numpy_epochs[e,:,:] = epoch[:, :min_epoch_length]
 
     return [event_list, numpy_epochs]
 
