@@ -3,6 +3,7 @@ using UnityEngine;
 using System;
 using BCIEssentials.Controllers;
 using BCIEssentials.StimulusEffects;
+using BCIEssentials.Utilities;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using System.IO;
@@ -41,170 +42,9 @@ namespace BCIEssentials.ControllerBehaviors
         private bool? preference;
         private int pairNum;
 
+        // Variables for comfort rating and saving
         int comfort = -1;
-
-        public class StimulusData
-        {
-            // Dictionary to hold stimulus indices and their corresponding names
-            public Dictionary<int, string> StimulusIndex { get; private set; }
-
-            // List of pairs for comparisons, with a pair number as a string
-            public List<(string pairNumber, string item1, string item2)> ComparisonPairs { get; private set; }
-
-            // List to hold winners
-            public List<int> Winners { get; private set; }
-
-            // Constructor to initialize the data structure
-            public StimulusData()
-            {
-                StimulusIndex = new Dictionary<int, string>();
-                ComparisonPairs = new List<(string, string, string)>();
-                Winners = new List<int>();
-            }
-
-            // Method to set the entire StimulusIndex dictionary
-            public void SetStimulusIndex(Dictionary<int, string> stimulusDictionary)
-            {
-                StimulusIndex = new Dictionary<int, string>(stimulusDictionary);
-            }
-
-            // Method to add a comparison pair with a pair number
-            public void AddComparisonPair(int pairNumber, string item1, string item2)
-            {
-                string pairNumberString = "Pair Number " + pairNumber.ToString(); // Convert pair number to string
-                ComparisonPairs.Add((pairNumberString, item1, item2));
-            }
-
-            // Method to add a winner
-            public void AddWinner(int winner)
-            {
-                Winners.Add(winner);
-            }
-            public void ExportToCsv(string filePath)
-            {
-                using (StreamWriter writer = new StreamWriter(filePath))
-                {
-                    // Write headers
-                    writer.WriteLine("Pair Number,Item 1,Item 2,Winner");
-
-                    // Iterate through ComparisonPairs and Winners
-                    for (int i = 0; i < ComparisonPairs.Count; i++)
-                    {
-                        string pairNumber = ComparisonPairs[i].pairNumber;
-                        string item1 = ComparisonPairs[i].item1;
-                        string item2 = ComparisonPairs[i].item2;
-
-                        // Get the corresponding winner (stimulus name) if it exists
-                        string winner = "N/A"; // Default value in case winner is not found
-                        if (i < Winners.Count)
-                        {
-                            int winnerIndex = Winners[i];
-                            // Get the stimulus name from the StimulusIndex dictionary using the winner index
-                            if (StimulusIndex.ContainsKey(winnerIndex))
-                            {
-                                winner = StimulusIndex[winnerIndex];
-                            }
-                        }
-
-                        // Write a row to the CSV
-                        writer.WriteLine($"{pairNumber},{item1},{item2},{winner}");
-                    }
-                }
-            }
-        }
-
-        public StimulusData bracketInfo = new StimulusData();
-
-        public class ComfortData
-        {
-            public Dictionary<string, List<int>> StimulusRatings { get; private set; }
-
-            public ComfortData()
-            {
-                StimulusRatings = new Dictionary<string, List<int>>();
-            }
-
-            public void SetStimulusNames(Dictionary<int, string> stimulusDictionary)
-            {
-                StimulusRatings.Clear(); // Clear existing ratings
-
-                // Initialize stimulus ratings with empty score lists
-                foreach (var kvp in stimulusDictionary)
-                {
-                    if (!StimulusRatings.ContainsKey(kvp.Value))
-                    {
-                        StimulusRatings[kvp.Value] = new List<int>();
-                    }
-                }
-            }
-
-            // Add a score to a named stimulus
-            public void AddScore(string stimulusName, int score)
-            {
-                if (!StimulusRatings.ContainsKey(stimulusName))
-                {
-                    Debug.LogWarning($"Stimulus name '{stimulusName}' not found in StimulusRatings.");
-                    return;
-                }
-
-                StimulusRatings[stimulusName].Add(score);
-            }
-
-            // Compute the mean comfort score for a given stimulus
-            public double GetMeanComfort(string stimulusId)
-            {
-                if (StimulusRatings.ContainsKey(stimulusId))
-                {
-                    var scores = StimulusRatings[stimulusId];
-                    double mean = 0.0;
-                    foreach (var score in scores)
-                    {
-                        mean += score;
-                    }
-                    mean /= scores.Count;
-                    return mean;
-                }
-                else
-                {
-                    Debug.LogWarning($"Stimulus ID '{stimulusId}' not found in StimulusRatings.");
-                    return -1000000;
-                }
-            }
-
-            // Generate a 2-row table for export: stimulus names in row 1, mean scores in row 2 (as strings)
-            public List<List<string>> GetComfortDataForExport()
-            {
-                List<string> headerRow = new List<string>();
-                List<string> meanRow = new List<string>();
-
-                foreach (var stimulus in StimulusRatings.Keys)
-                {
-                    headerRow.Add(stimulus);
-
-                    double? mean = GetMeanComfort(stimulus); 
-                    if (mean.HasValue)
-                        meanRow.Add(mean.Value.ToString("F4"));
-                    else
-                        meanRow.Add("N/A");
-                }
-
-                return new List<List<string>> { headerRow, meanRow };
-            }
-
-            // Write to CSV file 
-            public void ExportToCsv(string filePath)
-            {
-                var exportData = GetComfortDataForExport();
-                using (var writer = new StreamWriter(filePath))
-                {
-                    foreach (var row in exportData)
-                    {
-                        writer.WriteLine(string.Join(",", row));
-                    }
-                }
-            }
-        }
-
+        public BracketData bracketInfo = new BracketData();
         public ComfortData comfortData = new ComfortData();
 
 
@@ -519,13 +359,17 @@ namespace BCIEssentials.ControllerBehaviors
             StopCoroutineReference(ref _runStimulus);
             StopCoroutineReference(ref _sendMarkers);
 
-
-            // Ssave the bracket and comfort data to CSV files
-            string bracket_filepath = "D://Users//BCI-Morpheus//Documents//ES-Masters//Data//Bracket//Offline-Practice-Bracket.csv";
+            // Save the bracket and comfort data to CSV files
+            //string bracket_filepath = "D://Users//BCI-Morpheus//Documents//ES-Masters//Data//Bracket//Offline-Practice-Bracket.csv";
+            string bracket_filepath = "C://Users//admin//Documents//Masters//ES_Masters//Masters-Processing//Data//Pilot-Data//Bracket//relative.csv";
             bracketInfo.ExportToCsv(bracket_filepath);
 
-            string comfort_filepath = "D://Users//BCI-Morpheus//Documents//ES-Masters//Data//Bracket//Offline-Practice-Absolute.csv";
-            comfortData.ExportToCsv(comfort_filepath);
+            string comfort_mean_filepath = "C://Users//admin//Documents//Masters//ES_Masters//Masters-Processing//Data//Pilot-Data//Bracket//mean-comfort-absolute.csv";
+            string comfort_single_filepath = "C://Users//admin//Documents//Masters//ES_Masters//Masters-Processing//Data//Pilot-Data//Bracket//single-comfort-absolute.csv";
+
+            comfortData.ExportMeansToCsv(comfort_mean_filepath);
+            comfortData.ExportFullScoresToCsv(comfort_single_filepath);
+
 
             Debug.Log("Bracket and comfort data exported to CSV files.");
         }
@@ -703,7 +547,7 @@ namespace BCIEssentials.ControllerBehaviors
             }
             else if (textOption == "1/2")
             {
-                _displayText.text = "1/2 of the way done!";
+                _displayText.text = "1/2 way done!";
                 _displayText.color = Color.green;
                 yield return new WaitForSecondsRealtime(2.0f);
                 _displayText.text = "";
