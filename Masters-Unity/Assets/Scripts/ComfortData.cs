@@ -70,36 +70,6 @@ namespace BCIEssentials.Utilities
             return new List<List<string>> { headerRow, meanRow };
         }
 
-        // Export all individual scores per stimulus with mean (1 row per stimulus)
-        public List<List<string>> GetFullComfortDataForExport()
-        {
-            List<List<string>> rows = new List<List<string>>();
-
-            int maxEpochs = StimulusRatings.Values.Max(list => list.Count);
-            List<string> header = new List<string> { "Stimulus" };
-            for (int i = 0; i < maxEpochs; i++)
-                header.Add($"Epoch {i + 1}");
-            rows.Add(header);
-
-            foreach (var kvp in StimulusRatings)
-            {
-                List<string> row = new List<string> { kvp.Key };
-                var scores = kvp.Value;
-
-                for (int i = 0; i < maxEpochs; i++)
-                {
-                    if (i < scores.Count)
-                        row.Add(scores[i].ToString());
-                    else
-                        row.Add("");
-                }
-
-                rows.Add(row);
-            }
-
-            return rows;
-        }
-
         // Write means to CSV
         public void ExportMeansToCsv(string filePath)
         {
@@ -113,15 +83,35 @@ namespace BCIEssentials.Utilities
             }
         }
 
-        // Write all individual scores to CSV
-        public void ExportFullScoresToCsv(string filePath)
+        public void ExportScoresInLongFormat(string filePath)
         {
-            var exportData = GetFullComfortDataForExport();
             using (var writer = new StreamWriter(filePath))
             {
-                foreach (var row in exportData)
+                writer.WriteLine("Contrast,Size,Epoch,Comfort_Score");
+
+                foreach (var kvp in StimulusRatings)
                 {
-                    writer.WriteLine(string.Join(",", row));
+                    string stimulus = kvp.Key;
+                    List<int> scores = kvp.Value;
+
+                    // Parse Contrast and Size from the stimulus string
+                    var contrastMatch = System.Text.RegularExpressions.Regex.Match(stimulus, @"Contrast(\d+)");
+                    var sizeMatch = System.Text.RegularExpressions.Regex.Match(stimulus, @"Size(\d+)");
+
+                    if (!contrastMatch.Success || !sizeMatch.Success)
+                    {
+                        Debug.LogWarning($"Invalid stimulus format: {stimulus}");
+                        continue;
+                    }
+
+                    int contrast = int.Parse(contrastMatch.Groups[1].Value);
+                    int size = int.Parse(sizeMatch.Groups[1].Value);
+
+                    for (int epoch = 0; epoch < scores.Count; epoch++)
+                    {
+                        int score = scores[epoch];
+                        writer.WriteLine($"{contrast},{size},{epoch + 1},{score}");
+                    }
                 }
             }
         }
