@@ -360,15 +360,14 @@ namespace BCIEssentials.ControllerBehaviors
             StopCoroutineReference(ref _sendMarkers);
 
             // Save the bracket and comfort data to CSV files
-            //string bracket_filepath = "D://Users//BCI-Morpheus//Documents//ES-Masters//Data//Bracket//Offline-Practice-Bracket.csv";
-            string bracket_filepath = "C://Users//admin//Documents//Masters//ES_Masters//Masters-Processing//Data//Pilot-Data//Bracket//relative.csv";
+            string bracket_filepath = "C://Users//admin//Documents//Masters//ES_Masters//Masters-Processing//Data//Pilot-Data//Bracket//relative-practice.csv";
             bracketInfo.ExportToCsv(bracket_filepath);
 
-            string comfort_mean_filepath = "C://Users//admin//Documents//Masters//ES_Masters//Masters-Processing//Data//Pilot-Data//Bracket//mean-comfort-absolute.csv";
-            string comfort_single_filepath = "C://Users//admin//Documents//Masters//ES_Masters//Masters-Processing//Data//Pilot-Data//Bracket//single-comfort-absolute.csv";
+            string comfort_mean_filepath = "C://Users//admin//Documents//Masters//ES_Masters//Masters-Processing//Data//Pilot-Data//Bracket//mean-comfort-absolute-practice.csv";
+            string comfort_single_filepath= "C://Users//admin//Documents//Masters//ES_Masters//Masters-Processing//Data//Pilot-Data//Bracket//long-comfort-absolute-practice.csv";
 
             comfortData.ExportMeansToCsv(comfort_mean_filepath);
-            comfortData.ExportFullScoresToCsv(comfort_single_filepath);
+            comfortData.ExportScoresInLongFormat(comfort_single_filepath);
 
 
             Debug.Log("Bracket and comfort data exported to CSV files.");
