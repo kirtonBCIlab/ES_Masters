@@ -321,13 +321,13 @@ def get_best_stim(absolute_comfort_data_file, z_scores):
     z_score_dict_20 = dict(zip(stim_name_list, row_20))
 
     # Filter stims with z-score >= 2
-    for stim, z_score10 in z_score_dict_10.items():
-        for stim, z_score20 in z_score_dict_20.items():
-            if z_score10 >= 2 or z_score20 >= 2:
-                # Check if the stim is already in the kept_stim list
-                if stim not in kept_stim:
-                    # Append the stim to the kept_stim list
-                    kept_stim.append(stim)
+    for stim, z_score in z_score_dict_10.items():
+        if z_score >= 2:
+            kept_stim.append(stim)
+
+    for stim, z_score in z_score_dict_20.items():
+        if z_score >= 2 and stim not in kept_stim:
+            kept_stim.append(stim)
 
     # Find the stim (with Z-score > 2) with the highest absolute comfort score
     max_absolute_comfort = float("-inf")
