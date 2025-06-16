@@ -337,7 +337,7 @@ namespace BCIEssentials.ControllerBehaviors
                 {
                     StartCoroutine(DisplayTextOnScreen("1/2"));
                     yield return new WaitForSecondsRealtime(2.0f);
-                    Debug.Log("1/2 of the way done");
+                    Debug.Log("1/2 way done");
                 }
                 else if (pairNum == 15)
                 {
