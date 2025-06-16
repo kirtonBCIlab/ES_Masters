@@ -171,7 +171,7 @@ def average_occipital(settings_data, stimulus_data, baseline_data):
     return occipital_epochs, occipital_epochs_baseline
 
 def psd(occipital_epochs, settings_data):
-     # PSD settings
+    # PSD settings
     window_size = 5  # 5 = 0.2 Hz resolution; 0.1 resolution is not acheievable with 5 seconds of data
 
     # Preallocate variables
@@ -191,7 +191,7 @@ def psd(occipital_epochs, settings_data):
             f_values, pxx_values = signal.welch(
                 x=epoch,  # 1D array (samples,)
                 fs=settings_data["eeg_srate"],
-                nfft=int(window_size * settings_data["eeg_srate"])
+                nfft=int(window_size * settings_data["eeg_srate"]),
                 nperseg=window_size * settings_data["eeg_srate"],
                 noverlap=(window_size * settings_data["eeg_srate"]) * 0.5,  # 50% overlap
             )
@@ -226,7 +226,7 @@ def baseline_mean_sd(occipital_epochs_baseline, settings_data):
             f_values, pxx_values = signal.welch(
                 x=epoch,  # 1D array (samples,)
                 fs=settings_data["eeg_srate"],
-                nfft=int(window_size * settings_data["eeg_srate"])
+                nfft=int(window_size * settings_data["eeg_srate"]),
                 nperseg=window_size * settings_data["eeg_srate"],
                 noverlap=(window_size * settings_data["eeg_srate"]) * 0.5,  # 50% overlap
             )
