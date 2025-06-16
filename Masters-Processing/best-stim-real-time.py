@@ -191,6 +191,7 @@ def psd(occipital_epochs, settings_data):
             f_values, pxx_values = signal.welch(
                 x=epoch,  # 1D array (samples,)
                 fs=settings_data["eeg_srate"],
+                nfft=int(window_size * settings_data["eeg_srate"])
                 nperseg=window_size * settings_data["eeg_srate"],
                 noverlap=(window_size * settings_data["eeg_srate"]) * 0.5,  # 50% overlap
             )
@@ -225,6 +226,7 @@ def baseline_mean_sd(occipital_epochs_baseline, settings_data):
             f_values, pxx_values = signal.welch(
                 x=epoch,  # 1D array (samples,)
                 fs=settings_data["eeg_srate"],
+                nfft=int(window_size * settings_data["eeg_srate"])
                 nperseg=window_size * settings_data["eeg_srate"],
                 noverlap=(window_size * settings_data["eeg_srate"]) * 0.5,  # 50% overlap
             )
@@ -267,8 +269,8 @@ def get_zscore(eeg_pxx, eeg_f, baseline_mean, baseline_std):
     freqs = eeg_f[stim_label][0] 
 
     # Create a mask for both 10 Hz and 20 Hz
-    #fmask = (freqs == 10.0) | (freqs == 20.0)
-    fmask = (freqs == 10.007818608287725) | (freqs == 20.01563721657545)
+    fmask = (freqs == 10.0) | (freqs == 20.0)
+    #fmask = (freqs == 10.007818608287725) | (freqs == 20.01563721657545)
     ten_twenty_mean_zscores = {}
 
 
