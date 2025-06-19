@@ -153,9 +153,15 @@ def create_epochs(
 
     # Trim baseline epochs to same length as max "on" epoch length supplied as max_length
     if baseline:
-        numpy_epochs = np.zeros((len(epochs), eeg_data.shape[0], max_length))
-        for (e,epoch) in  enumerate(epochs):
-            numpy_epochs[e,:,:] = epoch[:, :max_length]
+        if max_length < min_epoch_length:
+            numpy_epochs = np.zeros((len(epochs), eeg_data.shape[0], max_length))
+            for (e,epoch) in  enumerate(epochs):
+                numpy_epochs[e,:,:] = epoch[:, :max_length]
+        else:
+            numpy_epochs = np.zeros((len(epochs), eeg_data.shape[0], int(min_epoch_length)))
+            for (e,epoch) in  enumerate(epochs):
+                numpy_epochs[e,:,:] = epoch[:, :min_epoch_length]
+
     # Trim epochs to same length (minimum length of "on" epochs)
     else:
         numpy_epochs = np.zeros((len(epochs), eeg_data.shape[0], int(min_epoch_length)))

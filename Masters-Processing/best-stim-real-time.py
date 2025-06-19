@@ -81,15 +81,6 @@ def create_epochs(filt_clean, eeg_ts, file_path):
         epoch_end=epoch_end
     )
 
-    # Create epochs for baseline (off)
-    baseline_epochs, eeg_baseline = data_tools.create_epochs(
-        eeg_data=filt_clean.get_data(),
-        eeg_ts=eeg_ts,
-        markers=markers,
-        markers_ts=marker_ts,
-        events=list_of_off_events,
-        epoch_end=epoch_end_off
-    )
 
     # Map stimuli and baseline
     dict_of_stimuli = {i: event for i, event in enumerate(list_of_events)}
@@ -100,6 +91,22 @@ def create_epochs(filt_clean, eeg_ts, file_path):
         eeg_epochs=eeg_epochs,
         labels=events_epochs,
         stimuli=dict_of_stimuli
+    )
+
+    # Save the maximum length of the epochs to trim baseline epochs to this length
+    on_max_length = eeg_epochs_organized[0].shape[-1]
+    print(on_max_length)
+
+    # Create epochs for baseline (off)
+    baseline_epochs, eeg_baseline = data_tools.create_epochs(
+        eeg_data=filt_clean.get_data(),
+        eeg_ts=eeg_ts,
+        markers=markers,
+        markers_ts=marker_ts,
+        events=list_of_off_events,
+        epoch_end=epoch_end_off,
+        max_length = on_max_length,
+        baseline = True
     )
 
     baseline_eeg_epochs_organized = data_tools.epochs_stim(
@@ -164,8 +171,8 @@ def average_occipital(settings_data, stimulus_data, baseline_data):
     return occipital_epochs, occipital_epochs_baseline
 
 def psd(occipital_epochs, settings_data):
-     # PSD settings
-    window_size = 10  # 10 = 0.1 Hz resolution, 5 = 0.2 Hz resolution, 2 = 0.5 Hz resolution
+    # PSD settings
+    window_size = 5  # 5 = 0.2 Hz resolution; 0.1 resolution is not acheievable with 5 seconds of data
 
     # Preallocate variables
     eeg_f = [None] 
@@ -182,8 +189,9 @@ def psd(occipital_epochs, settings_data):
         # Compute PSD for each epoch
         for epoch in epochs:  # Each epoch is now a 1D array (num_samples,)
             f_values, pxx_values = signal.welch(
-            x=epoch,  # 1D array (samples,)
+                x=epoch,  # 1D array (samples,)
                 fs=settings_data["eeg_srate"],
+                nfft=int(window_size * settings_data["eeg_srate"]),
                 nperseg=window_size * settings_data["eeg_srate"],
                 noverlap=(window_size * settings_data["eeg_srate"]) * 0.5,  # 50% overlap
             )
@@ -198,7 +206,7 @@ def psd(occipital_epochs, settings_data):
 
 def baseline_mean_sd(occipital_epochs_baseline, settings_data):
     # PSD settings
-    window_size = 10  # 10 = 0.1 Hz resolution, 5 = 0.2 Hz resolution, 2 = 0.5 Hz resolution
+    window_size = 5  # 5 = 0.2 Hz resolution; 0.1 resolution is not acheievable with 5 seconds of data
 
     # Preallocate variables
     baseline_f = [None] 
@@ -218,6 +226,7 @@ def baseline_mean_sd(occipital_epochs_baseline, settings_data):
             f_values, pxx_values = signal.welch(
                 x=epoch,  # 1D array (samples,)
                 fs=settings_data["eeg_srate"],
+                nfft=int(window_size * settings_data["eeg_srate"]),
                 nperseg=window_size * settings_data["eeg_srate"],
                 noverlap=(window_size * settings_data["eeg_srate"]) * 0.5,  # 50% overlap
             )
@@ -249,10 +258,10 @@ def get_zscore(eeg_pxx, eeg_f, baseline_mean, baseline_std):
             zscores_per_epoch.append(zscore_epoch)  # Store the z-scores for this epoch
 
         # Convert to array for consistency (epochs, freqs)
-        zscores_per_epoch = np.array(zscores_per_epoch)  # Shape (num_epochs, 1281)
+        zscores_per_epoch = np.array(zscores_per_epoch) 
 
         # Calculate the mean z-score for each stimulus
-        mean_zscore = np.mean(zscores_per_epoch, axis = 0) # Shape (num_epochs, 1281)
+        mean_zscore = np.mean(zscores_per_epoch, axis = 0) 
 
         # Store z-scores per stimulus (averaged across epochs)
         eeg_zscore_mean_pxx[stim_label] = mean_zscore
@@ -261,6 +270,7 @@ def get_zscore(eeg_pxx, eeg_f, baseline_mean, baseline_std):
 
     # Create a mask for both 10 Hz and 20 Hz
     fmask = (freqs == 10.0) | (freqs == 20.0)
+    #fmask = (freqs == 10.007818608287725) | (freqs == 20.01563721657545)
     ten_twenty_mean_zscores = {}
 
 
@@ -311,13 +321,13 @@ def get_best_stim(absolute_comfort_data_file, z_scores):
     z_score_dict_20 = dict(zip(stim_name_list, row_20))
 
     # Filter stims with z-score >= 2
-    for stim, z_score10 in z_score_dict_10.items():
-        for stim, z_score20 in z_score_dict_20.items():
-            if z_score10 >= 2 or z_score20 >= 2:
-                # Check if the stim is already in the kept_stim list
-                if stim not in kept_stim:
-                    # Append the stim to the kept_stim list
-                    kept_stim.append(stim)
+    for stim, z_score in z_score_dict_10.items():
+        if z_score >= 2:
+            kept_stim.append(stim)
+
+    for stim, z_score in z_score_dict_20.items():
+        if z_score >= 2 and stim not in kept_stim:
+            kept_stim.append(stim)
 
     # Find the stim (with Z-score > 2) with the highest absolute comfort score
     max_absolute_comfort = float("-inf")
@@ -327,7 +337,7 @@ def get_best_stim(absolute_comfort_data_file, z_scores):
             max_absolute_comfort = absolute_comfort_dict[stim]
             best_stim_absolute = stim
 
-    return best_stim_absolute
+    return best_stim_absolute, absolute_comfort_dict
 
 def main(file_path, comfort_file):
     # Import EEG data
@@ -362,14 +372,14 @@ def main(file_path, comfort_file):
     z_scores = get_zscore(eeg_pxx, eeg_f, baseline_mean, baseline_std)
     
     # Get the best stimulus based on the comfort and z-scores
-    best_stim = get_best_stim(comfort_file, z_scores)
+    best_stim, comfort_scores = get_best_stim(comfort_file, z_scores)
 
     stimuli = ["Contrast1Size1", "Contrast1Size2", "Contrast1Size3", "Contrast2Size1", "Contrast2Size2", "Contrast2Size3", "Contrast3Size1", "Contrast3Size2", "Contrast3Size3", "Contrast4Size1", "Contrast4Size2", "Contrast4Size3"]
 
     # Print list of stimuli with z-scores and comfort values
     print("Stimuli with Z-scores and Comfort Values:")
     for idx, stim in enumerate(stimuli):  # Use enumerate to get both index and stimulus
-        print(f"{stim}: Z-score 10Hz: {z_scores.iloc[1, idx]}, Z-score 20Hz: {z_scores.iloc[2, idx]}")
+        print(f"{stim}:  {comfort_scores[stim]:.2f}, \t\t Z-score 10Hz: {z_scores.iloc[1, idx]}, \t\t Z-score 20Hz: {z_scores.iloc[2, idx]}")
     print(f"The best stimulus based on comfort and z-scores: {best_stim}")
 
 if __name__ == "__main__":
