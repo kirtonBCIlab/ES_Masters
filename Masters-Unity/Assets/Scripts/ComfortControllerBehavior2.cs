@@ -244,11 +244,13 @@ namespace BCIEssentials.ControllerBehaviors
                     yield return OnStimulusRunBehavior();
                 }
 
-                marker.Write("stimulus ended");
+                marker.Write("stimulus ended, getting score");
 
                 stim1.enabled = false;
                 StartCoroutine(GetComfortScore());
                 yield return new WaitUntil(() => comfort != -1);
+
+                marker.Write("stimulus ended"); // Start baseline data epoch for processing by marker later
 
                 comfortData.AddScore(stim1Name, comfort); 
                 comfort = -1; // Reset comfort score for next stimulus
@@ -279,11 +281,13 @@ namespace BCIEssentials.ControllerBehaviors
                     yield return OnStimulusRunBehavior();
                 }
 
-                marker.Write("stimulus ended");
-                stim2.enabled = false;
+                marker.Write("stimulus ended, getting score");
 
+                stim2.enabled = false;
                 StartCoroutine(GetComfortScore());
                 yield return new WaitUntil(() => comfort != -1);
+
+                marker.Write("stimulus ended"); // Start baseline data epoch for processing by marker later
 
                 comfortData.AddScore(stim2Name, comfort); 
                 comfort = -1; // Reset comfort score for next stimulus
@@ -305,7 +309,6 @@ namespace BCIEssentials.ControllerBehaviors
                 stimulusString = ", Stim1: " + stim1Name + ", Stim2: " + stim2Name;
                 markerString = "ssvep," + _selectableSPOs.Count.ToString() + "," + windowLength.ToString() + "," + realFreqFlash.ToString() + stimulusString;
                 marker.Write(markerString);
-
 
                 StartCoroutine(OnStimulusRunUntilKeyPress());
                 yield return new WaitUntil(() => preference != null);
