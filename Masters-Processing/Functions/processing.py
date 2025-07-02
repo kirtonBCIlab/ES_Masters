@@ -196,3 +196,27 @@ def line_filter(eeg, srate, f_notch, f_order):
         )
 
     return filtered
+
+def psd(eeg_dict: dict, eeg_fs: float, window_size=5):
+    eeg_f = {}
+    eeg_pxx = {}
+
+    for stim_label, epochs in eeg_dict.items():  
+        eeg_f[stim_label] = []
+        eeg_pxx[stim_label] = []
+
+        for epoch in epochs: 
+            f_values, pxx_values = signal.welch(
+                x=epoch,
+                fs=eeg_fs,
+                nperseg=int(window_size * eeg_fs),
+                noverlap=int(window_size * eeg_fs * 0.5),
+            )
+            eeg_f[stim_label].append(f_values)
+            eeg_pxx[stim_label].append(pxx_values)
+
+        # Optionally convert lists to arrays
+        eeg_f[stim_label] = np.array(eeg_f[stim_label])
+        eeg_pxx[stim_label] = np.array(eeg_pxx[stim_label])
+
+    return eeg_f, eeg_pxx
