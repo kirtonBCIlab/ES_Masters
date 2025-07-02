@@ -58,7 +58,7 @@ def create_epochs(filt_clean, eeg_ts, file_path):
     
     # Define event markers for stimuli
     list_of_events = [f"Contrast{x+1}Size{y+1}" for x in range(4) for y in range(3)]
-    epoch_end = "stimulus ended"
+    epoch_end = "getting score"
 
     # Define baseline event
     list_of_off_events = ["stimulus ended"]
