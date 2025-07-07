@@ -244,7 +244,7 @@ namespace BCIEssentials.ControllerBehaviors
                     yield return OnStimulusRunBehavior();
                 }
 
-                marker.Write("stimulus ended, getting score");
+                marker.Write("getting score");
 
                 stim1.enabled = false;
                 StartCoroutine(GetComfortScore());
@@ -281,7 +281,7 @@ namespace BCIEssentials.ControllerBehaviors
                     yield return OnStimulusRunBehavior();
                 }
 
-                marker.Write("stimulus ended, getting score");
+                marker.Write("getting score");
 
                 stim2.enabled = false;
                 StartCoroutine(GetComfortScore());
