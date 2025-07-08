@@ -210,12 +210,12 @@ def psd(eeg_dict: dict, eeg_fs: float, window_size=5):
                 x=epoch,
                 fs=eeg_fs,
                 nperseg=int(window_size * eeg_fs),
+                nfft=int(window_size * eeg_fs),
                 noverlap=int(window_size * eeg_fs * 0.5),
             )
             eeg_f[stim_label].append(f_values)
             eeg_pxx[stim_label].append(pxx_values)
 
-        # Optionally convert lists to arrays
         eeg_f[stim_label] = np.array(eeg_f[stim_label])
         eeg_pxx[stim_label] = np.array(eeg_pxx[stim_label])
 
