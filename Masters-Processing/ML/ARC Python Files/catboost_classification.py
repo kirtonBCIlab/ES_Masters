@@ -120,11 +120,11 @@ def binary_classification_objective(trial):
 
 # Run binary classification study
 study = optuna.create_study(direction='maximize')
-study.optimize(binary_classification_objective, n_trials=5, show_progress_bar=True)
+study.optimize(binary_classification_objective, n_trials=200, show_progress_bar=True)
 
 # Print results
 print("\nBinary Classification Optimization Results:")
-print(f"Best Accuracy Score: {study.best_value:.4f}")
+print(f"Best ROC AUC Score: {study.best_value:.4f}")
 print("Best Parameters:")
 for key, value in study.best_params.items():
     print(f"  {key}: {value}")
@@ -203,5 +203,5 @@ print(f"Recall: {recall:.4f}")
 print(f"F1 Score: {f1:.4f}")
 print(f"ROC AUC: {roc_auc:.4f}")
 
-# Save metrics to CSV
-text = np.savetxt(sys.argv[2], metrics, delimiter=",")
+df = pd.DataFrame([metrics])  # make it a 1-row DataFrame
+df.to_csv(sys.argv[2], index=False)
