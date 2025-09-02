@@ -23,8 +23,6 @@ shuffled = data.sample(frac=1, random_state=42).reset_index(drop=True)
 data_shuffled = shuffled.iloc[:, 4:]
 labels_shuffled = shuffled["Comfort Score"]
 
-print("Number of Comfort Score == 3:", (labels_shuffled == 3).sum())
-
 # Create binary labels (1,2 = 0; 4,5 = 1; exclude 3 for clearer separation)
 binary_labels = labels_shuffled.apply(lambda x: 0 if x <= 2 else (1 if x >=4 else np.nan))
 binary_data = data_shuffled[~binary_labels.isna()]
