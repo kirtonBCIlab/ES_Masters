@@ -1,7 +1,6 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import seaborn as sns
 import optuna
 from mrmr import mrmr_classif
 from catboost import CatBoostClassifier
@@ -10,9 +9,7 @@ from sklearn.feature_selection import RFE
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import (accuracy_score, precision_score, recall_score, 
-                            f1_score, roc_auc_score, confusion_matrix, 
-                            roc_curve, precision_recall_curve, 
-                            average_precision_score)
+                            f1_score, roc_auc_score)
 import sys
 
 if len(sys.argv)<1:
