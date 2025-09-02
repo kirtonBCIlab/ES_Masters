@@ -1,15 +1,14 @@
 import numpy as np
 import pandas as pd
-import optuna
-from mrmr import mrmr_classif
-from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.model_selection import train_test_split, StratifiedKFold, cross_val_score
 from sklearn.feature_selection import RFE
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.impute import SimpleImputer
+from xgboost import XGBClassifier
+import optuna
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import (accuracy_score, precision_score, recall_score, 
                             f1_score, roc_auc_score)
+from mrmr import mrmr_classif
 import sys
 
 if len(sys.argv)<1:
@@ -37,13 +36,6 @@ X_train, X_test, y_train, y_test = train_test_split(
     stratify=binary_labels,
     random_state=42
 )
-
-# Impute missing values with median
-imputer = SimpleImputer(strategy='median')
-
-# Apply imputation to both training and test sets
-X_train = pd.DataFrame(imputer.fit_transform(X_train), columns=X_train.columns)
-X_test = pd.DataFrame(imputer.transform(X_test), columns=X_test.columns)
 
 class MRMRTransformer:
     def __init__(self, k_features):
@@ -75,7 +67,7 @@ class MRMRTransformer:
             X = pd.DataFrame(X, columns=self.column_names)
         return X[self.selected_features]
     
-# Optimize Feature Selection and Gradient Boosting Parameters
+
 X = X_train.copy()
 y = y_train.copy()
 
@@ -93,18 +85,21 @@ def binary_classification_objective(trial):
     else:
         selector = 'passthrough'
     
-    # Gradient Boosting hyperparameters https://www.geeksforgeeks.org/machine-learning/how-to-tune-hyperparameters-in-gradient-boosting-algorithm/, https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.GradientBoostingClassifier.html
+    # XGBoost hyperparameters 
     params = {
-        'n_estimators': trial.suggest_int('n_estimators', 50, 500, step=50),
+        'n_estimators': trial.suggest_int('n_estimators', 50, 1000, step = 50),
+        'max_depth': trial.suggest_int('max_depth', 3, 10),
         'learning_rate': trial.suggest_float('learning_rate', 0.001, 0.3, log=True),
-        'max_depth': trial.suggest_int('max_depth', 3, 7),
-        'min_samples_split': trial.suggest_int('min_samples_split', 2, 20),
-        'min_samples_leaf': trial.suggest_int('min_samples_leaf', 1, 10),
         'subsample': trial.suggest_float('subsample', 0.5, 1.0),
-        'random_state': 42
+        'colsample_bytree': trial.suggest_float('colsample_bytree', 0.5, 1.0),
+        'gamma': trial.suggest_float('gamma', 0, 5),
+        'reg_alpha': trial.suggest_float('reg_alpha', 0, 10),
+        'reg_lambda': trial.suggest_float('reg_lambda', 0, 10),
+        'random_state': 42,
+        'eval_metric': trial.suggest_categorical('eval_metric', ['logloss', 'auc']), #https://xgboost.readthedocs.io/en/stable/parameter.html#general-parameters
+        'objective': 'binary:logistic', #https://xgboost.readthedocs.io/en/stable/parameter.html#general-parameters
     }
-
-    model = GradientBoostingClassifier(**params)
+    model = XGBClassifier(**params)
         
     # Pipeline
     pipeline = Pipeline([
@@ -133,7 +128,7 @@ print("Best Parameters:")
 for key, value in study.best_params.items():
     print(f"  {key}: {value}")
 
-# Apply optimal feature selection method to training data
+# apply your feature selection code from before
 best_fs_method = study.best_params.get('feature_selection', 'None')
 
 if best_fs_method != 'None':
@@ -154,7 +149,7 @@ else:
     X_best = X
     selected_features = X.columns
 
-# Apply the same feature selection method to test data
+# Apply the same feature selection to test data
 if best_fs_method != 'None':
     if best_fs_method == 'MRMR':
         X_test_final = X_test[selected_features]
@@ -165,18 +160,23 @@ if best_fs_method != 'None':
 else:
     X_test_final = X_test
 
-# Create and Fit GradientBoosting Model with Best Parameters
-best_model = GradientBoostingClassifier(
+best_model = XGBClassifier(
     n_estimators=study.best_params['n_estimators'],
     max_depth=study.best_params['max_depth'],
     learning_rate=study.best_params['learning_rate'],
-    min_samples_split=study.best_params['min_samples_split'],
-    min_samples_leaf=study.best_params['min_samples_leaf'],
     subsample=study.best_params['subsample'],
-    random_state=42
-)
+    colsample_bytree=study.best_params['colsample_bytree'],
+    gamma=study.best_params['gamma'],
+    reg_alpha=study.best_params['reg_alpha'],
+    reg_lambda=study.best_params['reg_lambda'],
+    eval_metric=study.best_params['eval_metric'],
+    objective='binary:logistic',
+    random_state=42,
+    use_label_encoder=False
+    )
 
-# Get best model parameters
+# Train on full imputed data
+best_model.fit(X_best, y)
 params_dict = best_model.get_params()
 
 # Train model on training data with feature selection applied

@@ -1,7 +1,6 @@
 import numpy as np
 import pandas as pd
 import optuna
-import mrmr
 from mrmr import mrmr_classif
 from catboost import CatBoostClassifier
 from sklearn.model_selection import train_test_split, StratifiedKFold, cross_val_score
