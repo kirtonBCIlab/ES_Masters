@@ -244,7 +244,7 @@ namespace BCIEssentials.ControllerBehaviors
                     yield return OnStimulusRunBehavior();
                 }
 
-                marker.Write("stimulus ended, getting score");
+                marker.Write("getting score");
 
                 stim1.enabled = false;
                 StartCoroutine(GetComfortScore());
@@ -281,7 +281,7 @@ namespace BCIEssentials.ControllerBehaviors
                     yield return OnStimulusRunBehavior();
                 }
 
-                marker.Write("stimulus ended, getting score");
+                marker.Write("getting score");
 
                 stim2.enabled = false;
                 StartCoroutine(GetComfortScore());
@@ -363,11 +363,11 @@ namespace BCIEssentials.ControllerBehaviors
             StopCoroutineReference(ref _sendMarkers);
 
             // Save the bracket and comfort data to CSV files
-            string bracket_filepath = "C://Users//admin//Documents//Masters//ES_Masters//Masters-Processing//Data//Pilot-Data//Bracket//relative-practice.csv";
+            string bracket_filepath = "D://Users///BCI-Morpheus//Documents//ES-Masters//Data//Bracket//Pilot_v2//P011//P011_relative.csv";
             bracketInfo.ExportToCsv(bracket_filepath);
 
-            string comfort_mean_filepath = "C://Users//admin//Documents//Masters//ES_Masters//Masters-Processing//Data//Pilot-Data//Bracket//mean-comfort-absolute-practice.csv";
-            string comfort_single_filepath= "C://Users//admin//Documents//Masters//ES_Masters//Masters-Processing//Data//Pilot-Data//Bracket//long-comfort-absolute-practice.csv";
+            string comfort_mean_filepath = "D://Users///BCI-Morpheus//Documents//ES-Masters//Data//Bracket//Pilot_v2//P011//P011_mean_absolute.csv";
+            string comfort_single_filepath= "D://Users///BCI-Morpheus//Documents//ES-Masters//Data//Bracket//Pilot_v2//P011//P011_single_absolute.csv";
 
             comfortData.ExportMeansToCsv(comfort_mean_filepath);
             comfortData.ExportScoresInLongFormat(comfort_single_filepath);
