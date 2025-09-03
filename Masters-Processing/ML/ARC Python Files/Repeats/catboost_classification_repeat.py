@@ -76,7 +76,6 @@ def binary_classification_objective(trial):
         'random_seed': 42,
         'verbose': False,
     }
-
     model = CatBoostClassifier(**params)
 
     # Pipeline
@@ -87,7 +86,6 @@ def binary_classification_objective(trial):
 
     # Cross-validation
     cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
-
     try:
         scores = cross_val_score(pipeline, X, y, cv=cv, scoring='roc_auc', n_jobs=1)
         return np.mean(scores)
@@ -129,7 +127,7 @@ for run in range(3):
         selector.fit(X, y)
         if hasattr(selector, 'get_support'):  # For RFE
             selected_features = X.columns[selector.get_support()]
-        else:  # For MRMRTransformer
+        else:  # For MRMR
             selected_features = selector.selected_features
         X_best = X[selected_features]
     else:

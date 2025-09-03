@@ -5,8 +5,7 @@ from sklearn.feature_selection import RFE
 from sklearn.ensemble import RandomForestClassifier
 import optuna
 from sklearn.pipeline import Pipeline
-from sklearn.metrics import (accuracy_score, precision_score, recall_score, 
-                            f1_score, roc_auc_score)
+from sklearn.metrics import (accuracy_score, precision_score, recall_score, f1_score, roc_auc_score)
 from mrmr_wrapper import MRMRTransformer
 import sys
 
@@ -72,7 +71,6 @@ def binary_classification_objective(trial):
 
     # Cross-validation
     cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
-
     try:
         scores = cross_val_score(pipeline, X, y, cv=cv, scoring='roc_auc', n_jobs=1)
         return np.mean(scores)
@@ -105,7 +103,7 @@ if best_fs_method != 'None':
     selector.fit(X, y)
     if hasattr(selector, 'get_support'):  # For RFE
         selected_features = X.columns[selector.get_support()]
-    else:  # For MRMRTransformer
+    else:  # For MRMR
         selected_features = selector.selected_features
     X_best = X[selected_features]
 else:

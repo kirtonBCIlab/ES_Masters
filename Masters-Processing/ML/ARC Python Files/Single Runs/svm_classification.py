@@ -7,12 +7,9 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import SVC
 import optuna
-from sklearn.decomposition import PCA
-from sklearn.inspection import DecisionBoundaryDisplay
 from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
-from sklearn.metrics import (accuracy_score, precision_score, recall_score, 
-                            f1_score, roc_auc_score)
+from sklearn.metrics import (accuracy_score, precision_score, recall_score, f1_score, roc_auc_score)
 from mrmr_wrapper import MRMRTransformer
 import sys
 
@@ -92,7 +89,6 @@ def binary_classification_objective(trial):
 
     # Cross-validation
     cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
-
     try:
         scores = cross_val_score(pipeline, X, y, cv=cv, scoring='roc_auc', n_jobs=1)
         return np.mean(scores)
@@ -125,7 +121,7 @@ if best_fs_method != 'None':
     selector.fit(X, y)
     if hasattr(selector, 'get_support'):  # For RFE
         selected_features = X.columns[selector.get_support()]
-    else:  # For MRMRTransformer
+    else:  # For MRMR
         selected_features = selector.selected_features
     X_best = X[selected_features]
 else:
@@ -156,37 +152,6 @@ best_model = SVC(
 # Train on full (potentially feature-selected) data
 best_model.fit(X_best, y)
 params_dict = best_model.get_params()
-
-# Try to plot decision boundary using PCA
-def plot_decision_boundary_pca(model, X, y, title="SVC Decision Boundary (PCA)"):
-    """
-    Project high-dimensional data to 2D using PCA for visualization
-    """
-    # Reduce to 2D using PCA
-    pca = PCA(n_components=2)
-    X_pca = pca.fit_transform(X)
-    
-    # Train a new model on PCA-transformed data (for accurate boundary)
-    model_pca = SVC(**params_dict)
-    model_pca.fit(X_pca, y)
-    
-    # Plot decision boundary
-    display = DecisionBoundaryDisplay.from_estimator(
-        model_pca,
-        X_pca,
-        response_method="predict",
-        cmap=plt.cm.coolwarm,
-        alpha=0.8,
-    )
-    
-    plt.scatter(X_pca[:, 0], X_pca[:, 1], c=y, edgecolors='k', cmap=plt.cm.coolwarm)
-    plt.title(f"{title}\n(PCA Projection)")
-    plt.xlabel('Principal Component 1')
-    plt.ylabel('Principal Component 2')
-    plt.show()
-
-# Usage for high-dimensional data
-plot_decision_boundary_pca(best_model, X_best, y)
 
 # Make predictions
 y_pred = best_model.predict(X_test_final)

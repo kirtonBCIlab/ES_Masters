@@ -7,8 +7,7 @@ from sklearn.model_selection import train_test_split, StratifiedKFold, cross_val
 from sklearn.feature_selection import RFE
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.pipeline import Pipeline
-from sklearn.metrics import (accuracy_score, precision_score, recall_score, 
-                            f1_score, roc_auc_score)
+from sklearn.metrics import (accuracy_score, precision_score, recall_score, f1_score, roc_auc_score)
 import sys
 
 if len(sys.argv)<1:
@@ -66,7 +65,6 @@ def binary_classification_objective(trial):
         'random_seed': 42,
         'verbose': False,
     }
-
     model = CatBoostClassifier(**params)
 
     # Pipeline
@@ -77,7 +75,6 @@ def binary_classification_objective(trial):
 
     # Cross-validation
     cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
-
     try:
         scores = cross_val_score(pipeline, X, y, cv=cv, scoring='roc_auc', n_jobs=1)
         return np.mean(scores)
@@ -110,7 +107,7 @@ if best_fs_method != 'None':
     selector.fit(X, y)
     if hasattr(selector, 'get_support'):  # For RFE
         selected_features = X.columns[selector.get_support()]
-    else:  # For MRMRTransformer
+    else:  # For MRMR
         selected_features = selector.selected_features
     X_best = X[selected_features]
 else:
@@ -127,7 +124,6 @@ if best_fs_method != 'None':
             X_test_final = pd.DataFrame(X_test_final, columns=selected_features)
 else:
     X_test_final = X_test
-
 
 best_model = CatBoostClassifier(
     iterations=study.best_params['iterations'],

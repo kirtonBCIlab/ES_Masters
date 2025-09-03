@@ -8,8 +8,7 @@ from sklearn.feature_selection import RFE
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
-from sklearn.metrics import (accuracy_score, precision_score, recall_score, 
-                            f1_score, roc_auc_score)
+from sklearn.metrics import (accuracy_score, precision_score, recall_score, f1_score, roc_auc_score)
 import sys
 
 if len(sys.argv)<1:
@@ -73,7 +72,6 @@ def binary_classification_objective(trial):
         'subsample': trial.suggest_float('subsample', 0.5, 1.0),
         'random_state': 42
     }
-
     model = GradientBoostingClassifier(**params)
         
     # Pipeline
@@ -84,7 +82,6 @@ def binary_classification_objective(trial):
 
     # Cross-validation
     cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
-
     try:
         scores = cross_val_score(pipeline, X, y, cv=cv, scoring='roc_auc', n_jobs=1)
         return np.mean(scores)
@@ -117,7 +114,7 @@ if best_fs_method != 'None':
     selector.fit(X, y)
     if hasattr(selector, 'get_support'):  # For RFE
         selected_features = X.columns[selector.get_support()]
-    else:  # For MRMRTransformer
+    else:  # For MRMR
         selected_features = selector.selected_features
     X_best = X[selected_features]
 else:
@@ -146,11 +143,11 @@ best_model = GradientBoostingClassifier(
     random_state=42
 )
 
-# Get best model parameters
-params_dict = best_model.get_params()
-
 # Train model on training data with feature selection applied
 best_model.fit(X_best, y)
+
+# Get best model parameters
+params_dict = best_model.get_params()
 
 # Make predictions
 y_pred = best_model.predict(X_test_final)
