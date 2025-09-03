@@ -54,7 +54,6 @@ def binary_classification_objective(trial):
         selector = 'passthrough'
     
     # RF Hyperparameters
-
     params = {
         'n_estimators': trial.suggest_int('n_estimators', 100, 1000, step=50),
         'max_depth': trial.suggest_int('max_depth', 3, 20),
@@ -63,7 +62,6 @@ def binary_classification_objective(trial):
         'min_samples_leaf': trial.suggest_int('min_samples_leaf', 1, 10),
         'random_state': 42
     }
-    
     model = RandomForestClassifier(**params)
 
     # Pipeline
@@ -92,8 +90,6 @@ print(f"Best Accuracy Score: {study.best_value:.4f}")
 print("Best Parameters:")
 for key, value in study.best_params.items():
     print(f"  {key}: {value}")
-
-
 
 # apply feature selection code from before
 best_fs_method = study.best_params.get('feature_selection', 'None')
