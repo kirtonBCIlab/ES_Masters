@@ -1,5 +1,4 @@
 import numpy as np
-import matplotlib.pyplot as plt
 import pandas as pd
 from sklearn.model_selection import train_test_split, StratifiedKFold, cross_val_score
 from sklearn.feature_selection import RFE
@@ -152,13 +151,13 @@ for run in range(3):
     # Apply the same feature selection to test data
     if best_fs_method != 'None':
         if best_fs_method == 'MRMR':
-            X_test_final = X_test[selected_features]
+            X_test_final = X_test_scaled[selected_features]
         else:
-            X_test_final = selector.transform(X_test)
-            if isinstance(X_test, pd.DataFrame):
+            X_test_final = selector.transform(X_test_scaled)
+            if isinstance(X_test_scaled, pd.DataFrame):
                 X_test_final = pd.DataFrame(X_test_final, columns=selected_features)
     else:
-        X_test_final = X_test
+        X_test_final = X_test_scaled
 
     # Create and Fit SVM Model with Best Parameters
     best_model = SVC(
