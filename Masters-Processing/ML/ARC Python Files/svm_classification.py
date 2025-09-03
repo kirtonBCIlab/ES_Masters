@@ -13,7 +13,7 @@ from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import (accuracy_score, precision_score, recall_score, 
                             f1_score, roc_auc_score)
-from mrmr import mrmr_classif
+from mrmr_wrapper import MRMRTransformer
 import sys
 
 if len(sys.argv)<1:
@@ -53,37 +53,6 @@ scaler = StandardScaler()
 
 X_train_scaled = pd.DataFrame(scaler.fit_transform(X_train))
 X_test_scaled = pd.DataFrame(scaler.transform(X_test))
-
-# MRMR Wrapper
-class MRMRTransformer:
-    def __init__(self, k_features):
-        self.k_features = k_features
-        self.selected_features = None
-        self.column_names = None
-    
-    def fit(self, X, y):
-        # Convert to DataFrame if not already
-        if not isinstance(X, pd.DataFrame):
-            X = pd.DataFrame(X)
-        
-        # Reset indices to avoid alignment issues
-        X = X.reset_index(drop=True)
-        y = pd.Series(y).reset_index(drop=True)
-        
-        self.column_names = X.columns.tolist()
-        try:
-            self.selected_features = mrmr_classif(X, y, K=self.k_features)
-            print("Got MRMR features")
-        except:
-            # Fallback to random features if MRMR fails
-            self.selected_features = np.random.choice(X.columns, size=min(self.k_features, len(X.columns)), replace=False)
-            print("MRMR failed, selected random features instead.")
-        return self
-    
-    def transform(self, X):
-        if not isinstance(X, pd.DataFrame):
-            X = pd.DataFrame(X, columns=self.column_names)
-        return X[self.selected_features]
 
 # Optimize Feature Selection and SVM Parameters    
 X = X_train_scaled.copy()

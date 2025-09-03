@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 import optuna
-from mrmr import mrmr_classif
+from mrmr_wrapper import MRMRTransformer
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.model_selection import train_test_split, StratifiedKFold, cross_val_score
 from sklearn.feature_selection import RFE
@@ -45,36 +45,6 @@ imputer = SimpleImputer(strategy='median')
 X_train = pd.DataFrame(imputer.fit_transform(X_train), columns=X_train.columns)
 X_test = pd.DataFrame(imputer.transform(X_test), columns=X_test.columns)
 
-class MRMRTransformer:
-    def __init__(self, k_features):
-        self.k_features = k_features
-        self.selected_features = None
-        self.column_names = None
-    
-    def fit(self, X, y):
-        # Convert to DataFrame if not already
-        if not isinstance(X, pd.DataFrame):
-            X = pd.DataFrame(X)
-        
-        # Reset indices to avoid alignment issues
-        X = X.reset_index(drop=True)
-        y = pd.Series(y).reset_index(drop=True)
-        
-        self.column_names = X.columns.tolist()
-        try:
-            self.selected_features = mrmr_classif(X, y, K=self.k_features)
-            print("Got MRMR features")
-        except:
-            # Fallback to random features if MRMR fails
-            self.selected_features = np.random.choice(X.columns, size=min(self.k_features, len(X.columns)), replace=False)
-            print("MRMR failed, selected random features instead.")
-        return self
-    
-    def transform(self, X):
-        if not isinstance(X, pd.DataFrame):
-            X = pd.DataFrame(X, columns=self.column_names)
-        return X[self.selected_features]
-    
 # Optimize Feature Selection and Gradient Boosting Parameters
 X = X_train.copy()
 y = y_train.copy()
