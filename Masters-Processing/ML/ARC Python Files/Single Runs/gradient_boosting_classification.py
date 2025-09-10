@@ -107,7 +107,7 @@ if best_fs_method != 'None':
     k_features = study.best_params['k_features']
     if best_fs_method == 'RFE':
         estimator = RandomForestClassifier()
-        selector = RFE(estimator)
+        selector = RFE(estimator, n_features_to_select=k_features)
     elif best_fs_method == 'MRMR':
         selector = MRMRTransformer(k_features=k_features)
     

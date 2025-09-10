@@ -110,7 +110,7 @@ def binary_classification_objective(trial):
 all_results = []
 
 # Repeat the optimization and testing process 3 times
-for run in range(3):
+for run in range(10):
     print(f"\n{'='*50}")
     print(f"STARTING RUN {run + 1}/3")
     print(f"{'='*50}")
