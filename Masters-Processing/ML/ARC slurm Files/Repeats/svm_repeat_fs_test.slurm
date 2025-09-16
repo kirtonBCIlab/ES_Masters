@@ -6,7 +6,7 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=48G
-#SBATCH --time=48:0:0
+#SBATCH --time=96:0:0
 
 export PATH=~/miniconda3/bin/envs/ml/bin:$PATH
 echo $(which python)

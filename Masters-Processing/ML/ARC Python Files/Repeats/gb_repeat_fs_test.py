@@ -254,7 +254,7 @@ for run in range(10):
         top_features['best_cv_score'] = study.best_value
 
         # Save per-run CSV
-        run_csv = os.path(f'feature_importance_run{run+1}.csv')
+        run_csv  = os.path.join(out_dir, f'feature_importance_run{run+1}.csv')
         feature_importance_df.to_csv(run_csv, index=False)
         print(f"Saved feature importance CSV for run {run+1} -> {run_csv}")
 
