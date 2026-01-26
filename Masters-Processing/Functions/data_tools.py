@@ -1,7 +1,3 @@
-"""
-    Set of functions to work with the Boccia software pilot data
-"""
-
 # Import libraries
 import os
 import mne
@@ -9,7 +5,6 @@ import pyxdf
 import numpy as np
 import pandas as pd
 import scipy.signal as signal
-
 
 def import_data(xdf_file: str) -> tuple[mne.io.Raw, pd.DataFrame, pd.DataFrame]:
     """
@@ -87,7 +82,6 @@ def import_data(xdf_file: str) -> tuple[mne.io.Raw, pd.DataFrame, pd.DataFrame]:
             unity_stream = pd.DataFrame(dict_unity)
 
     return (eeg_mne, python_stream, unity_stream)
-
 
 def create_epochs(
     eeg_data: mne.io.Raw,
@@ -376,7 +370,6 @@ def import_data_byType_noPython(
     # Changing return right now as a hardcode - but there should be a way to optionally include the outputs
     return (eeg_mne, unity_stream)
 
-
 def create_epochs_es(
     eeg: mne.io.Raw, markers: pd.DataFrame, events=list[str]
 ) -> mne.Epochs:
@@ -387,101 +380,6 @@ def create_epochs_es(
 
     eeg_epochs = 0
     return eeg_epochs
-
-
-def build_events_list_es(eeg: mne.io.Raw, markers: pd.DataFrame):
-    """
-    Documentation to be here one day.
-    This just is a hardcoded build of a basic event list for Emily Schrag's summer project
-    """
-    unity_markers = markers["Event"]
-    unity_time_stamps = markers["Time Stamps"]
-    # using the below functions to find calls
-    idx_markers = find_indices_of_repeated_values(unity_markers)
-    idx_markers.sort()
-
-    # Stimulus off calls happen every other block. So we will move those into their own index array, and not include the first one as it is before the stim started. Note that the first value has to be included for it to fold properly
-    stim_off_markers = idx_markers[1:-1:2]
-    # Make sure that the stim_off markers are true and only the stimulus off ones.
-    for m in stim_off_markers:
-        assert unity_markers[m] == "Stimulus Off"
-
-    # Put them into a 2D matrix of shape Nx4, ignoring the first off call (pre-marker), so these now correspond to the "off" times between each of the 24 different blocks of stimulus
-    grouped_stimOff_array = group_into_new_dimension(stim_off_markers, 4)
-
-    # Repeat with the stim markers
-    stim_markers = idx_markers[2:-1:2]
-    # Ok ok ok. No we group this as well using our grouped call above, so we have each dimension as one of the "blocks", with the index for where each start of that block.
-    grouped_stim = group_into_new_dimension(stim_markers, 4)
-
-    # This should be length 24 right now
-    # for i in range(0,len(ts_grouped_markers)):
-
-    #     #Handle edge case here, cause the final one will require something different and we need data from the next value up in the groups.
-    #     if i < len(ts_grouped_markers):
-    #         nextOffVar = np.array(ts_grouped_offStim[i+1][0])
-    #         offVar = ts_grouped_offStim[i][1:4]
-    #         offVar = np.append(offVar,nextOffVar)
-    #         #Create your local variables based on the outer loop
-    #         stimVar = ts_grouped_markers[i]
-
-    #         #Create an empty output for stim/off values for a given block
-    #         output = [[],[]]
-
-    #         #Now have an internal second loop grabbing the data and putting it into a different array
-    #         for jj in range(len(stimVar)):
-    #             output[0].extend(eeg[stimVar[jj]:offVar[jj]])
-    #             if jj < len(stimVar)-1:
-    #                 output[1].extend(eeg[offVar[jj]:stimVar[jj+1]])
-
-    #         # print(ts_grouped_markers[i])
-    #     else:
-    #         #Handle the last case
-    #         stimVar = ts_grouped_markers[i]
-    #         offVar = ts_grouped_offStim[i][1:3]
-    #         #Create an empty output for stim/off values for a given block
-    #         output = [[],[]]
-    #         #Now have an internal second loop grabbing the data and putting it into a different array
-    #         for jj in range(len(offVar)):
-
-    #             if jj < len(offVar):
-    #                 output[0].extend(eeg[stimVar[jj]:offVar[jj]])
-    #                 output[1].extend(eeg[offVar[jj]:stimVar[jj+1]])
-    #             else:
-    #                 output[0].extend(eeg[stimVar[jj]:-1])
-    #                 output[1].extend(eeg[offVar[jj]:stimVar[jj+1]])
-
-    return idx_markers, grouped_stim, grouped_stimOff_array
-
-
-##EKL Additions
-def find_indices_of_repeated_values(arr):
-    result = []  # List to store the indices of the first occurrence
-    previous_str = None
-
-    for idx, item in enumerate(arr):
-        item_str = str(item)  # Convert to string representation
-
-        if item_str != previous_str:
-            # If the current string is different from the previous one,
-            # add the index to the result
-            result.append(idx)
-
-        previous_str = item_str  # Update the previous string
-
-    return result
-
-
-def find_indices_with_substring(strings_list, substring):
-    indices = [idx for idx, string in enumerate(strings_list) if substring in string]
-    return indices
-
-
-def group_into_new_dimension(input_array, group_size):
-    return [
-        input_array[i : i + group_size] for i in range(0, len(input_array), group_size)
-    ]
-
 
 def epochs_from_unity_markers(
         eeg_time: np.ndarray,
@@ -545,39 +443,6 @@ def find_repeats(marker_data: list) -> tuple((np.ndarray, list)):
     labels = [marker_data[i][0] for i in repeats[:, 0]]
 
     return repeats, labels
-
-def fix_labels(labels: list[str]) -> list[str]:
-    """
-        Fix labels in pilot data (e.g., "tvep,1,-1,1,2Min", should be 
-        "tvep,1,-1,1,2, Min")
-
-        Parameters
-        ----------
-            labels: list[str]
-                Original set of labels found in Unity LSL stream
-
-        Returns
-        -------
-            fixed_labels: list[str]
-                List of labels with mistakes fixed
-    """
-
-    # Preallocate output
-    fixed_labels = []
-
-    for label in labels:
-        if label == "tvep,1,-1,1,2Min":
-            fixed_labels.append("tvep,1,-1,1,2, Min")
-        elif label == "tvep,1,-1,1,9.6Min":
-            fixed_labels.append("tvep,1,-1,1,9.6, Min")
-        elif label == "tvep,1,-1,1,16Min":
-            fixed_labels.append("tvep,1,-1,1,16, Min")
-        elif label == "tvep,1,-1,1,36Min":
-            fixed_labels.append("tvep,1,-1,1,36, Min")
-        else:
-            fixed_labels.append(label)
-
-    return fixed_labels
 
 def get_tvep_stimuli(labels: list[str]) -> dict:
     """
@@ -661,8 +526,6 @@ def epochs_stim_freq(
 
     return np.array(eeg_epochs_organized)
 
-import numpy as np
-
 def epochs_stim(eeg_epochs: list, labels: list, stimuli: dict) -> list:
     """
     Organizes EEG epochs into a list of lists based on stimulus.
@@ -692,8 +555,6 @@ def epochs_stim(eeg_epochs: list, labels: list, stimuli: dict) -> list:
                 break
 
     return [np.array(stim_list) for stim_list in eeg_epochs_organized]
-
-
 
 def labels_to_dict_and_array(labels:list) -> tuple[dict, np.ndarray]:
     """
@@ -751,7 +612,6 @@ def trim_epochs(epochs:list) -> np.ndarray:
         trimmed_epochs[e,:,:] = epoch[:,:min_samples]
 
     return trimmed_epochs
-
 
 def drop_epochs_by_label(epochs:list[np.ndarray], labels:list[str], label_to_drop:list[str]) -> tuple[list[np.ndarray], list[str]]:
     """
@@ -835,80 +695,5 @@ def normalize_epochs_length(
 
     # Return epochs to correct shape if needed
     normalized_epochs = np.array(normalized_epochs)
-    # if transpose_flag:
-    #     normalized_epochs = np.transpose(normalized_epochs, (0, 2, 1))
 
     return normalized_epochs
-
-def read_xdf(file: str, picks: list[str]="all"):
-    """
-        Imports a .XDF file and returns the data matrix [channels x samples] and sample rate [Hz]
-
-        Parameters
-        ----------
-            - file: str
-                Full directory of the file to import
-            - picks: list[str] = ["all"]
-                List of strings with the names of the channels to import. Default will import all EEG channels
-            - return_marker_data: bool
-                If enabled, the function also returns the marker data and time stamps
-
-        Returns
-        -------
-            - `eeg_ts`: EEG time stamps [sec]
-            - `eeg`: np.ndarray [channels x samples]
-                EEG raw data
-            - `srate`: double
-                Sampling rate [Hz]
-            
-    """
-    file_path = os.path.normpath(file)  # Normalize path OS agnostic
-    [data, header] = pyxdf.load_xdf(file_path, verbose=False)
-    
-    for stream in data:
-        # Obtain data for SMARTING headset
-        if (stream["info"]["source_id"][0]=="SMARTING" and stream["info"]["type"][0]=="EEG"):
-            eeg_ts = stream["time_stamps"]
-            eeg_np = stream["time_series"]
-            srate = float(stream["info"]["nominal_srate"][0])
-            break
-
-        source_id_list = stream["info"]["source_id"][0].split("_")
-        if source_id_list[0] == 'gUSBamp' and source_id_list[-1] != "markers":
-            eeg_ts = stream["time_stamps"]
-            eeg_np = stream["time_series"]
-            srate = float(stream["info"]["nominal_srate"][0])
-            break
-
-
-    # Obtained from:
-    # - https://mbraintrain.com/wp-content/uploads/2021/02/RBE-24-STD.pdf
-    n_chans = len(stream['info']['desc'][0]['channels'][0]['channel'])
-    chans_names = [stream['info']['desc'][0]['channels'][0]['channel'][i]['label'][0] for i in range(n_chans)]
-
-    eeg_pd = pd.DataFrame(data=eeg_np, columns=chans_names)
-
-    if picks != "all":
-        eeg_pd = eeg_pd[picks]                    
-
-    return eeg_ts, eeg_pd.to_numpy().T, srate
-
-def read_xdf_unity_markers(file: str) -> tuple[np.ndarray, list[str]]:
-    """
-        This function returns the time stamps and markers from the Unity stream of an xdf file
-
-        Returns
-        -------
-            - `marker_time`. Numpy vector with the time stamps of the Unity stream markers.
-            - `marker_data`. List with the string of markers.
-    """
-
-    file_path = os.path.normpath(file)  # Normalize path OS agnostic
-    [data, _] = pyxdf.load_xdf(file_path, verbose=False)
-
-    for stream in data:
-        if stream["info"]["name"][0] == 'UnityMarkerStream':
-            marker_time = stream["time_stamps"]
-            marker_data = stream["time_series"]  
-
-    return marker_time, marker_data
