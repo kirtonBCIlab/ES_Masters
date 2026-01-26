@@ -2,7 +2,6 @@
     Processing
     --------------
     Set of functions to pre-process and process the SSVEP data
-
 """
 import numpy as np
 import scipy.signal as signal

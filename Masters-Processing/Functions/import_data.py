@@ -1,6 +1,5 @@
 """
     Set of functions to import data
-
 """
 
 import os
@@ -60,11 +59,7 @@ def read_edf(file: str, picks: list[str] = ["all"]):
                 EEG raw data
             - srate: double
                 Sampling rate [Hz]
-
     """
-
-    # if file.split(".")[-1] != "edf":
-        # file = f"{file}.edf"
 
     edf_data = mne.io.read_raw_edf(file, verbose=False)
     eeg = edf_data.get_data(picks)       # EEG [V]
@@ -133,13 +128,13 @@ def read_xdf(file: str, picks: list[str]="all"):
                 EEG raw data
             - `srate`: double
                 Sampling rate [Hz]
-            
     """
 
     [data, header] = pyxdf.load_xdf(file, verbose=False)
     
     for stream in data:
         # Obtain data for SMARTING headset
+
         # For mock EEG:
         #if (stream["info"]["type"][0]=="EEG"):
         #    eeg_ts = stream["time_stamps"]
@@ -161,18 +156,9 @@ def read_xdf(file: str, picks: list[str]="all"):
             break
 
 
-    # Obtained from:
-    # - https://mbraintrain.com/wp-content/uploads/2021/02/RBE-24-STD.pdf
+    # Obtained from: https://mbraintrain.com/wp-content/uploads/2021/02/RBE-24-STD.pdf
     n_chans = len(stream['info']['desc'][0]['channels'][0]['channel'])
     chans_names = [stream['info']['desc'][0]['channels'][0]['channel'][i]['label'][0] for i in range(n_chans)]
-    #chans_names = [stream['info']['desc'][0]['channels'][0]['channel'][i]['name'][0] for i in range(n_chans)]
-
-    # chans_dict = {
-    #     0:"Fp1", 1:"Fp2", 2:"F3", 3:"F4", 4:"C3", 5:"C4", 6:"P3",
-    #     7:"P4", 8:"O1", 9:"O2", 10:"F7", 11:"F8", 12:"T7", 13:"T8",
-    #     14:"P7", 15:"P8", 16:"Fz", 17:"Cz", 18:"Pz", 19:"M1", 20:"M2",
-    #     21:"AFz", 22:"CPz", 23:"POz",
-    #     }
 
     eeg_pd = pd.DataFrame(data=eeg_np, columns=chans_names)
 
