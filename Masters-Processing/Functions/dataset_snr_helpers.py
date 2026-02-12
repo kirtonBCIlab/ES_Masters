@@ -209,6 +209,7 @@ def compute_snr_from_spectrum(freqs, spectrum, bandwidth=2, use_dB=True):
             snr[i] = np.nan
     
     return snr, noise_floor
+
 def compute_snr(data_list, freqs, individual_spectra, bandwidth=2, use_dB=True):
     """
     Compute SNR for each trial, average over trials for each participant, 
