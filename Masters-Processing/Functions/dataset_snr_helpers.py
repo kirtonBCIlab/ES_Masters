@@ -154,7 +154,7 @@ def compute_amplitude_spectrum(data_list, sampling_freq, window='hann'):
         
     return freqs, participant_avg_spectra, grand_avg_spectrum, participant_std, all_individual_spectra
 
-def compute_snr_from_spectrum(freqs, spectrum, bandwidth=2, use_dB=True):
+def compute_wang_snr_from_spectrum(freqs, spectrum, bandwidth=2, use_dB=True):
     """
     Compute SNR as amplitude at each frequency divided by 
     mean amplitude in the neighboring frequency band [f-1, f+1] Hz.
@@ -210,7 +210,54 @@ def compute_snr_from_spectrum(freqs, spectrum, bandwidth=2, use_dB=True):
     
     return snr, noise_floor
 
-def compute_snr(data_list, freqs, individual_spectra, bandwidth=2, use_dB=True):
+def compute_snr_from_spectrum_pediatric_formula(freqs, spectrum, k_range=8, use_dB=True):
+    """
+    Compute SNR using pediatric formula with AVERAGE:
+    SNR = 20log10[y(f) / (1/N * Σ_{k=1}^8 [y(f-Δf·k) + y(f+Δf·k)])]
+    
+    Where Δf is the FREQUENCY RESOLUTION (determined automatically)
+    """
+    n_freqs = len(freqs)
+    snr = np.full_like(spectrum, np.nan)
+    noise_floor = np.full_like(spectrum, np.nan)
+    
+    # Determine Δf from the data
+    df = np.mean(np.diff(freqs))  # Frequency resolution
+    
+    for i, f in enumerate(freqs):
+        total_noise = 0.0
+        valid_bins = 0
+        
+        for k in range(1, k_range + 1):
+            # Use ACTUAL frequency resolution, not hardcoded 0.2
+            f_minus = f - k * df
+            f_plus = f + k * df
+            
+            # Find closest frequency indices
+            idx_minus = np.argmin(np.abs(freqs - f_minus))
+            idx_plus = np.argmin(np.abs(freqs - f_plus))
+            
+            # Add both sides if within bounds
+            if 0 <= idx_minus < n_freqs:
+                total_noise += spectrum[idx_minus]
+                valid_bins += 1
+            if 0 <= idx_plus < n_freqs:
+                total_noise += spectrum[idx_plus]
+                valid_bins += 1
+        
+        if valid_bins > 0:
+            # AVERAGE noise
+            noise_floor[i] = total_noise / valid_bins
+            snr_ratio = spectrum[i] / noise_floor[i]
+            
+            if use_dB:
+                snr[i] = 20 * np.log10(snr_ratio)
+            else:
+                snr[i] = snr_ratio
+                
+    return snr, noise_floor
+
+def compute_snr(data_list, freqs, individual_spectra, bandwidth=2, use_dB=True, dataset=None):
     """
     Compute SNR for each trial, average over trials for each participant, 
     then average across participants.
@@ -228,6 +275,7 @@ def compute_snr(data_list, freqs, individual_spectra, bandwidth=2, use_dB=True):
         Bandwidth for noise calculation (default: 2 Hz)
     use_dB : bool
         If True, return SNR in dB
+    dataset : str
     
     Returns:
     --------
@@ -267,9 +315,14 @@ def compute_snr(data_list, freqs, individual_spectra, bandwidth=2, use_dB=True):
         # Compute SNR for each trial of this participant
         for spectrum in participant_spectra:
             if spectrum is not None:
-                snr, noise_floor = compute_snr_from_spectrum(freqs, spectrum, bandwidth, use_dB)
-                trial_snrs.append(snr)
-                trial_noise_floors.append(noise_floor)
+                if dataset == 'wang':
+                    snr, noise_floor = compute_wang_snr_from_spectrum(freqs, spectrum, bandwidth, use_dB)
+                    trial_snrs.append(snr)
+                    trial_noise_floors.append(noise_floor)
+                elif dataset == 'pediatric':
+                    snr, noise_floor = compute_snr_from_spectrum_pediatric_formula(freqs, spectrum, k_range=8, use_dB=use_dB)
+                    trial_snrs.append(snr)
+                    trial_noise_floors.append(noise_floor)
         
         # Average across trials for this participant
         if trial_snrs:
