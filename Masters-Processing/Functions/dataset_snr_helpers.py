@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 # ============================================================================
 def trim_epochs(first_stimulus_epochs_all):
     """
-    Trim first stimulus epochs across all participants to the minimum sample length.
+    Trim or zero-pad first stimulus epochs across all participants to 1280 samples.
     
     Parameters:
     -----------
@@ -16,47 +16,48 @@ def trim_epochs(first_stimulus_epochs_all):
 
     Returns:
     --------
-    trimmed_epochs : list
-        List with trimmed first stimulus epochs.
-    min_sample_length : int
-        Minimum sample length.
+    processed_epochs : list
+        List with processed first stimulus epochs (all with 1280 samples).
+    target_length : int
+        Target sample length (1280).
     """
+    # Target sample length (5 seconds * 256 Hz)
+    target_length = 1280
     
-    # Find min length across all participants
-    min_sample_length = None
-    all_lengths = []
-    
-    for participant_idx, participant_epochs in enumerate(first_stimulus_epochs_all):
-        if participant_epochs is not None and len(participant_epochs) > 0:
-            sample_length = participant_epochs.shape[-1]  # Get the sample dimension
-            all_lengths.append(sample_length)
-            
-            if min_sample_length is None:
-                min_sample_length = sample_length
-            else:
-                min_sample_length = min(min_sample_length, sample_length)
-    
-    print(f"Minimum sample length: {min_sample_length}")
-    
-    # Trim epochs to minimum length
-    trimmed_epochs = []
+    processed_epochs = []
     
     for participant_idx, participant_epochs in enumerate(first_stimulus_epochs_all):
         if participant_epochs is None or len(participant_epochs) == 0:
-            trimmed_epochs.append(None)
+            processed_epochs.append(None)
             continue
         
         current_length = participant_epochs.shape[-1]
         
-        if current_length > min_sample_length:
-            # Trim from the end: [n_trials, samples, channels] -> trim samples dimension
-            trimmed_participant = participant_epochs[:, :, :min_sample_length]
+        if current_length > target_length:
+            # Trim from the end to target length
+            processed_participant = participant_epochs[:, :, :target_length]
+            
+        elif current_length < target_length:            
+            # Get shape: [n_trials, samples, channels]
+            n_trials = participant_epochs.shape[0]
+            n_channels = participant_epochs.shape[1] if len(participant_epochs.shape) > 2 else 1
+            
+            if len(participant_epochs.shape) == 3:
+                # Create padded array [n_trials, channels, target_length]
+                padded_data = np.zeros((n_trials, n_channels, target_length))
+                padded_data[:, :, :current_length] = participant_epochs
+            
+            processed_participant = padded_data
+            
         else:
-            trimmed_participant = participant_epochs
+            # Already at target length
+            processed_participant = participant_epochs
         
-        trimmed_epochs.append(trimmed_participant)
+        processed_epochs.append(processed_participant)
     
-    return trimmed_epochs
+    print(f"\nAll participants processed to {target_length} samples")
+    
+    return processed_epochs
 
 # ============================================================================
 # SPECTRAL ANALYSIS FUNCTIONS
@@ -187,6 +188,8 @@ def compute_wang_snr_from_spectrum(freqs, spectrum, bandwidth=2, use_dB=True):
         # Find frequencies within [f - half_bandwidth, f + half_bandwidth]
         # Exclude the frequency f itself
         mask = (freqs >= f - half_bandwidth) & (freqs <= f + half_bandwidth) & (freqs != f)
+        #print frequencies in the mask for debugging
+        #print(f"Frequency: {f:.2f} Hz, Neighboring frequencies: {freqs[mask]}")
         
         if np.any(mask):
             # Calculate noise as mean amplitude in neighboring band
