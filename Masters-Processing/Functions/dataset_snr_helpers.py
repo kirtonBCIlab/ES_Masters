@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 # ============================================================================
 # DATA PROCESSING FUNCTIONS
 # ============================================================================
-def trim_epochs(first_stimulus_epochs_all):
+def pad_epochs(first_stimulus_epochs_all):
     """
     Trim or zero-pad first stimulus epochs across all participants to 1280 samples.
     
