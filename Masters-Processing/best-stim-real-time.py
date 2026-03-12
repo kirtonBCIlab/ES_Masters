@@ -67,10 +67,6 @@ def create_epochs(filt_clean, eeg_ts, file_path):
     # Load markers
     marker_ts, markers = import_data.read_xdf_unity_markers(file_path)
 
-    #TEMP
-    #markers = markers[:-1] # Dan practice data has an extra marker at the end that is not needed
-    #marker_ts = marker_ts[:-1] # Remove the last marker timestamp and label
-
     # Create epochs for stimuli
     events_epochs, eeg_epochs = data_tools.create_epochs(
         eeg_data=filt_clean.get_data(),
@@ -80,7 +76,6 @@ def create_epochs(filt_clean, eeg_ts, file_path):
         events=list_of_events,
         epoch_end=epoch_end
     )
-
 
     # Map stimuli and baseline
     dict_of_stimuli = {i: event for i, event in enumerate(list_of_events)}
@@ -206,7 +201,7 @@ def psd(occipital_epochs, settings_data):
 
 def baseline_mean_sd(occipital_epochs_baseline, settings_data):
     # PSD settings
-    window_size = 5  # 5 = 0.2 Hz resolution; 0.1 resolution is not acheievable with 5 seconds of data
+    window_size = 5  # 5 = 0.2 Hz resolution
 
     # Preallocate variables
     baseline_f = [None] 
@@ -270,9 +265,7 @@ def get_zscore(eeg_pxx, eeg_f, baseline_mean, baseline_std):
 
     # Create a mask for both 10 Hz and 20 Hz
     fmask = (freqs == 10.0) | (freqs == 20.0)
-    #fmask = (freqs == 10.007818608287725) | (freqs == 20.01563721657545)
     ten_twenty_mean_zscores = {}
-
 
     # Compute filtered mean Z scores for each stimulus
     for stim_label in eeg_zscore_mean_pxx.keys():

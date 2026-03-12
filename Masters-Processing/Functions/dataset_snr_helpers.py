@@ -188,8 +188,6 @@ def compute_wang_snr_from_spectrum(freqs, spectrum, bandwidth=2, use_dB=True):
         # Find frequencies within [f - half_bandwidth, f + half_bandwidth]
         # Exclude the frequency f itself
         mask = (freqs >= f - half_bandwidth) & (freqs <= f + half_bandwidth) & (freqs != f)
-        #print frequencies in the mask for debugging
-        #print(f"Frequency: {f:.2f} Hz, Neighboring frequencies: {freqs[mask]}")
         
         if np.any(mask):
             # Calculate noise as mean amplitude in neighboring band
