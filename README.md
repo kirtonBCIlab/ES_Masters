@@ -14,7 +14,7 @@ ES_Masters
 ├── Functions/                  ← custom python modules used by notebooks
 │   └── data_tools.py           ← helper functions for epoching data
 │   └── dataset_snr_helpers.py  ← helper functions to calculate amplitude spectra and SNR using different formulae
-│   └── elo.py                  ← helper functions for calculaing stimulus elo rankings (not used)
+│   └── elo.py                  ← helper functions for calculaing relative comfort ratings (not used)
 │   └── import_data.py          ← helper functions for importing EEG and marker data
 │   └── processing.py           ← helper functions filtering
 ├── Masters-Processing/         ← folder that contains the jupyter notebooks for the processing of EEG and Comfort data 
